@@ -7,12 +7,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "npx tsc",
-    "start": "npx pm2 start dist/app.js -i max"
+    "build": "tsc",
+    "start": "pm2 start dist/app.js -i max",
+    "dev": "ts-node src/app.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
     "@types/node": "^14.14.31",
+    "ts-node": "^9.1.1",
     "typescript": "^4.2.2"
   },
   "dependencies": {
