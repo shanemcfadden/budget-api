@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "./util/env";
 import { Application } from "express";
 
 import db from "./database/db";
