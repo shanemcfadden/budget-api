@@ -1,0 +1,9 @@
+{
+  "name": "budget-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/shanemcfadden/budget-api.git",
+  "author": "Shane McFadden <28913393+shanemcfadden@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true
+}
