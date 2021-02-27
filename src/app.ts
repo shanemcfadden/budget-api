@@ -3,10 +3,13 @@ import { Application } from "express";
 
 import db from "./database/db";
 import express from "express";
+import AuthRoutes from "./routes/auth";
 
 const app: Application = express();
 
 const { PORT } = process.env;
+
+app.use("/auth", AuthRoutes);
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
