@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
+import { RequestHandler } from "express";
 
-export const login = (req: Request, res: Response) => {
+export const login: RequestHandler = (req, res, next) => {
   res.send("POST /auth/login");
 };
 
-export const signup = (req: Request, res: Response) => {
+export const signup: RequestHandler = (req, res) => {
   res.send("PUT /auth/signup");
 };
