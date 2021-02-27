@@ -1,5 +1,6 @@
 import "./util/env";
 import { Application } from "express";
+import bodyParser from "body-parser";
 
 import db from "./database/db";
 import express from "express";
@@ -8,6 +9,8 @@ import AuthRoutes from "./routes/auth";
 const app: Application = express();
 
 const { PORT } = process.env;
+
+app.use(bodyParser.json());
 
 app.use("/auth", AuthRoutes);
 
