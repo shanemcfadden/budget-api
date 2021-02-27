@@ -11,6 +11,10 @@ const { PORT } = process.env;
 
 app.use("/auth", AuthRoutes);
 
+app.use((req, res) => {
+  res.send("route not found");
+});
+
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
   db.query("SHOW TABLES;")
