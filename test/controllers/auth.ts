@@ -1,14 +1,58 @@
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
-import sinon from "sinon";
+import sinon, { SinonSpy } from "sinon";
 import { login } from "../../src/controllers/auth";
 
+interface MockResponse {
+  status(code: number): MockResponse;
+  json(object: Record<string, any>): void;
+  statusCode?: number;
+  body?: Record<string, any>;
+}
 describe("login", () => {
   describe("If email and password are correct...", () => {
-    it("should not throw an error");
+    let req: Request;
+    let res: MockResponse;
+    let next: SinonSpy;
+
+    beforeEach(() => {
+      req = {
+        body: {
+          email: "fake@email.com",
+          password: "fakepassword",
+        },
+      } as Request;
+      res = {
+        status: function (code) {
+          this.statusCode = code;
+          return this;
+        },
+        json: function (object) {
+          this.body = object;
+          return;
+        },
+      };
+      next = sinon.spy();
+    });
+
+    it("should not throw an error", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(next.called).to.be.false;
+    });
+    it("should set response status to 200", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(res.statusCode).to.equal(200);
+    });
+    it("should send success message in res body", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(res.body).to.deep.equal({ message: "Login successful" });
+    });
     it("should return a JWT in the response");
   });
-  describe("If email and password are incorrect...", () => {
+  describe("If email is incorrect...", () => {
+    it("should throw an error");
+  });
+  describe("If password is incorrect...", () => {
     it("should throw an error");
   });
 });
