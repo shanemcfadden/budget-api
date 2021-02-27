@@ -12,7 +12,8 @@
     "start": "pm2 start dist/app.js -i max",
     "dev": "ts-node src/app.ts",
     "dev:watch": "tsc -w & nodemon -w dist dist/app.js",
-    "test": "mocha"
+    "test": "mocha --recursive",
+    "test:watch": "mocha --watch --recursive"
   },
   "devDependencies": {
     "@types/chai": "^4.2.15",
