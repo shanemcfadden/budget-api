@@ -11,7 +11,7 @@
     "postbuild": "copyfiles -u 1 src/**/*.sql dist",
     "start": "pm2 start dist/app.js -i max",
     "dev": "ts-node src/app.ts",
-    "dev:watch": "tsc -w & nodemon -w dist dist/app.js",
+    "dev:watch": "tsc -w && nodemon -w dist dist/app.js",
     "test": "mocha --recursive",
     "test:watch": "mocha --watch --recursive"
   },
