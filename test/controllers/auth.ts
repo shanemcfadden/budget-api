@@ -142,6 +142,8 @@ describe("signup", async () => {
       body: {
         email: "fake@email.com",
         password: "fakepassword",
+        firstName: "Jane",
+        lastName: "Doe",
       },
     } as Request;
     res = {
@@ -164,27 +166,39 @@ describe("signup", async () => {
   describe("if email is not a duplicate...", async () => {
     const SIGNUP_SUCCESS_MESSAGE = "Sign up successful";
     let jwtSignStub: SinonStub;
+    let createUserStub: SinonStub;
 
     beforeEach(() => {
       sinon.stub(User, "findByEmail").returns(null);
-      sinon.stub(User, "create").resolves({ _id: fakeUser._id });
+      createUserStub = sinon
+        .stub(User, "create")
+        .resolves({ _id: fakeUser._id });
+      sinon.stub(bcrypt, "hash").resolves(fakeUser.password);
       // jwt.sign() Types default to the asynchronous version, which returns void
       // Haven't found a way to get the stub to reference the synchronous sign method
       jwtSignStub = sinon
         .stub(jwt, "sign")
         .returns((mockJWT as unknown) as void);
     });
+    it("should create a user", async () => {
+      const { email, firstName, lastName, password } = fakeUser;
+      await signup(req, res as Response, next as NextFunction);
+      expect(createUserStub.calledOnce).to.be.true;
+      expect(
+        createUserStub.calledWith({ email, firstName, lastName, password })
+      ).to.be.true;
+    });
     it("should set response status to 201", async () => {
-      await login(req, res as Response, next as NextFunction);
+      await signup(req, res as Response, next as NextFunction);
       expect(res.statusCode).to.equal(201);
     });
     it("should send success message in res body", async () => {
-      await login(req, res as Response, next as NextFunction);
+      await signup(req, res as Response, next as NextFunction);
       expect(res.body).to.have.property("message");
       expect(res.body?.message).to.equal(SIGNUP_SUCCESS_MESSAGE);
     });
     it("should set a JWT with the user id that expires in 1 hour", async () => {
-      await login(req, res as Response, next as NextFunction);
+      await signup(req, res as Response, next as NextFunction);
       expect(
         jwtSignStub.calledWith({ userId: fakeUser._id }, JWT_SECRET, {
           expiresIn: "1h",
@@ -192,7 +206,7 @@ describe("signup", async () => {
       ).to.be.true;
     });
     it("should return a JWT in the response", async () => {
-      await login(req, res as Response, next as NextFunction);
+      await signup(req, res as Response, next as NextFunction);
       expect(res.body).to.have.property("token");
       expect(res.body?.token).to.equal(mockJWT);
     });
