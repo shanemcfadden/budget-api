@@ -41,6 +41,8 @@ describe("login", () => {
         this.body = object;
         return;
       },
+      body: undefined,
+      statusCode: undefined,
     };
     next = sinon.spy();
   });
@@ -75,6 +77,11 @@ describe("login", () => {
       login(req, res as Response, next as NextFunction);
       expect(next.calledOnce).to.be.true;
     });
+    it("should not send a response", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(res.statusCode).to.be.undefined;
+      expect(res.body).to.be.undefined;
+    });
   });
   describe("If password is incorrect...", () => {
     it("should throw an error", () => {
@@ -82,6 +89,11 @@ describe("login", () => {
       sinon.stub(bcrypt, "compare").resolves(false);
       login(req, res as Response, next as NextFunction);
       expect(next.calledOnce).to.be.true;
+    });
+    it("should not send a response", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(res.statusCode).to.be.undefined;
+      expect(res.body).to.be.undefined;
     });
   });
 });
