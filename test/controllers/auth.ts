@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import sinon, { SinonSpy, SinonStub } from "sinon";
 import bcrypt from "bcrypt";
 import { login } from "../../src/controllers/auth";
@@ -41,8 +42,6 @@ describe("login", () => {
         this.body = object;
         return;
       },
-      body: undefined,
-      statusCode: undefined,
     };
     next = sinon.spy();
   });
@@ -52,9 +51,14 @@ describe("login", () => {
   });
 
   describe("If email and password are correct...", () => {
+    const LOGIN_SUCCESS_MESSAGE = "Login succesful";
+    const mockJWT =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+
     beforeEach(() => {
       sinon.stub(User, "findByEmail").returns(fakeUser);
       sinon.stub(bcrypt, "compare").resolves(true);
+      sinon.stub(jwt, "sign").returns((mockJWT as unknown) as void);
     });
 
     it("should not throw an error", () => {
@@ -67,9 +71,23 @@ describe("login", () => {
     });
     it("should send success message in res body", () => {
       login(req, res as Response, next as NextFunction);
-      expect(res.body).to.deep.equal({ message: "Login successful" });
+      expect(res.body).to.have.property("message");
+      expect(res.body?.message).to.equal(LOGIN_SUCCESS_MESSAGE);
     });
-    it("should return a JWT in the response");
+    it("should return a JWT in the response", () => {
+      // jwt.sign() Types default to the asynchronous version, which returns void
+      // Haven't found a way to get the stub to reference the synchronous sign method
+      login(req, res as Response, next as NextFunction);
+      expect(res.body).to.have.property("token");
+      expect(res.body?.token).to.equal(mockJWT);
+    });
+    it("should only have message and token in json body", () => {
+      login(req, res as Response, next as NextFunction);
+      expect(res.body).to.deep.equal({
+        message: LOGIN_SUCCESS_MESSAGE,
+        token: mockJWT,
+      });
+    });
   });
   describe("If email is incorrect...", () => {
     it("should throw an error", () => {
