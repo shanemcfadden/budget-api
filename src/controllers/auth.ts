@@ -23,7 +23,6 @@ export const login: RequestHandler = async (req, res, next) => {
   if (!passwordMatches) {
     const error = new Error("Incorrect email or password");
     next(error);
-    console.log("password error");
     return;
   }
 
