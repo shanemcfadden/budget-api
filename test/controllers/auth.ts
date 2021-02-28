@@ -1,7 +1,9 @@
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
-import sinon, { SinonSpy } from "sinon";
+import sinon, { SinonSpy, SinonStub } from "sinon";
+import bcrypt from "bcrypt";
 import { login } from "../../src/controllers/auth";
+import User from "../../src/models/user";
 
 interface MockResponse {
   status(code: number): MockResponse;
@@ -9,30 +11,48 @@ interface MockResponse {
   statusCode?: number;
   body?: Record<string, any>;
 }
-describe("login", () => {
-  describe("If email and password are correct...", () => {
-    let req: Request;
-    let res: MockResponse;
-    let next: SinonSpy;
 
+const fakeUser = {
+  email: "fake@email.com",
+  password: "passwordhash",
+  _id: "fakeid123",
+  firstName: "Jane",
+  lastName: "Doe",
+};
+
+describe("login", () => {
+  let req: Request;
+  let res: MockResponse;
+  let next: SinonSpy;
+
+  beforeEach(() => {
+    req = {
+      body: {
+        email: "fake@email.com",
+        password: "fakepassword",
+      },
+    } as Request;
+    res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (object) {
+        this.body = object;
+        return;
+      },
+    };
+    next = sinon.spy();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  describe("If email and password are correct...", () => {
     beforeEach(() => {
-      req = {
-        body: {
-          email: "fake@email.com",
-          password: "fakepassword",
-        },
-      } as Request;
-      res = {
-        status: function (code) {
-          this.statusCode = code;
-          return this;
-        },
-        json: function (object) {
-          this.body = object;
-          return;
-        },
-      };
-      next = sinon.spy();
+      sinon.stub(User, "findByEmail").returns(fakeUser);
+      sinon.stub(bcrypt, "compare").resolves(true);
     });
 
     it("should not throw an error", () => {
@@ -50,10 +70,19 @@ describe("login", () => {
     it("should return a JWT in the response");
   });
   describe("If email is incorrect...", () => {
-    it("should throw an error");
+    it("should throw an error", () => {
+      sinon.stub(User, "findByEmail").returns(null);
+      login(req, res as Response, next as NextFunction);
+      expect(next.calledOnce).to.be.true;
+    });
   });
   describe("If password is incorrect...", () => {
-    it("should throw an error");
+    it("should throw an error", () => {
+      sinon.stub(User, "findByEmail").returns(fakeUser);
+      sinon.stub(bcrypt, "compare").resolves(false);
+      login(req, res as Response, next as NextFunction);
+      expect(next.calledOnce).to.be.true;
+    });
   });
 });
 
