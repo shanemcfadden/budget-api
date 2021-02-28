@@ -1,16 +1,19 @@
-interface UserData {
+interface NewUserData {
   email: string;
   password: string;
-  _id: string;
   firstName: string;
   lastName: string;
 }
+interface UserData extends NewUserData {
+  _id: string;
+}
+
 class User {
   static findByEmail(email: string): UserData | null {
     return null;
   }
-  static async create(newUserData: UserData): Promise<{ _id: string }> {
-    return { _id: newUserData._id };
+  static async create(newUserData: NewUserData): Promise<{ _id: string }> {
+    return { _id: "mockId" };
   }
 }
 
