@@ -9,7 +9,7 @@ interface UserData extends NewUserData {
 }
 
 class User {
-  static findByEmail(email: string): UserData | null {
+  static async findByEmail(email: string): Promise<UserData | null> {
     return null;
   }
   static async create(newUserData: NewUserData): Promise<{ _id: string }> {

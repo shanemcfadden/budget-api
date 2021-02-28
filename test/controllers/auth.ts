@@ -48,7 +48,7 @@ describe("Auth Controller", () => {
       let jwtSignStub: SinonStub;
 
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").returns(fakeUser);
+        sinon.stub(User, "findByEmail").resolves(fakeUser);
         sinon.stub(bcrypt, "compare").resolves(true);
         // jwt.sign() Types default to the asynchronous version, which returns void
         // Haven't found a way to get the stub to reference the synchronous sign method
@@ -93,7 +93,7 @@ describe("Auth Controller", () => {
     });
     describe("If email is incorrect...", async () => {
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").returns(null);
+        sinon.stub(User, "findByEmail").resolves(null);
       });
       it("should throw an error", async () => {
         await login(req, res as Response, next as NextFunction);
@@ -107,7 +107,7 @@ describe("Auth Controller", () => {
     });
     describe("If password is incorrect...", () => {
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").returns(fakeUser);
+        sinon.stub(User, "findByEmail").resolves(fakeUser);
         sinon.stub(bcrypt, "compare").resolves(false);
       });
       it("should throw an error", async () => {
@@ -139,7 +139,7 @@ describe("Auth Controller", () => {
       let createUserStub: SinonStub;
 
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").returns(null);
+        sinon.stub(User, "findByEmail").resolves(null);
         createUserStub = sinon
           .stub(User, "create")
           .resolves({ _id: fakeUser._id });
@@ -183,7 +183,7 @@ describe("Auth Controller", () => {
     });
     describe("if email is a duplicate...", async () => {
       it("should throw an error.", async () => {
-        sinon.stub(User, "findByEmail").returns(fakeUser);
+        sinon.stub(User, "findByEmail").resolves(fakeUser);
         await signup(req, res as Response, next as NextFunction);
         expect(next.calledOnce).to.be.true;
       });

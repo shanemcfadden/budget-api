@@ -8,7 +8,7 @@ const { JWT_SECRET } = process.env;
 export const login: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = User.findByEmail(email);
+  const user = await User.findByEmail(email);
 
   if (!user) {
     const error = new Error("Incorrect email or password");
@@ -33,7 +33,7 @@ export const login: RequestHandler = async (req, res, next) => {
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { email, password, firstName, lastName } = req.body;
-  const user = User.findByEmail(email);
+  const user = await User.findByEmail(email);
   if (user) {
     const error = new Error("Account for this email already exists");
     next(error);
