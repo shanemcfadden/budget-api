@@ -1,8 +1,12 @@
-import sinon from "sinon";
-import { expect } from "chai";
+import sinon, { SinonStub } from "sinon";
+import chai from "chai";
+import chaiuuid from "chai-uuid";
 import { RowDataPacket } from "mysql2";
 import User from "../../src/models/user";
 import * as Database from "../../src/database/Database";
+
+chai.use(chaiuuid);
+const expect = chai.expect;
 
 const fakeUser = {
   _id: "asdfasdfa",
@@ -35,8 +39,37 @@ describe("User model", () => {
     });
   });
   describe("create()", () => {
-    it("should create a unique id for each user");
-    it("should create a user with a query");
-    it("should return an object with the user id");
+    let queryDbStub: SinonStub;
+    beforeEach(() => {
+      queryDbStub = sinon.stub(Database, "queryDb").resolves();
+    });
+    const fakeUserData = {
+      ...fakeUser,
+      _id: undefined,
+    };
+    it("should create a unique id for each user", async () => {
+      const result = await User.create(fakeUserData);
+      expect(result).to.have.property("_id");
+      // @ts-ignore
+      expect(result?._id).to.be.a.uuid("v4");
+    });
+    it("should create a user with a query", async () => {
+      const { email, password, firstName, lastName } = fakeUserData;
+
+      await User.create(fakeUserData);
+      expect(
+        queryDbStub.calledOnceWith("users/create.sql", [
+          sinon.match.string,
+          email,
+          password,
+          firstName,
+          lastName,
+        ])
+      ).to.be.true;
+    });
+    it("should return an object with the user id", async () => {
+      const result = await User.create(fakeUserData);
+      expect(result).to.have.all.keys(["_id"]);
+    });
   });
 });
