@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { v4 as uuid } from "uuid";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import db from "../database/db";
 
@@ -40,7 +41,11 @@ class User {
     try {
       [results] = await db.query(query, [email]);
     } catch {
-      throw new Error("No user associated with this email");
+      throw new Error("Database error");
+    }
+
+    if ((results as RowDataPacket).length < 1) {
+      return null;
     }
 
     const userData = (results as RowDataPacket)[0];
@@ -56,7 +61,44 @@ class User {
   }
 
   static async create(newUserData: NewUserData): Promise<{ _id: string }> {
-    return { _id: "mockId" };
+    const { email, password, firstName, lastName } = newUserData;
+    const id = uuid();
+
+    const queryPath = path.join(
+      __dirname,
+      "..",
+      "database",
+      "queries",
+      "users",
+      "create.sql"
+    );
+    let query: string;
+    let results:
+      | RowDataPacket[]
+      | RowDataPacket[][]
+      | OkPacket
+      | OkPacket[]
+      | ResultSetHeader;
+
+    try {
+      query = await fs.readFile(queryPath, "utf-8");
+    } catch {
+      throw new Error("query path invalid");
+    }
+
+    try {
+      [results] = await db.query(query, [
+        id,
+        email,
+        password,
+        firstName,
+        lastName,
+      ]);
+    } catch (err) {
+      throw new Error(err);
+    }
+
+    return { _id: id };
   }
 }
 
