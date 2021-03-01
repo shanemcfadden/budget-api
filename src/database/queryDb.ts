@@ -4,22 +4,22 @@ import path from "path";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import db from "./db";
 
+type PoolQueryResults =
+  | RowDataPacket[]
+  | RowDataPacket[][]
+  | OkPacket
+  | OkPacket[]
+  | ResultSetHeader;
+
 const queryDb = async function (
   queryPath: string,
   values: any[]
-): Promise<
-  RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[] | ResultSetHeader
-> {
+): Promise<PoolQueryResults> {
   const splitPath = queryPath.split("/");
   const completePath = path.join(__dirname, "queries", ...splitPath);
 
   let query: string;
-  let results:
-    | RowDataPacket[]
-    | RowDataPacket[][]
-    | OkPacket
-    | OkPacket[]
-    | ResultSetHeader;
+  let results: PoolQueryResults;
 
   try {
     query = await fs.readFile(completePath, "utf-8");
