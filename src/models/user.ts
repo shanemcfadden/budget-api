@@ -1,10 +1,6 @@
-import fs from "fs/promises";
-import path from "path";
 import { v4 as uuid } from "uuid";
-import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
-import db from "../database/db";
+import { RowDataPacket } from "mysql2";
 import queryDb from "../database/queryDb";
-import { query } from "express";
 
 interface NewUserData {
   email: string;
