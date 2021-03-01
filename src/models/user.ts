@@ -3,6 +3,8 @@ import path from "path";
 import { v4 as uuid } from "uuid";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import db from "../database/db";
+import queryDb from "../database/queryDb";
+import { query } from "express";
 
 interface NewUserData {
   email: string;
@@ -16,33 +18,7 @@ interface UserData extends NewUserData {
 
 class User {
   static async findByEmail(email: string): Promise<UserData | null> {
-    const queryPath = path.join(
-      __dirname,
-      "..",
-      "database",
-      "queries",
-      "users",
-      "findByEmail.sql"
-    );
-    let query: string;
-    let results:
-      | RowDataPacket[]
-      | RowDataPacket[][]
-      | OkPacket
-      | OkPacket[]
-      | ResultSetHeader;
-
-    try {
-      query = await fs.readFile(queryPath, "utf-8");
-    } catch {
-      throw new Error("query path invalid");
-    }
-
-    try {
-      [results] = await db.query(query, [email]);
-    } catch {
-      throw new Error("Database error");
-    }
+    const results = await queryDb("/users/findByEmail.sql", [email]);
 
     if ((results as RowDataPacket).length < 1) {
       return null;
@@ -64,39 +40,13 @@ class User {
     const { email, password, firstName, lastName } = newUserData;
     const id = uuid();
 
-    const queryPath = path.join(
-      __dirname,
-      "..",
-      "database",
-      "queries",
-      "users",
-      "create.sql"
-    );
-    let query: string;
-    let results:
-      | RowDataPacket[]
-      | RowDataPacket[][]
-      | OkPacket
-      | OkPacket[]
-      | ResultSetHeader;
-
-    try {
-      query = await fs.readFile(queryPath, "utf-8");
-    } catch {
-      throw new Error("query path invalid");
-    }
-
-    try {
-      [results] = await db.query(query, [
-        id,
-        email,
-        password,
-        firstName,
-        lastName,
-      ]);
-    } catch (err) {
-      throw new Error(err);
-    }
+    await queryDb("users/create.sql", [
+      id,
+      email,
+      password,
+      firstName,
+      lastName,
+    ]);
 
     return { _id: id };
   }
