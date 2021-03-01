@@ -20,15 +20,7 @@ class User {
       return null;
     }
 
-    const userData = (results as RowDataPacket)[0];
-    const user = {
-      _id: userData.id,
-      email: userData.email,
-      password: userData.pw,
-      firstName: userData.first_name,
-      lastName: userData.last_name,
-    };
-
+    const user = (results as RowDataPacket)[0];
     return user;
   }
 
