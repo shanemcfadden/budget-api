@@ -4,17 +4,10 @@ import chaiuuid from "chai-uuid";
 import { RowDataPacket } from "mysql2";
 import User from "../../src/models/user";
 import * as Database from "../../src/database/Database";
+import { fakeUser } from "../fixtures";
 
 chai.use(chaiuuid);
 const expect = chai.expect;
-
-const fakeUser = {
-  _id: "asdfasdfa",
-  email: "fake@email.com",
-  password: "asdfasdf",
-  firstName: "John",
-  lastName: "Smith",
-};
 
 describe("User model", () => {
   afterEach(() => {
@@ -22,7 +15,7 @@ describe("User model", () => {
   });
 
   describe("findByEmail()", () => {
-    const email = "fake@email.com";
+    const { email } = fakeUser;
     describe("If user with email exists in the database...", () => {
       it("should return complete user object", async () => {
         sinon.stub(Database, "queryDb").resolves([fakeUser] as RowDataPacket[]);

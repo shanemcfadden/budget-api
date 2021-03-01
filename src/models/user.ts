@@ -16,9 +16,7 @@ class User {
   static async findByEmail(email: string): Promise<UserData | null> {
     const results = await queryDb("/users/findByEmail.sql", [email]);
 
-    if ((results as RowDataPacket).length < 1) {
-      return null;
-    }
+    if ((results as RowDataPacket).length < 1) return null;
 
     const user = (results as RowDataPacket)[0];
     return user;
@@ -27,7 +25,6 @@ class User {
   static async create(newUserData: NewUserData): Promise<{ _id: string }> {
     const { email, password, firstName, lastName } = newUserData;
     const id = uuid();
-
     await queryDb("users/create.sql", [
       id,
       email,
@@ -35,7 +32,6 @@ class User {
       firstName,
       lastName,
     ]);
-
     return { _id: id };
   }
 }
