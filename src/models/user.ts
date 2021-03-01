@@ -14,7 +14,7 @@ interface UserData extends NewUserData {
 
 class User {
   static async findByEmail(email: string): Promise<UserData | null> {
-    const results = await queryDb("/users/findByEmail.sql", [email]);
+    const results = await queryDb("users/findByEmail.sql", [email]);
 
     if ((results as RowDataPacket).length < 1) return null;
 
