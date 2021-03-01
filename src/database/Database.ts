@@ -1,8 +1,9 @@
-import { query } from "express";
 import fs from "fs/promises";
 import path from "path";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
-import db from "./db";
+import mysql from "mysql2";
+
+const { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE } = process.env;
 
 type PoolQueryResults =
   | RowDataPacket[]
@@ -11,7 +12,16 @@ type PoolQueryResults =
   | OkPacket[]
   | ResultSetHeader;
 
-const queryDb = async function (
+const pool = mysql.createPool({
+  host: MYSQL_HOST,
+  user: MYSQL_USER,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DATABASE,
+});
+
+export const db = pool.promise();
+
+export const queryDb = async function (
   queryPath: string,
   values: any[]
 ): Promise<PoolQueryResults> {
@@ -35,5 +45,3 @@ const queryDb = async function (
   }
   return results;
 };
-
-export default queryDb;

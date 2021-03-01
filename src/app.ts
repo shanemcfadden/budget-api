@@ -2,7 +2,7 @@ import "./util/env";
 import { Application } from "express";
 import bodyParser from "body-parser";
 
-import db from "./database/db";
+import { db } from "./database/Database";
 import express from "express";
 import AuthRoutes from "./routes/auth";
 

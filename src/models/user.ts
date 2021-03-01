@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
-import queryDb from "../database/queryDb";
+import { queryDb } from "../database/Database";
 
 interface NewUserData {
   email: string;
