@@ -7,3 +7,11 @@ CREATE TABLE users(
     first_name VARCHAR(100),
     last_name VARCHAR(100)
 );
+
+INSERT INTO users (id, email, pw, first_name, last_name)
+    VALUES 
+        ('1', 'test@test.com', 'asdfreqwreij', 'Jane', 'Doe'),
+        ('2', 'test2@test.com', 'password', 'John', 'Smith'),
+        ('3', 'test3@test.com', 'ThisisHashed', 'Franz', 'Liszt'),
+        ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach')
+;
