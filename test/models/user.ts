@@ -10,12 +10,21 @@ chai.use(chaiuuid);
 const expect = chai.expect;
 
 describe("User model", () => {
+  let queryDbStub: SinonStub;
   afterEach(() => {
     sinon.restore();
   });
 
   describe("findByEmail()", () => {
     const { email } = fakeUser;
+    it("should query the database", async () => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([fakeUser] as RowDataPacket[]);
+      await User.findByEmail(email);
+      expect(queryDbStub.calledOnceWith("users/findByEmail.sql", [email])).to.be
+        .true;
+    });
     describe("If user with email exists in the database...", () => {
       it("should return complete user object", async () => {
         sinon.stub(Database, "queryDb").resolves([fakeUser] as RowDataPacket[]);
@@ -32,7 +41,6 @@ describe("User model", () => {
     });
   });
   describe("create()", () => {
-    let queryDbStub: SinonStub;
     beforeEach(() => {
       queryDbStub = sinon.stub(Database, "queryDb").resolves();
     });
