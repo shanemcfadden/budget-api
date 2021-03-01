@@ -13,9 +13,6 @@ const fakeUser = {
 };
 
 describe("User model", () => {
-  beforeEach(() => {
-    sinon.stub(Database, "queryDb").resolves([fakeUser] as RowDataPacket[]);
-  });
   afterEach(() => {
     sinon.restore();
   });
@@ -24,12 +21,17 @@ describe("User model", () => {
     const email = "fake@email.com";
     describe("If user with email exists in the database...", () => {
       it("should return complete user object", async () => {
+        sinon.stub(Database, "queryDb").resolves([fakeUser] as RowDataPacket[]);
         const result = await User.findByEmail(email);
         expect(result).to.deep.equal(fakeUser);
       });
     });
     describe("If email doesn't exist in the database...", () => {
-      it("should return null");
+      it("should return null", async () => {
+        sinon.stub(Database, "queryDb").resolves([] as RowDataPacket[]);
+        const result = await User.findByEmail(email);
+        expect(result).to.be.null;
+      });
     });
   });
   describe("create()", () => {
