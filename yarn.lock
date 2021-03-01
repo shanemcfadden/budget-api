@@ -226,7 +226,15 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/chai@^4.2.15":
+"@types/chai-uuid@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/chai-uuid/-/chai-uuid-1.0.2.tgz#0f9e2530e8ad947f4a487bce5d7df1e5268e059e"
+  integrity sha512-bT/Y19gztsbE5ZvKBCMHf6Ziiw3e3l2v962ycLIksjJEd85YSW+L3jrj6wO4yA53d6CRKifZ09QDa73OA2VUDw==
+  dependencies:
+    "@types/chai" "*"
+    "@types/node" "*"
+
+"@types/chai@*", "@types/chai@^4.2.15":
   version "4.2.15"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.2.15.tgz#b7a6d263c2cecf44b6de9a051cf496249b154553"
   integrity sha512-rYff6FI+ZTKAPkJUoyz7Udq3GaoDZnxYDEvdEdFZASiA7PoErltHezDishqQiSDWrGxvxmplH304jyzQmjp0AQ==
@@ -733,6 +741,11 @@ camelcase@^6.0.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.2.0.tgz#924af881c9d525ac9d87f40d964e5cea982a1809"
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
+
+chai-uuid@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/chai-uuid/-/chai-uuid-1.0.6.tgz#353a3b817dd66aa2608a0660faf68593fb918c8b"
+  integrity sha1-NTo7gX3WaqJgigZg+vaFk/uRjIs=
 
 chai@^4.3.0:
   version "4.3.0"

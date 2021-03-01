@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/chai": "^4.2.15",
+    "@types/chai-uuid": "^1.0.2",
     "@types/express": "^4.17.11",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mocha": "^8.2.1",
@@ -28,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
     "chai": "^4.3.0",
+    "chai-uuid": "^1.0.6",
     "copyfiles": "^2.4.1",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.1.0",
