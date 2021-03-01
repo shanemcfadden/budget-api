@@ -1,4 +1,4 @@
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
@@ -7,9 +7,7 @@ const { JWT_SECRET } = process.env;
 
 export const login: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body;
-
   const user = await User.findByEmail(email);
-
   if (!user) {
     const error = new Error("Incorrect email or password");
     next(error);
@@ -17,9 +15,7 @@ export const login: RequestHandler = async (req, res, next) => {
   }
 
   const hashedPassword = user.password;
-
   const passwordMatches = await bcrypt.compare(password, hashedPassword);
-
   if (!passwordMatches) {
     const error = new Error("Incorrect email or password");
     next(error);
