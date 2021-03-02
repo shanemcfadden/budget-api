@@ -17,7 +17,7 @@ describe("Budget model", () => {
         title: "The Addams Family budget",
         description: "It's a bit scary...",
       };
-      it("should return complete budget information", () => {
+      it("should return complete budget information", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([mockBudgetData] as RowDataPacket[]);
@@ -26,7 +26,7 @@ describe("Budget model", () => {
       });
     });
     describe("If budgetId is not in the database...", () => {
-      it("should return null", () => {
+      it("should return null", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([] as RowDataPacket[]);
@@ -35,5 +35,30 @@ describe("Budget model", () => {
       });
     });
   });
-  describe("findAllByUserId()", () => {});
+  describe("findAllByUserId()", () => {
+    const userId = "asdfwerwqiohon";
+    describe("If user has at least one budget", () => {
+      const mockBudgetData = {
+        id: 2,
+        title: "The Addams Family budget",
+        description: "It's a bit scary...",
+      };
+      it("should return array of budget information", async () => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([mockBudgetData] as RowDataPacket[]);
+        const result = await Budget.findAllByUserId(userId);
+        expect(result).to.deep.equal(mockBudgetData);
+      });
+    });
+    describe("If user has no budgets", () => {
+      it("should return an empty array", async () => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([] as RowDataPacket[]);
+        const result = await Budget.findAllByUserId(userId);
+        expect(result).to.deep.equal([]);
+      });
+    });
+  });
 });
