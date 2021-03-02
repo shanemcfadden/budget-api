@@ -10,11 +10,22 @@ interface AccountData {
 }
 
 class Account {
-  static async findById(budgetId: number) {}
+  static async findById(budgetId: number) {
+    const accounts = (await queryDb("accounts/findById.sql", [
+      budgetId,
+    ])) as RowDataPacket[];
+    if (accounts.length < 1) {
+      return null;
+    }
+    return accounts[0];
+  }
 
-  static async findAllByUserId(userId: string) {}
-
-  static async findAllByBudgetId(budgetId: number) {}
+  static async findAllByUserId(userId: string) {
+    const accounts = (await queryDb("accounts/findAllByUserId.sql", [
+      userId,
+    ])) as RowDataPacket[];
+    return accounts;
+  }
 }
 
 export default Account;
