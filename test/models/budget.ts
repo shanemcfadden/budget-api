@@ -21,7 +21,7 @@ describe("Budget model", () => {
         .stub(Database, "queryDb")
         .resolves([mockBudgetData] as RowDataPacket[]);
       await Budget.findById(budgetId);
-      expect(queryDbStub.calledOnceWith("budget/findById.sql", [budgetId])).to
+      expect(queryDbStub.calledOnceWith("budgets/findById.sql", [budgetId])).to
         .be.true;
     });
     describe("If budgetId is in the database...", () => {
@@ -55,8 +55,9 @@ describe("Budget model", () => {
         .stub(Database, "queryDb")
         .resolves([mockBudgetData] as RowDataPacket[]);
       await Budget.findAllByUserId(userId);
-      expect(queryDbStub.calledOnceWith("budget/findAllByUserId.sql", [userId]))
-        .to.be.true;
+      expect(
+        queryDbStub.calledOnceWith("budgets/findAllByUserId.sql", [userId])
+      ).to.be.true;
     });
     describe("If user has at least one budget", () => {
       it("should return array of budget information", async () => {
