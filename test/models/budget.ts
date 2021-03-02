@@ -65,7 +65,7 @@ describe("Budget model", () => {
           .stub(Database, "queryDb")
           .resolves([mockBudgetData] as RowDataPacket[]);
         const result = await Budget.findAllByUserId(userId);
-        expect(result).to.deep.equal(mockBudgetData);
+        expect(result).to.deep.equal([mockBudgetData]);
       });
     });
     describe("If user has no budgets", () => {
