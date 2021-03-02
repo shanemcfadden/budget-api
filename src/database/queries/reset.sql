@@ -1,5 +1,6 @@
 DROP TABLE users;
 DROP TABLE budgets;
+DROP TABLE budget_users;
 
 CREATE TABLE users(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
@@ -22,4 +23,12 @@ CREATE TABLE budgets(
     title VARCHAR(100) NOT NULL,
     description VARCHAR(240),
     PRIMARY KEY (id)
+);
+
+CREATE TABLE budget_users(
+    budget_id INT NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (budget_id) REFERENCES budgets(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    PRIMARY KEY (budget_id, user_id)
 );
