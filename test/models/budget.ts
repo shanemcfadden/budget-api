@@ -11,12 +11,20 @@ describe("Budget model", () => {
   });
   describe("findById()", () => {
     const budgetId = 30;
+    const mockBudgetData = {
+      id: 2,
+      title: "The Addams Family budget",
+      description: "It's a bit scary...",
+    };
+    it("should query the database", async () => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([mockBudgetData] as RowDataPacket[]);
+      await Budget.findById(budgetId);
+      expect(queryDbStub.calledOnceWith("budget/findById.sql", [budgetId])).to
+        .be.true;
+    });
     describe("If budgetId is in the database...", () => {
-      const mockBudgetData = {
-        id: 2,
-        title: "The Addams Family budget",
-        description: "It's a bit scary...",
-      };
       it("should return complete budget information", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
@@ -37,12 +45,20 @@ describe("Budget model", () => {
   });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
+    const mockBudgetData = {
+      id: 2,
+      title: "The Addams Family budget",
+      description: "It's a bit scary...",
+    };
+    it("should query the database", async () => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([mockBudgetData] as RowDataPacket[]);
+      await Budget.findAllByUserId(userId);
+      expect(queryDbStub.calledOnceWith("budget/findAllByUserId.sql", [userId]))
+        .to.be.true;
+    });
     describe("If user has at least one budget", () => {
-      const mockBudgetData = {
-        id: 2,
-        title: "The Addams Family budget",
-        description: "It's a bit scary...",
-      };
       it("should return array of budget information", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
