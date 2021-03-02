@@ -50,14 +50,45 @@ describe("isAuth middleware", () => {
       });
     });
     describe("if JWT is expired", () => {
-      it("should not attach isAuth to request object");
-      it("should not attach userId to request object");
-      it("should call next at the end of the middleware");
+      beforeEach(() => {
+        sinon.stub(jwt, "verify").throws({
+          name: "TokenExpiredError",
+          message: "jwt expired",
+          expiredAt: 1408621000,
+        });
+      });
+      it("should not attach isAuth to request object", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(req.isAuth).to.be.undefined;
+      });
+      it("should not attach userId to request object", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(req.userId).to.be.undefined;
+      });
+      it("should call next at the end of the middleware", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(next.calledOnce).to.be.true;
+      });
     });
     describe("if JWT is not valid...", () => {
-      it("should not attach isAuth to request object");
-      it("should not attach userId to request object");
-      it("should call next at the end of the middleware");
+      beforeEach(() => {
+        sinon.stub(jwt, "verify").throws({
+          name: "JsonWebTokenError",
+          message: "jwt malformed",
+        });
+      });
+      it("should not attach isAuth to request object", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(req.isAuth).to.be.undefined;
+      });
+      it("should not attach userId to request object", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(req.userId).to.be.undefined;
+      });
+      it("should call next at the end of the middleware", () => {
+        isAuth(req, res, next as NextFunction);
+        expect(next.calledOnce).to.be.true;
+      });
     });
   });
   describe("if request does not have authorization header...", () => {
