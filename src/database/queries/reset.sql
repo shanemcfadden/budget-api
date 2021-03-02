@@ -1,4 +1,5 @@
 DROP TABLE users;
+DROP TABLE budgets;
 
 CREATE TABLE users(
     id VARCHAR(36) PRIMARY KEY,
@@ -15,3 +16,10 @@ INSERT INTO users (id, email, pw, first_name, last_name)
         ('3', 'test3@test.com', 'ThisisHashed', 'Franz', 'Liszt'),
         ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach')
 ;
+
+CREATE TABLE budgets(
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(240),
+    PRIMARY KEY (id)
+);
