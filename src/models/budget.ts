@@ -7,7 +7,7 @@ interface BudgetData {
 class Budget {
   static findById(budgetId: number) {}
 
-  static findAllByUserID(userId: string) {}
+  static findAllByUserId(userId: string) {}
 }
 
 export default Budget;
