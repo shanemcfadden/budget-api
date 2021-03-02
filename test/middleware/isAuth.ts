@@ -11,6 +11,7 @@ describe("isAuth middleware", () => {
   let next: SinonStub;
 
   beforeEach(() => {
+    res = {} as Response;
     next = sinon.stub();
   });
   afterEach(() => {
@@ -27,7 +28,6 @@ describe("isAuth middleware", () => {
           }
         },
       };
-      res = {} as Response;
     });
     describe("if JWT is valid...", () => {
       const mockUserId = "asdfljasdf;lkjasdf";
@@ -92,8 +92,24 @@ describe("isAuth middleware", () => {
     });
   });
   describe("if request does not have authorization header...", () => {
-    it("should not attach isAuth to request object");
-    it("should not attach userId to request object");
-    it("should call next at the end of the middleware");
+    beforeEach(() => {
+      req = {
+        // @ts-ignore
+        // TS compiler not reconciling mock req.get() with function overload
+        get(name: string): string | undefined {},
+      };
+    });
+    it("should not attach isAuth to request object", () => {
+      isAuth(req, res, next as NextFunction);
+      expect(req.isAuth).to.be.undefined;
+    });
+    it("should not attach userId to request object", () => {
+      isAuth(req, res, next as NextFunction);
+      expect(req.userId).to.be.undefined;
+    });
+    it("should call next at the end of the middleware", () => {
+      isAuth(req, res, next as NextFunction);
+      expect(next.calledOnce).to.be.true;
+    });
   });
 });
