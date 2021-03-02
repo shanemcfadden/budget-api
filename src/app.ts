@@ -1,16 +1,16 @@
 import "./util/env";
-import { Application } from "express";
-import bodyParser from "body-parser";
-
-import { db } from "./database/Database";
 import express from "express";
+import bodyParser from "body-parser";
+import { db } from "./database/Database";
 import AuthRoutes from "./routes/auth";
+import isAuth from "./middleware/isAuth";
 
-const app: Application = express();
+const app = express();
 
 const { PORT } = process.env;
 
 app.use(bodyParser.json());
+app.use(isAuth);
 
 app.use("/auth", AuthRoutes);
 
