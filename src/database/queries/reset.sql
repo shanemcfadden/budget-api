@@ -1,6 +1,6 @@
+DROP TABLE budget_users;
 DROP TABLE users;
 DROP TABLE budgets;
-DROP TABLE budget_users;
 
 CREATE TABLE users(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
@@ -15,7 +15,9 @@ INSERT INTO users (id, email, pw, first_name, last_name)
         ('1', 'test@test.com', '$2b$12$RKlftCLGSo0VkcpG0yqJfezbnHAbgsR8kXfsXQb2UrIws9A1MU1wq', 'Jane', 'Doe'), 
         ('2', 'test2@test.com', 'password', 'John', 'Smith'),
         ('3', 'test3@test.com', 'ThisisHashed', 'Franz', 'Liszt'),
-        ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach')
+        ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach'),
+        ('5', 'renegade@whitehouse.gov', 'secretpw', 'Barack', 'Obama'),
+        ('6', 'renaissance@whitehouse.gov', 'evenMOREsecretpw', 'Michelle', 'Obama')
 ;
 
 CREATE TABLE budgets(
@@ -25,10 +27,25 @@ CREATE TABLE budgets(
     PRIMARY KEY (id)
 );
 
+INSERT INTO budgets (title, description)
+    VALUES
+        ('Vacation', 'Not Cancun'),
+        ('The Obama household', 'Yes we still budget'),
+        ('My new startup', "We'll be profitable next month, I swear")
+;
+
 CREATE TABLE budget_users(
     budget_id INT NOT NULL,
     user_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (budget_id) REFERENCES budgets(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (budget_id, user_id)
 );
+
+INSERT INTO budget_users (budget_id, user_id)
+    VALUES
+        (2, '5'),
+        (2, '6'),
+        (1, '3'),
+        (3, '4')
+;
