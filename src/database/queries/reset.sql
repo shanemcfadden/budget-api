@@ -49,3 +49,14 @@ INSERT INTO budget_users (budget_id, user_id)
         (1, '3'),
         (3, '4')
 ;
+
+CREATE TABLE accounts(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(240),
+    start_date TIMESTAMP NOT NULL,
+    start_balance DECIMAL(10, 2) NOT NULL,
+    budget_id INT NOT NULL,
+    FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
