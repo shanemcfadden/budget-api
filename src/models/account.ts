@@ -1,4 +1,4 @@
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket, OkPacket } from "mysql2";
 import { queryDb } from "../database/Database";
 import { findById } from "../util/models";
 interface AccountData {
@@ -21,7 +21,14 @@ class Account {
     return accounts;
   }
 
-  static async removeById(accountId: number) {}
+  static async removeById(accountId: number) {
+    const results = (await queryDb("accounts/removeById.sql")) as OkPacket;
+    if (results.affectedRows === 1) {
+      return true;
+    } else if (!results.affectedRows) {
+      throw new Error("Account does not exist");
+    }
+  }
 }
 
 export default Account;

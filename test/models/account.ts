@@ -102,7 +102,7 @@ describe("Account model", () => {
             throw new Error("findById should reject");
           })
           .catch((error) => {
-            expect(error).to.equal("Account does not exist");
+            expect(error.message).to.equal("Account does not exist");
           });
       });
     });
