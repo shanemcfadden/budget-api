@@ -153,7 +153,7 @@ describe("Account model", () => {
             })
             .catch((error) => {
               expect(error.message).to.equal(
-                "Multiple rows updated due to faulty query. Fix accounts/removeById.sql"
+                "Multiple rows updated due to faulty query. Fix accounts/update.sql"
               );
             });
         });
