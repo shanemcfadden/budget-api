@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
-import sinon, { mock, SinonStub } from "sinon";
+import sinon, { SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import Account from "../../src/models/account";
 
@@ -9,15 +9,18 @@ describe("Account model", () => {
   afterEach(() => {
     sinon.restore();
   });
+  const newAccountData = {
+    name: "The Addams Family account",
+    description: "It's a bit scary...",
+    startDate: new Date("2020-01-11"),
+    startBalance: 100,
+    budgetId: 3,
+  };
+  const mockAccountData = {
+    ...newAccountData,
+    id: 2,
+  };
   describe("create()", () => {
-    const mockAccountData = {
-      id: 2,
-      name: "The Addams Family account",
-      description: "It's a bit scary...",
-      startDate: new Date("2020-01-11"),
-      startBalance: 100,
-      budgetId: 3,
-    };
     let queryDbStub: SinonStub;
     beforeEach(() => {
       queryDbStub = sinon.stub(Database, "queryDb").resolves({
@@ -25,86 +28,45 @@ describe("Account model", () => {
       } as OkPacket);
     });
     it("Should query the database", async () => {
-      const {
-        name,
-        description,
-        startDate,
-        startBalance,
-        budgetId,
-      } = mockAccountData;
-      const newAccountData = {
-        name,
-        description,
-        startDate,
-        startBalance,
-        budgetId,
-      };
       await Account.create(newAccountData);
       expect(queryDbStub.calledOnce).to.be.true;
     });
     it("Should return the account id", async () => {
-      const {
-        name,
-        description,
-        startDate,
-        startBalance,
-        budgetId,
-      } = mockAccountData;
-      const newAccountData = {
-        name,
-        description,
-        startDate,
-        startBalance,
-        budgetId,
-      };
       const results = await Account.create(newAccountData);
       expect(results).to.deep.equal({ _id: 2 });
     });
   });
   describe("findById()", () => {
-    const accountId = 30;
-    const mockAccountData = {
-      id: 2,
-      name: "The Addams Family account",
-      description: "It's a bit scary...",
-      startDate: new Date("2020-01-11"),
-      startBalance: 100,
-      budgetId: 3,
-    };
+    const { id } = mockAccountData;
     it("should query the database", async () => {
       queryDbStub = sinon
         .stub(Database, "queryDb")
         .resolves([mockAccountData] as RowDataPacket[]);
-      await Account.findById(accountId);
-      expect(queryDbStub.calledOnceWith("accounts/findById.sql", [accountId]))
-        .to.be.true;
+      await Account.findById(id);
+      expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
+        .true;
     });
-    describe("If accountId is in the database...", () => {
+    describe("If account is in the database...", () => {
       it("should return complete account information", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([mockAccountData] as RowDataPacket[]);
-        const result = await Account.findById(accountId);
+        const result = await Account.findById(id);
         expect(result).to.deep.equal(mockAccountData);
       });
     });
-    describe("If accountId is not in the database...", () => {
+    describe("If account is not in the database...", () => {
       it("should return null", async () => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([] as RowDataPacket[]);
-        const result = await Account.findById(accountId);
+        const result = await Account.findById(id);
         expect(result).to.be.null;
       });
     });
   });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
-    const mockAccountData = {
-      id: 2,
-      title: "The Addams Family account",
-      description: "It's a bit scary...",
-    };
     it("should query the database", async () => {
       queryDbStub = sinon
         .stub(Database, "queryDb")
@@ -134,13 +96,13 @@ describe("Account model", () => {
     });
   });
   describe("removeById()", () => {
-    const mockAccountId = 23;
+    const { id } = mockAccountData;
     describe("If account exists", () => {
       it("should return true", async () => {
         sinon.stub(Database, "queryDb").resolves({
           affectedRows: 1,
         } as OkPacket);
-        const result = await Account.removeById(mockAccountId);
+        const result = await Account.removeById(id);
         expect(result).to.be.true;
       });
     });
@@ -149,7 +111,7 @@ describe("Account model", () => {
         sinon.stub(Database, "queryDb").resolves({
           affectedRows: 0,
         } as OkPacket);
-        return Account.removeById(mockAccountId)
+        return Account.removeById(id)
           .then(() => {
             throw new Error("removeById should reject");
           })
@@ -163,7 +125,7 @@ describe("Account model", () => {
         sinon.stub(Database, "queryDb").resolves({
           affectedRows: 2,
         } as OkPacket);
-        return Account.removeById(mockAccountId)
+        return Account.removeById(id)
           .then(() => {
             throw new Error("removeById should reject");
           })
