@@ -20,6 +20,8 @@ class Account {
     ])) as RowDataPacket[];
     return accounts;
   }
+
+  static async removeById(accountId: number) {}
 }
 
 export default Account;

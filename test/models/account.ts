@@ -81,4 +81,11 @@ describe("Account model", () => {
       });
     });
   });
+  describe('removeById()', () => {
+    describe('If account exists', () => {
+      it('should return true')
+    })
+    describe('If account does not exist', () => {
+      it('should throw an error')
+  })
 });
