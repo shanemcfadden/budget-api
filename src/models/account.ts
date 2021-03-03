@@ -1,5 +1,6 @@
 import { RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
+import { findById } from "../util/models";
 interface AccountData {
   id: number;
   name: string;
@@ -8,16 +9,9 @@ interface AccountData {
   startingBalance: number;
   budgetId: number;
 }
-
 class Account {
-  static async findById(budgetId: number) {
-    const accounts = (await queryDb("accounts/findById.sql", [
-      budgetId,
-    ])) as RowDataPacket[];
-    if (accounts.length < 1) {
-      return null;
-    }
-    return accounts[0];
+  static async findById(accountId: number) {
+    return await findById(accountId, "account");
   }
 
   static async findAllByUserId(userId: string) {
