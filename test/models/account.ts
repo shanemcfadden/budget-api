@@ -9,6 +9,58 @@ describe("Account model", () => {
   afterEach(() => {
     sinon.restore();
   });
+  describe("create()", () => {
+    const mockAccountData = {
+      id: 2,
+      name: "The Addams Family account",
+      description: "It's a bit scary...",
+      startDate: new Date("2020-01-11"),
+      startBalance: 100,
+      budgetId: 3,
+    };
+    let queryDbStub: SinonStub;
+    beforeEach(() => {
+      queryDbStub = sinon.stub(Database, "queryDb").resolves({
+        insertId: 2,
+      } as OkPacket);
+    });
+    it("Should query the database", async () => {
+      const {
+        name,
+        description,
+        startDate,
+        startBalance,
+        budgetId,
+      } = mockAccountData;
+      const newAccountData = {
+        name,
+        description,
+        startDate,
+        startBalance,
+        budgetId,
+      };
+      await Account.create(newAccountData);
+      expect(queryDbStub.calledOnce).to.be.true;
+    });
+    it("Should return the account id", async () => {
+      const {
+        name,
+        description,
+        startDate,
+        startBalance,
+        budgetId,
+      } = mockAccountData;
+      const newAccountData = {
+        name,
+        description,
+        startDate,
+        startBalance,
+        budgetId,
+      };
+      const results = await Account.create(newAccountData);
+      expect(results).to.deep.equal({ _id: 2 });
+    });
+  });
   describe("findById()", () => {
     const accountId = 30;
     const mockAccountData = {
