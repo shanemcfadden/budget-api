@@ -28,6 +28,9 @@ class Account {
     } else if (!results.affectedRows) {
       throw new Error("Account does not exist");
     }
+    throw new Error(
+      "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
+    );
   }
 }
 
