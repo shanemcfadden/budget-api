@@ -1,4 +1,5 @@
 import { RowDataPacket, OkPacket } from "mysql2";
+import { isDate } from "util";
 import { queryDb } from "../database/Database";
 import { findById } from "../util/models";
 interface NewAccountData {
@@ -44,8 +45,37 @@ class Account {
     return accounts;
   }
 
+  static async update(accountData: AccountData) {
+    const {
+      id,
+      name,
+      description,
+      startDate,
+      startBalance,
+      budgetId,
+    } = accountData;
+    const results = (await queryDb("accounts/update.sql", [
+      name,
+      description,
+      startDate,
+      startBalance,
+      budgetId,
+      id,
+    ])) as OkPacket;
+    if (results.affectedRows === 1) {
+      return true;
+    } else if (!results.affectedRows) {
+      throw new Error("Account does not exist");
+    }
+    throw new Error(
+      "Multiple rows updated due to faulty query. Fix accounts/update.sql"
+    );
+  }
+
   static async removeById(accountId: number) {
-    const results = (await queryDb("accounts/removeById.sql")) as OkPacket;
+    const results = (await queryDb("accounts/removeById.sql", [
+      accountId,
+    ])) as OkPacket;
     if (results.affectedRows === 1) {
       return true;
     } else if (!results.affectedRows) {
