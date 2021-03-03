@@ -95,14 +95,37 @@ describe("Account model", () => {
       });
     });
   });
-  describe("removeById()", () => {
-    const { id } = mockAccountData;
+  describe("update()", () => {
+    it("should query the database", async () => {
+      const {
+        id,
+        name,
+        description,
+        startDate,
+        startBalance,
+        budgetId,
+      } = mockAccountData;
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves({ affectedRows: 1 } as OkPacket);
+      await Account.update(mockAccountData);
+      expect(
+        queryDbStub.calledOnceWith("accounts/update.sql", [
+          name,
+          description,
+          startDate,
+          startBalance,
+          budgetId,
+          id,
+        ])
+      ).to.be.true;
+    });
     describe("If account exists", () => {
       it("should return true", async () => {
         sinon.stub(Database, "queryDb").resolves({
           affectedRows: 1,
         } as OkPacket);
-        const result = await Account.removeById(id);
+        const result = await Account.update(mockAccountData);
         expect(result).to.be.true;
       });
     });
@@ -111,29 +134,79 @@ describe("Account model", () => {
         sinon.stub(Database, "queryDb").resolves({
           affectedRows: 0,
         } as OkPacket);
-        return Account.removeById(id)
+        return Account.update(mockAccountData)
           .then(() => {
-            throw new Error("removeById should reject");
+            throw new Error("update should reject");
           })
           .catch((error) => {
             expect(error.message).to.equal("Account does not exist");
           });
       });
+      describe("If more than one row is deleted by faulty query", () => {
+        it("should throw an error", () => {
+          sinon.stub(Database, "queryDb").resolves({
+            affectedRows: 2,
+          } as OkPacket);
+          return Account.update(mockAccountData)
+            .then(() => {
+              throw new Error("update() should reject");
+            })
+            .catch((error) => {
+              expect(error.message).to.equal(
+                "Multiple rows updated due to faulty query. Fix accounts/removeById.sql"
+              );
+            });
+        });
+      });
     });
-    describe("If more than one row is deleted by faulty query", () => {
-      it("should throw an error", () => {
-        sinon.stub(Database, "queryDb").resolves({
-          affectedRows: 2,
-        } as OkPacket);
-        return Account.removeById(id)
-          .then(() => {
-            throw new Error("removeById should reject");
-          })
-          .catch((error) => {
-            expect(error.message).to.equal(
-              "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
-            );
-          });
+    describe("removeById()", () => {
+      const { id } = mockAccountData;
+      it("should query the database", async () => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves({ affectedRows: 1 } as OkPacket);
+        await Account.removeById(id);
+        expect(queryDbStub.calledOnceWith("accounts/removeById.sql", [id])).to
+          .be.true;
+      });
+      describe("If account exists", () => {
+        it("should return true", async () => {
+          sinon.stub(Database, "queryDb").resolves({
+            affectedRows: 1,
+          } as OkPacket);
+          const result = await Account.removeById(id);
+          expect(result).to.be.true;
+        });
+      });
+      describe("If account does not exist", () => {
+        it("should throw an error", () => {
+          sinon.stub(Database, "queryDb").resolves({
+            affectedRows: 0,
+          } as OkPacket);
+          return Account.removeById(id)
+            .then(() => {
+              throw new Error("removeById should reject");
+            })
+            .catch((error) => {
+              expect(error.message).to.equal("Account does not exist");
+            });
+        });
+      });
+      describe("If more than one row is deleted by faulty query", () => {
+        it("should throw an error", () => {
+          sinon.stub(Database, "queryDb").resolves({
+            affectedRows: 2,
+          } as OkPacket);
+          return Account.removeById(id)
+            .then(() => {
+              throw new Error("removeById should reject");
+            })
+            .catch((error) => {
+              expect(error.message).to.equal(
+                "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
+              );
+            });
+        });
       });
     });
   });
