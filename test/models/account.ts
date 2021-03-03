@@ -99,10 +99,26 @@ describe("Account model", () => {
         } as OkPacket);
         return Account.removeById(mockAccountId)
           .then(() => {
-            throw new Error("findById should reject");
+            throw new Error("removeById should reject");
           })
           .catch((error) => {
             expect(error.message).to.equal("Account does not exist");
+          });
+      });
+    });
+    describe("If more than one row is deleted by faulty query", () => {
+      it("should throw an error", () => {
+        sinon.stub(Database, "queryDb").resolves({
+          affectedRows: 2,
+        } as OkPacket);
+        return Account.removeById(mockAccountId)
+          .then(() => {
+            throw new Error("removeById should reject");
+          })
+          .catch((error) => {
+            expect(error.message).to.equal(
+              "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
+            );
           });
       });
     });
