@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { RowDataPacket } from "mysql2";
-import sinon, { SinonStub } from "sinon";
+import { OkPacket, RowDataPacket } from "mysql2";
+import sinon, { mock, SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import Account from "../../src/models/account";
 
@@ -81,11 +81,30 @@ describe("Account model", () => {
       });
     });
   });
-  describe('removeById()', () => {
-    describe('If account exists', () => {
-      it('should return true')
-    })
-    describe('If account does not exist', () => {
-      it('should throw an error')
-  })
+  describe("removeById()", () => {
+    const mockAccountId = 23;
+    describe("If account exists", () => {
+      it("should return true", async () => {
+        sinon.stub(Database, "queryDb").resolves({
+          affectedRows: 1,
+        } as OkPacket);
+        const result = await Account.removeById(mockAccountId);
+        expect(result).to.be.true;
+      });
+    });
+    describe("If account does not exist", () => {
+      it("should throw an error", () => {
+        sinon.stub(Database, "queryDb").resolves({
+          affectedRows: 0,
+        } as OkPacket);
+        return Account.removeById(mockAccountId)
+          .then(() => {
+            throw new Error("findById should reject");
+          })
+          .catch((error) => {
+            expect(error).to.equal("Account does not exist");
+          });
+      });
+    });
+  });
 });
