@@ -1,15 +1,38 @@
 import { RowDataPacket, OkPacket } from "mysql2";
 import { queryDb } from "../database/Database";
 import { findById } from "../util/models";
-interface AccountData {
-  id: number;
+interface NewAccountData {
   name: string;
   description?: string;
   startDate: Date;
-  startingBalance: number;
+  startBalance: number;
   budgetId: number;
 }
+interface AccountData extends NewAccountData {
+  id: number;
+}
 class Account {
+  static async create(accountData: NewAccountData) {
+    const {
+      name,
+      description,
+      startDate,
+      startBalance,
+      budgetId,
+    } = accountData;
+    const results = (await queryDb("accounts/create.sql", [
+      name,
+      description,
+      startDate,
+      startBalance,
+      budgetId,
+    ])) as OkPacket;
+
+    return {
+      _id: results.insertId,
+    };
+  }
+
   static async findById(accountId: number) {
     return await findById(accountId, "account");
   }
