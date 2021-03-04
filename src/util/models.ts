@@ -1,7 +1,10 @@
 import { OkPacket, RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
+import { capitalize } from "./strings";
 
-export async function findById(id: number | string, model: string) {
+type RowId = number | string;
+
+export async function findById(id: RowId, model: string) {
   const results = (await queryDb(`${model}s/findById.sql`, [
     id,
   ])) as RowDataPacket[];
@@ -19,7 +22,7 @@ export async function create(data: any[], model: string) {
   };
 }
 
-export async function update(id: number | string, data: any[], model: string) {
+export async function update(id: RowId, data: any[], model: string) {
   const results = (await queryDb(`${model}s/update.sql`, [
     ...data,
     id,
@@ -28,10 +31,21 @@ export async function update(id: number | string, data: any[], model: string) {
     return true;
   }
   if (!results.affectedRows) {
-    const capitalizedModel = model[0].toUpperCase() + model.slice(1);
-    throw new Error(`${capitalizedModel} does not exist`);
+    throw new Error(`${capitalize(model)} does not exist`);
   }
   throw new Error(
     `Multiple rows updated due to faulty query. Fix ${model}s/update.sql`
+  );
+}
+
+export async function removeById(id: RowId, model: string) {
+  const results = (await queryDb(`${model}s/removeById.sql`, [id])) as OkPacket;
+  if (results.affectedRows === 1) {
+    return true;
+  } else if (!results.affectedRows) {
+    throw new Error(`${capitalize(model)} does not exist`);
+  }
+  throw new Error(
+    `Multiple rows deleted due to faulty query. Fix ${model}s/removeById.sql`
   );
 }
