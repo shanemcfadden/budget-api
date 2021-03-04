@@ -45,7 +45,15 @@ describe("Account model", () => {
     });
     it("Should query the database", async () => {
       await Account.create(newAccountData);
-      expect(queryDbStub.calledOnce).to.be.true;
+      expect(
+        queryDbStub.calledOnceWith("accounts/create.sql", [
+          name,
+          description,
+          startDate,
+          startBalance,
+          budgetId,
+        ])
+      ).to.be.true;
     });
     it("Should return the account id", async () => {
       const results = await Account.create(newAccountData);
