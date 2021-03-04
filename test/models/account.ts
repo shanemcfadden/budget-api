@@ -6,9 +6,6 @@ import Account from "../../src/models/account";
 
 describe("Account model", () => {
   let queryDbStub: SinonStub;
-  afterEach(() => {
-    sinon.restore();
-  });
   const newAccountData = {
     name: "The Addams Family account",
     description: "It's a bit scary...",
@@ -20,8 +17,27 @@ describe("Account model", () => {
     ...newAccountData,
     id: 2,
   };
+  const {
+    id,
+    name,
+    description,
+    startDate,
+    startBalance,
+    budgetId,
+  } = mockAccountData;
+  const noAffectedRows = {
+    affectedRows: 0,
+  } as OkPacket;
+  const oneAffectedRow = {
+    affectedRows: 1,
+  } as OkPacket;
+  const twoAffectedRows = {
+    affectedRows: 2,
+  } as OkPacket;
+  afterEach(() => {
+    sinon.restore();
+  });
   describe("create()", () => {
-    let queryDbStub: SinonStub;
     beforeEach(() => {
       queryDbStub = sinon.stub(Database, "queryDb").resolves({
         insertId: 2,
@@ -37,29 +53,34 @@ describe("Account model", () => {
     });
   });
   describe("findById()", () => {
-    const { id } = mockAccountData;
-    it("should query the database", async () => {
-      queryDbStub = sinon
-        .stub(Database, "queryDb")
-        .resolves([mockAccountData] as RowDataPacket[]);
-      await Account.findById(id);
-      expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
-        .true;
-    });
     describe("If account is in the database...", () => {
-      it("should return complete account information", async () => {
+      beforeEach(() => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([mockAccountData] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await Account.findById(id);
+        expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
+          .true;
+      });
+      it("should return complete account information", async () => {
         const result = await Account.findById(id);
         expect(result).to.deep.equal(mockAccountData);
       });
     });
     describe("If account is not in the database...", () => {
-      it("should return null", async () => {
+      beforeEach(() => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await Account.findById(id);
+        expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
+          .true;
+      });
+      it("should return null", async () => {
         const result = await Account.findById(id);
         expect(result).to.be.null;
       });
@@ -67,73 +88,85 @@ describe("Account model", () => {
   });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
-    it("should query the database", async () => {
-      queryDbStub = sinon
-        .stub(Database, "queryDb")
-        .resolves([mockAccountData] as RowDataPacket[]);
-      await Account.findAllByUserId(userId);
-      expect(
-        queryDbStub.calledOnceWith("accounts/findAllByUserId.sql", [userId])
-      ).to.be.true;
-    });
     describe("If user has at least one account", () => {
-      it("should return array of account information", async () => {
+      beforeEach(() => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([mockAccountData] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await Account.findAllByUserId(userId);
+        expect(
+          queryDbStub.calledOnceWith("accounts/findAllByUserId.sql", [userId])
+        ).to.be.true;
+      });
+      it("should return array of account information", async () => {
         const result = await Account.findAllByUserId(userId);
         expect(result).to.deep.equal([mockAccountData]);
       });
     });
     describe("If user has no accounts", () => {
-      it("should return an empty array", async () => {
+      beforeEach(() => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
           .resolves([] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await Account.findAllByUserId(userId);
+        expect(
+          queryDbStub.calledOnceWith("accounts/findAllByUserId.sql", [userId])
+        ).to.be.true;
+      });
+      it("should return an empty array", async () => {
         const result = await Account.findAllByUserId(userId);
         expect(result).to.deep.equal([]);
       });
     });
   });
   describe("update()", () => {
-    it("should query the database", async () => {
-      const {
-        id,
-        name,
-        description,
-        startDate,
-        startBalance,
-        budgetId,
-      } = mockAccountData;
-      queryDbStub = sinon
-        .stub(Database, "queryDb")
-        .resolves({ affectedRows: 1 } as OkPacket);
-      await Account.update(mockAccountData);
-      expect(
-        queryDbStub.calledOnceWith("accounts/update.sql", [
-          name,
-          description,
-          startDate,
-          startBalance,
-          budgetId,
-          id,
-        ])
-      ).to.be.true;
-    });
     describe("If account exists", () => {
+      beforeEach(() => {
+        queryDbStub = sinon.stub(Database, "queryDb").resolves(oneAffectedRow);
+      });
+      it("should query the database", async () => {
+        await Account.update(mockAccountData);
+        expect(
+          queryDbStub.calledOnceWith("accounts/update.sql", [
+            name,
+            description,
+            startDate,
+            startBalance,
+            budgetId,
+            id,
+          ])
+        ).to.be.true;
+      });
       it("should return true", async () => {
-        sinon.stub(Database, "queryDb").resolves({
-          affectedRows: 1,
-        } as OkPacket);
         const result = await Account.update(mockAccountData);
         expect(result).to.be.true;
       });
     });
     describe("If account does not exist", () => {
+      beforeEach(() => {
+        queryDbStub = sinon.stub(Database, "queryDb").resolves(noAffectedRows);
+      });
+      it("should query the database", () => {
+        return Account.update(mockAccountData)
+          .catch(() => {})
+          .finally(() => {
+            expect(
+              queryDbStub.calledOnceWith("accounts/update.sql", [
+                name,
+                description,
+                startDate,
+                startBalance,
+                budgetId,
+                id,
+              ])
+            ).to.be.true;
+          });
+      });
       it("should throw an error", () => {
-        sinon.stub(Database, "queryDb").resolves({
-          affectedRows: 0,
-        } as OkPacket);
         return Account.update(mockAccountData)
           .then(() => {
             throw new Error("update should reject");
@@ -142,47 +175,54 @@ describe("Account model", () => {
             expect(error.message).to.equal("Account does not exist");
           });
       });
-      describe("If more than one row is deleted by faulty query", () => {
-        it("should throw an error", () => {
-          sinon.stub(Database, "queryDb").resolves({
-            affectedRows: 2,
-          } as OkPacket);
-          return Account.update(mockAccountData)
-            .then(() => {
-              throw new Error("update() should reject");
-            })
-            .catch((error) => {
-              expect(error.message).to.equal(
-                "Multiple rows updated due to faulty query. Fix accounts/update.sql"
-              );
-            });
-        });
+    });
+    describe("If more than one row is deleted by faulty query", () => {
+      it("should throw an error", () => {
+        sinon.stub(Database, "queryDb").resolves(twoAffectedRows);
+        return Account.update(mockAccountData)
+          .then(() => {
+            throw new Error("update() should reject");
+          })
+          .catch((error) => {
+            expect(error.message).to.equal(
+              "Multiple rows updated due to faulty query. Fix accounts/update.sql"
+            );
+          });
       });
     });
     describe("removeById()", () => {
-      const { id } = mockAccountData;
-      it("should query the database", async () => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves({ affectedRows: 1 } as OkPacket);
-        await Account.removeById(id);
-        expect(queryDbStub.calledOnceWith("accounts/removeById.sql", [id])).to
-          .be.true;
-      });
       describe("If account exists", () => {
+        beforeEach(() => {
+          queryDbStub = sinon
+            .stub(Database, "queryDb")
+            .resolves(oneAffectedRow);
+        });
+        it("should query the database", async () => {
+          await Account.removeById(id);
+          expect(queryDbStub.calledOnceWith("accounts/removeById.sql", [id])).to
+            .be.true;
+        });
         it("should return true", async () => {
-          sinon.stub(Database, "queryDb").resolves({
-            affectedRows: 1,
-          } as OkPacket);
           const result = await Account.removeById(id);
           expect(result).to.be.true;
         });
       });
       describe("If account does not exist", () => {
+        beforeEach(() => {
+          queryDbStub = sinon
+            .stub(Database, "queryDb")
+            .resolves(noAffectedRows);
+        });
+        it("should query the database", () => {
+          return Account.removeById(id)
+            .catch(() => {})
+            .finally(() => {
+              expect(
+                queryDbStub.calledOnceWith("accounts/removeById.sql", [id])
+              ).to.be.true;
+            });
+        });
         it("should throw an error", () => {
-          sinon.stub(Database, "queryDb").resolves({
-            affectedRows: 0,
-          } as OkPacket);
           return Account.removeById(id)
             .then(() => {
               throw new Error("removeById should reject");
@@ -194,9 +234,7 @@ describe("Account model", () => {
       });
       describe("If more than one row is deleted by faulty query", () => {
         it("should throw an error", () => {
-          sinon.stub(Database, "queryDb").resolves({
-            affectedRows: 2,
-          } as OkPacket);
+          sinon.stub(Database, "queryDb").resolves(twoAffectedRows);
           return Account.removeById(id)
             .then(() => {
               throw new Error("removeById should reject");
