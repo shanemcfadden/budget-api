@@ -1,6 +1,6 @@
 import { OkPacket, RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { findById } from "../util/models";
+import { create, findById } from "../util/models";
 
 interface NewBudgetData {
   title?: string;
@@ -13,18 +13,11 @@ interface BudgetData extends NewBudgetData {
 class Budget {
   static async create(newBudgetData: NewBudgetData) {
     const { title, description } = newBudgetData;
-    const results = (await queryDb("budgets/create.sql", [
-      title,
-      description,
-    ])) as OkPacket;
-
-    return {
-      _id: results.insertId,
-    };
+    return await create([title, description], "budget");
   }
 
   static async findById(budgetId: number) {
-    return findById(budgetId, "budget");
+    return await findById(budgetId, "budget");
   }
 
   static async findAllByUserId(userId: string) {
