@@ -9,6 +9,8 @@ interface BudgetData {
 }
 
 class Budget {
+  static async create() {}
+
   static async findById(budgetId: number) {
     return findById(budgetId, "budget");
   }
@@ -19,6 +21,10 @@ class Budget {
     ])) as RowDataPacket[];
     return budgets;
   }
+
+  static async update() {}
+
+  static async removeById() {}
 }
 
 export default Budget;
