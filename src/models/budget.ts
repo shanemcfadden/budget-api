@@ -2,14 +2,16 @@ import { RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
 import { findById } from "../util/models";
 
-interface BudgetData {
-  id: number;
+interface NewBudgetData {
   title?: string;
   description?: string;
 }
+interface BudgetData extends NewBudgetData {
+  id: number;
+}
 
 class Budget {
-  static async create() {}
+  static async create(newBudgetData: NewBudgetData) {}
 
   static async findById(budgetId: number) {
     return findById(budgetId, "budget");
@@ -22,9 +24,9 @@ class Budget {
     return budgets;
   }
 
-  static async update() {}
+  static async update(budgetData: BudgetData) {}
 
-  static async removeById() {}
+  static async removeById(id: number) {}
 }
 
 export default Budget;
