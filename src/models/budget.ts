@@ -1,6 +1,6 @@
 import { OkPacket, RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { create, findById } from "../util/models";
+import { create, findById, update } from "../util/models";
 
 interface NewBudgetData {
   title?: string;
@@ -29,19 +29,7 @@ class Budget {
 
   static async update(budgetData: BudgetData) {
     const { id, title, description } = budgetData;
-    const results = (await queryDb("budgets/update.sql", [
-      title,
-      description,
-      id,
-    ])) as OkPacket;
-    if (results.affectedRows === 1) {
-      return true;
-    } else if (!results.affectedRows) {
-      throw new Error("Budget does not exist");
-    }
-    throw new Error(
-      "Multiple rows updated due to faulty query. Fix budgets/update.sql"
-    );
+    return await update(id, [title, description], "budget");
   }
 
   static async removeById(id: number) {

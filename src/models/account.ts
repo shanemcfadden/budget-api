@@ -1,6 +1,6 @@
 import { RowDataPacket, OkPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { create, findById } from "../util/models";
+import { create, findById, update } from "../util/models";
 interface NewAccountData {
   name: string;
   description?: string;
@@ -46,21 +46,10 @@ class Account {
       startBalance,
       budgetId,
     } = accountData;
-    const results = (await queryDb("accounts/update.sql", [
-      name,
-      description,
-      startDate,
-      startBalance,
-      budgetId,
+    return await update(
       id,
-    ])) as OkPacket;
-    if (results.affectedRows === 1) {
-      return true;
-    } else if (!results.affectedRows) {
-      throw new Error("Account does not exist");
-    }
-    throw new Error(
-      "Multiple rows updated due to faulty query. Fix accounts/update.sql"
+      [name, description, startDate, startBalance, budgetId],
+      "account"
     );
   }
 
