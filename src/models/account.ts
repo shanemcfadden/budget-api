@@ -1,5 +1,4 @@
 import { RowDataPacket, OkPacket } from "mysql2";
-import { isDate } from "util";
 import { queryDb } from "../database/Database";
 import { findById } from "../util/models";
 interface NewAccountData {
