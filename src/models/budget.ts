@@ -1,5 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
+import { findById } from "../util/models";
+
 interface BudgetData {
   id: number;
   title?: string;
@@ -8,13 +10,7 @@ interface BudgetData {
 
 class Budget {
   static async findById(budgetId: number) {
-    const budgets = (await queryDb("budgets/findById.sql", [
-      budgetId,
-    ])) as RowDataPacket[];
-    if (budgets.length < 1) {
-      return null;
-    }
-    return budgets[0];
+    return findById(budgetId, "budget");
   }
 
   static async findAllByUserId(userId: string) {

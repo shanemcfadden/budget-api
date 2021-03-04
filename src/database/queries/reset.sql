@@ -1,3 +1,4 @@
+DROP TABLE accounts;
 DROP TABLE budget_users;
 DROP TABLE users;
 DROP TABLE budgets;
@@ -48,4 +49,24 @@ INSERT INTO budget_users (budget_id, user_id)
         (2, '6'),
         (1, '3'),
         (3, '4')
+;
+
+CREATE TABLE accounts(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(240),
+    start_date DATE NOT NULL,
+    start_balance DECIMAL(10, 2) NOT NULL,
+    budget_id INT NOT NULL,
+    FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO accounts (budget_id, name, description, start_date, start_balance) 
+    VALUES
+        (1, 'Vaca Savings', 'Chase bank, 1.1%APY', '2015-01-31', '500'),
+        (2, 'Retirement', 'Vanguard Mutual Fund', '2009-1-20', '100000'),
+        (2, 'Checking', 'The Federal Reserve', '2013-1-20', '49000.76'),
+        (3, 'Chase Saphire Reserve', 'Chase bank, 21.99%APY', '2015-01-31', '-872.61'),
+        (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
 ;
