@@ -18,3 +18,20 @@ export async function create(data: any[], model: string) {
     _id: results.insertId,
   };
 }
+
+export async function update(id: number | string, data: any[], model: string) {
+  const results = (await queryDb(`${model}s/update.sql`, [
+    ...data,
+    id,
+  ])) as OkPacket;
+  if (results.affectedRows === 1) {
+    return true;
+  }
+  if (!results.affectedRows) {
+    const capitalizedModel = model[0].toUpperCase() + model.slice(1);
+    throw new Error(`${capitalizedModel} does not exist`);
+  }
+  throw new Error(
+    `Multiple rows updated due to faulty query. Fix ${model}s/update.sql`
+  );
+}
