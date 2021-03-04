@@ -1,6 +1,6 @@
 import { RowDataPacket, OkPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { create, findById, update } from "../util/models";
+import { create, findById, update, removeById } from "../util/models";
 interface NewAccountData {
   name: string;
   description?: string;
@@ -54,17 +54,7 @@ class Account {
   }
 
   static async removeById(accountId: number) {
-    const results = (await queryDb("accounts/removeById.sql", [
-      accountId,
-    ])) as OkPacket;
-    if (results.affectedRows === 1) {
-      return true;
-    } else if (!results.affectedRows) {
-      throw new Error("Account does not exist");
-    }
-    throw new Error(
-      "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
-    );
+    return await removeById(accountId, "account");
   }
 }
 
