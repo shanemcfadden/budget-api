@@ -35,7 +35,9 @@ describe("Budget model", () => {
     });
     it("Should query the database", async () => {
       await Budget.create(newBudgetData);
-      expect(queryDbStub.calledOnce).to.be.true;
+      expect(
+        queryDbStub.calledOnceWith("budgets/create.sql", [title, description])
+      ).to.be.true;
     });
     it("Should return the budget id", async () => {
       const results = await Budget.create(newBudgetData);
