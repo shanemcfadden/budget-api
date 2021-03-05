@@ -1,5 +1,3 @@
-import { OkPacket, RowDataPacket } from "mysql2";
-import { queryDb } from "../database/Database";
 import {
   create,
   findAllByUserId,
