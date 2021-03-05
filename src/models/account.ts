@@ -1,6 +1,12 @@
 import { RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { create, findById, update, removeById } from "../util/models";
+import {
+  create,
+  findById,
+  update,
+  removeById,
+  findAllByUserId,
+} from "../util/models";
 interface NewAccountData {
   name: string;
   description?: string;
@@ -31,10 +37,7 @@ class Account {
   }
 
   static async findAllByUserId(userId: string) {
-    const accounts = (await queryDb("accounts/findAllByUserId.sql", [
-      userId,
-    ])) as RowDataPacket[];
-    return accounts;
+    return await findAllByUserId(userId, "account");
   }
 
   static async update(accountData: AccountData) {

@@ -1,12 +1,10 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
-import sinon, { SinonStub } from "sinon";
-import * as Database from "../../src/database/Database";
+import sinon from "sinon";
 import Account from "../../src/models/account";
 import * as Model from "../../src/util/models";
 
 describe("Account model", () => {
-  let queryDbStub: SinonStub;
   const newAccountData = {
     name: "The Addams Family account",
     description: "It's a bit scary...",
@@ -54,47 +52,21 @@ describe("Account model", () => {
   });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
-    describe("If user has at least one account", () => {
-      beforeEach(() => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([mockAccountData] as RowDataPacket[]);
-      });
-      it("should query the database", async () => {
-        await Account.findAllByUserId(userId);
-        expect(
-          queryDbStub.calledOnceWith("accounts/findAllByUserId.sql", [userId])
-        ).to.be.true;
-      });
-      it("should return array of account information", async () => {
-        const result = await Account.findAllByUserId(userId);
-        expect(result).to.deep.equal([mockAccountData]);
-      });
-    });
-    describe("If user has no accounts", () => {
-      beforeEach(() => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([] as RowDataPacket[]);
-      });
-      it("should query the database", async () => {
-        await Account.findAllByUserId(userId);
-        expect(
-          queryDbStub.calledOnceWith("accounts/findAllByUserId.sql", [userId])
-        ).to.be.true;
-      });
-      it("should return an empty array", async () => {
-        const result = await Account.findAllByUserId(userId);
-        expect(result).to.deep.equal([]);
-      });
+    it("should call util findAllByUserId() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findAllByUserId")
+        .resolves([mockAccountData as RowDataPacket]);
+      const results = await Account.findAllByUserId(userId);
+      expect(findStub.calledOnceWith(userId, "account")).to.be.true;
+      expect(results).to.deep.equal([mockAccountData]);
     });
   });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
-      const createStub = sinon.stub(Model, "update").resolves(true);
+      const updateSub = sinon.stub(Model, "update").resolves(true);
       const results = await Account.update(mockAccountData);
       expect(
-        createStub.calledOnceWith(
+        updateSub.calledOnceWith(
           id,
           [name, description, startDate, startBalance, budgetId],
           "account"

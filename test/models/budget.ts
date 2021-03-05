@@ -1,7 +1,6 @@
 import { expect } from "chai";
-import { OkPacket, RowDataPacket } from "mysql2";
-import sinon, { SinonStub } from "sinon";
-import * as Database from "../../src/database/Database";
+import { RowDataPacket } from "mysql2";
+import sinon from "sinon";
 import Budget from "../../src/models/budget";
 import * as Model from "../../src/util/models";
 
@@ -15,16 +14,6 @@ describe("Budget model", () => {
     id: 2,
   };
   const { id, title, description } = mockBudgetData;
-  const noAffectedRows = {
-    affectedRows: 0,
-  } as OkPacket;
-  const oneAffectedRow = {
-    affectedRows: 1,
-  } as OkPacket;
-  const twoAffectedRows = {
-    affectedRows: 2,
-  } as OkPacket;
-  let queryDbStub: SinonStub;
   afterEach(() => {
     sinon.restore();
   });
@@ -49,32 +38,13 @@ describe("Budget model", () => {
   });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
-    it("should query the database", async () => {
-      queryDbStub = sinon
-        .stub(Database, "queryDb")
-        .resolves([mockBudgetData] as RowDataPacket[]);
-      await Budget.findAllByUserId(userId);
-      expect(
-        queryDbStub.calledOnceWith("budgets/findAllByUserId.sql", [userId])
-      ).to.be.true;
-    });
-    describe("If user has at least one budget", () => {
-      it("should return array of budget information", async () => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([mockBudgetData] as RowDataPacket[]);
-        const result = await Budget.findAllByUserId(userId);
-        expect(result).to.deep.equal([mockBudgetData]);
-      });
-    });
-    describe("If user has no budgets", () => {
-      it("should return an empty array", async () => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([] as RowDataPacket[]);
-        const result = await Budget.findAllByUserId(userId);
-        expect(result).to.deep.equal([]);
-      });
+    it("should call util findAllByUserId() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findAllByUserId")
+        .resolves([mockBudgetData as RowDataPacket]);
+      const results = await Budget.findAllByUserId(userId);
+      expect(findStub.calledOnceWith(userId, "budget")).to.be.true;
+      expect(results).to.deep.equal([mockBudgetData]);
     });
   });
   describe("update()", () => {
