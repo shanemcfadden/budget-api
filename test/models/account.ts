@@ -3,6 +3,7 @@ import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import Account from "../../src/models/account";
+import * as Model from "../../src/util/models";
 
 describe("Account model", () => {
   let queryDbStub: SinonStub;
@@ -38,60 +39,26 @@ describe("Account model", () => {
     sinon.restore();
   });
   describe("create()", () => {
-    beforeEach(() => {
-      queryDbStub = sinon.stub(Database, "queryDb").resolves({
-        insertId: 2,
-      } as OkPacket);
-    });
-    it("Should query the database", async () => {
-      await Account.create(newAccountData);
-      expect(
-        queryDbStub.calledOnceWith("accounts/create.sql", [
-          name,
-          description,
-          startDate,
-          startBalance,
-          budgetId,
-        ])
-      ).to.be.true;
-    });
-    it("Should return the account id", async () => {
+    it("should call util create() and return its value", async () => {
+      const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await Account.create(newAccountData);
-      expect(results).to.deep.equal({ _id: 2 });
+      expect(
+        createStub.calledOnceWith(
+          [name, description, startDate, startBalance, budgetId],
+          "account"
+        )
+      ).to.be.true;
+      expect(results).to.deep.equal({ _id: id });
     });
   });
   describe("findById()", () => {
-    describe("If account is in the database...", () => {
-      beforeEach(() => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([mockAccountData] as RowDataPacket[]);
-      });
-      it("should query the database", async () => {
-        await Account.findById(id);
-        expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
-          .true;
-      });
-      it("should return complete account information", async () => {
-        const result = await Account.findById(id);
-        expect(result).to.deep.equal(mockAccountData);
-      });
-    });
-    describe("If account is not in the database...", () => {
-      beforeEach(() => {
-        queryDbStub = sinon
-          .stub(Database, "queryDb")
-          .resolves([] as RowDataPacket[]);
-      });
-      it("should query the database", async () => {
-        await Account.findById(id);
-        expect(queryDbStub.calledOnceWith("accounts/findById.sql", [id])).to.be
-          .true;
-      });
-      it("should return null", async () => {
-        const result = await Account.findById(id);
-        expect(result).to.be.null;
-      });
+    it("should call util findById() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findById")
+        .resolves(mockAccountData as RowDataPacket);
+      const results = await Account.findById(id);
+      expect(findStub.calledOnceWith(id, "account")).to.be.true;
+      expect(results).to.deep.equal(mockAccountData);
     });
   });
   describe("findAllByUserId()", () => {
@@ -132,128 +99,25 @@ describe("Account model", () => {
     });
   });
   describe("update()", () => {
-    describe("If account exists", () => {
-      beforeEach(() => {
-        queryDbStub = sinon.stub(Database, "queryDb").resolves(oneAffectedRow);
-      });
-      it("should query the database", async () => {
-        await Account.update(mockAccountData);
-        expect(
-          queryDbStub.calledOnceWith("accounts/update.sql", [
-            name,
-            description,
-            startDate,
-            startBalance,
-            budgetId,
-            id,
-          ])
-        ).to.be.true;
-      });
-      it("should return true", async () => {
-        const result = await Account.update(mockAccountData);
-        expect(result).to.be.true;
-      });
+    it("should call util update() and return its value", async () => {
+      const createStub = sinon.stub(Model, "update").resolves(true);
+      const results = await Account.update(mockAccountData);
+      expect(
+        createStub.calledOnceWith(
+          id,
+          [name, description, startDate, startBalance, budgetId],
+          "account"
+        )
+      ).to.be.true;
+      expect(results).to.equal(true);
     });
-    describe("If account does not exist", () => {
-      beforeEach(() => {
-        queryDbStub = sinon.stub(Database, "queryDb").resolves(noAffectedRows);
-      });
-      it("should query the database", () => {
-        return Account.update(mockAccountData)
-          .catch(() => {})
-          .finally(() => {
-            expect(
-              queryDbStub.calledOnceWith("accounts/update.sql", [
-                name,
-                description,
-                startDate,
-                startBalance,
-                budgetId,
-                id,
-              ])
-            ).to.be.true;
-          });
-      });
-      it("should throw an error", () => {
-        return Account.update(mockAccountData)
-          .then(() => {
-            throw new Error("update should reject");
-          })
-          .catch((error) => {
-            expect(error.message).to.equal("Account does not exist");
-          });
-      });
-    });
-    describe("If more than one row is deleted by faulty query", () => {
-      it("should throw an error", () => {
-        sinon.stub(Database, "queryDb").resolves(twoAffectedRows);
-        return Account.update(mockAccountData)
-          .then(() => {
-            throw new Error("update() should reject");
-          })
-          .catch((error) => {
-            expect(error.message).to.equal(
-              "Multiple rows updated due to faulty query. Fix accounts/update.sql"
-            );
-          });
-      });
-    });
-    describe("removeById()", () => {
-      describe("If account exists", () => {
-        beforeEach(() => {
-          queryDbStub = sinon
-            .stub(Database, "queryDb")
-            .resolves(oneAffectedRow);
-        });
-        it("should query the database", async () => {
-          await Account.removeById(id);
-          expect(queryDbStub.calledOnceWith("accounts/removeById.sql", [id])).to
-            .be.true;
-        });
-        it("should return true", async () => {
-          const result = await Account.removeById(id);
-          expect(result).to.be.true;
-        });
-      });
-      describe("If account does not exist", () => {
-        beforeEach(() => {
-          queryDbStub = sinon
-            .stub(Database, "queryDb")
-            .resolves(noAffectedRows);
-        });
-        it("should query the database", () => {
-          return Account.removeById(id)
-            .catch(() => {})
-            .finally(() => {
-              expect(
-                queryDbStub.calledOnceWith("accounts/removeById.sql", [id])
-              ).to.be.true;
-            });
-        });
-        it("should throw an error", () => {
-          return Account.removeById(id)
-            .then(() => {
-              throw new Error("removeById should reject");
-            })
-            .catch((error) => {
-              expect(error.message).to.equal("Account does not exist");
-            });
-        });
-      });
-      describe("If more than one row is deleted by faulty query", () => {
-        it("should throw an error", () => {
-          sinon.stub(Database, "queryDb").resolves(twoAffectedRows);
-          return Account.removeById(id)
-            .then(() => {
-              throw new Error("removeById should reject");
-            })
-            .catch((error) => {
-              expect(error.message).to.equal(
-                "Multiple rows deleted due to faulty query. Fix accounts/removeById.sql"
-              );
-            });
-        });
-      });
+  });
+  describe("removeById()", () => {
+    it("should call util removeById() and return its value", async () => {
+      const removeStub = sinon.stub(Model, "removeById").resolves(true);
+      const results = await Account.removeById(id);
+      expect(removeStub.calledOnceWith(id, "account")).to.be.true;
+      expect(results).to.deep.equal(true);
     });
   });
 });
