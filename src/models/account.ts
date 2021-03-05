@@ -1,4 +1,4 @@
-import { RowDataPacket, OkPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
 import { create, findById, update, removeById } from "../util/models";
 interface NewAccountData {
