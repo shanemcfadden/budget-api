@@ -2,7 +2,13 @@ import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
-import { create, findById, update, removeById } from "../../src/util/models";
+import {
+  create,
+  findAllByUserId,
+  findById,
+  update,
+  removeById,
+} from "../../src/util/models";
 import { capitalize } from "../../src/util/strings";
 
 describe("util/model.ts", () => {
@@ -77,6 +83,36 @@ describe("util/model.ts", () => {
       it("should return null", async () => {
         const result = await findById(id, model);
         expect(result).to.be.null;
+      });
+    });
+  });
+  describe("findAllByUserId()", () => {
+    const userId = "asdfwerwqiohon";
+    it("should query the database", async () => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([mockData] as RowDataPacket[]);
+      await findAllByUserId(userId, model);
+      expect(
+        queryDbStub.calledOnceWith(model + "s/findAllByUserId.sql", [userId])
+      ).to.be.true;
+    });
+    describe("If user has at least one of a given model", () => {
+      it("should return array of model information", async () => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([mockData] as RowDataPacket[]);
+        const result = await findAllByUserId(userId, model);
+        expect(result).to.deep.equal([mockData]);
+      });
+    });
+    describe("If user has none of a given model", () => {
+      it("should return an empty array", async () => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([] as RowDataPacket[]);
+        const result = await findAllByUserId(userId, model);
+        expect(result).to.deep.equal([]);
       });
     });
   });
