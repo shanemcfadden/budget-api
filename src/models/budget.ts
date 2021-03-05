@@ -1,6 +1,12 @@
 import { OkPacket, RowDataPacket } from "mysql2";
 import { queryDb } from "../database/Database";
-import { create, findById, removeById, update } from "../util/models";
+import {
+  create,
+  findAllByUserId,
+  findById,
+  removeById,
+  update,
+} from "../util/models";
 
 interface NewBudgetData {
   title?: string;
@@ -21,10 +27,7 @@ class Budget {
   }
 
   static async findAllByUserId(userId: string) {
-    const budgets = (await queryDb("budgets/findAllByUserId.sql", [
-      userId,
-    ])) as RowDataPacket[];
-    return budgets;
+    return await findAllByUserId(userId, "budget");
   }
 
   static async update(budgetData: BudgetData) {
@@ -34,15 +37,6 @@ class Budget {
 
   static async removeById(id: number) {
     return await removeById(id, "budget");
-    // const results = (await queryDb("budgets/removeById.sql", [id])) as OkPacket;
-    // if (results.affectedRows === 1) {
-    //   return true;
-    // } else if (!results.affectedRows) {
-    //   throw new Error("Budget does not exist");
-    // }
-    // throw new Error(
-    //   "Multiple rows deleted due to faulty query. Fix budgets/removeById.sql"
-    // );
   }
 }
 
