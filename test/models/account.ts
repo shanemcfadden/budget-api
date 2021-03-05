@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { OkPacket, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import Account from "../../src/models/account";
@@ -26,15 +26,6 @@ describe("Account model", () => {
     startBalance,
     budgetId,
   } = mockAccountData;
-  const noAffectedRows = {
-    affectedRows: 0,
-  } as OkPacket;
-  const oneAffectedRow = {
-    affectedRows: 1,
-  } as OkPacket;
-  const twoAffectedRows = {
-    affectedRows: 2,
-  } as OkPacket;
   afterEach(() => {
     sinon.restore();
   });
