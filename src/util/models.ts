@@ -14,6 +14,12 @@ export async function findById(id: RowId, model: string) {
   return results[0];
 }
 
+export async function findAllByUserId(id: string, model: string) {
+  return (await queryDb(`${model}s/findAllByUserId.sql`, [
+    id,
+  ])) as RowDataPacket[];
+}
+
 export async function create(data: any[], model: string) {
   const results = (await queryDb(`${model}s/create.sql`, data)) as OkPacket;
 
