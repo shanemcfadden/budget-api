@@ -1,3 +1,4 @@
+DROP TABLE transaction_macro_categories;
 DROP TABLE transactions;
 DROP TABLE accounts;
 DROP TABLE budget_users;
@@ -70,6 +71,16 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (2, 'Checking', 'The Federal Reserve', '2013-1-20', '49000.76'),
         (3, 'Chase Saphire Reserve', 'Chase bank, 21.99%APY', '2015-01-31', '-872.61'),
         (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
+;
+
+CREATE TABLE transaction_macro_categories (
+    id INT AUTO_INCREMENT,
+    description VARCHAR(100) NOT NULL,
+    is_income TINYINT(1) NOT NULL,
+    budget_id INT NOT NULL,
+    FOREIGN Key (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+)
 ;
 
 CREATE TABLE transactions(
