@@ -117,18 +117,20 @@ CREATE TABLE transactions(
     description VARCHAR(100),
     date DATE NOT NULL,
     account_id INT NOT NULL,
+    category_id INT NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES transaction_micro_categories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 )
 ;
 
-INSERT INTO transactions (amount, description, date, account_id) 
+INSERT INTO transactions (amount, description, date, account_id, category_id) 
     VALUES
-        (300.50, 'Christmas bonus', '2020-12-25', 1),
-        (40, 'Found in coat pocket', '2021-01-02', 1),
-        (-334.99, 'Flight (Found on flash sale!)', '2021-01-15', 1),
-        (525000, 'Lumpsum of salary', '2010-1-1', 2),
-        (535000, 'Lumpsum of salary', '2011-1-1', 2),
-        (545000, 'Lumpsum of salary', '2012-1-1', 2),
-        (-20000, "Malia's tuition", '2016-1-3', 3)
+        (300.50, 'Christmas bonus', '2020-12-25', 1, 1),
+        (40, 'Found in coat pocket', '2021-01-02', 1, 2),
+        (-334.99, 'Flight (Found on flash sale!)', '2021-01-15', 1, 3),
+        (525000, 'Lumpsum of salary', '2010-1-1', 2, 4),
+        (535000, 'Lumpsum of salary', '2011-1-1', 2, 4),
+        (545000, 'Lumpsum of salary', '2012-1-1', 2, 4),
+        (-20000, "Malia's tuition", '2016-1-3', 3, 5)
 ;
