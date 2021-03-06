@@ -1,4 +1,3 @@
-import { queryDb } from "../database/Database";
 import {
   create,
   findById,
@@ -6,7 +5,9 @@ import {
   removeById,
   findAllByUserId,
   findAllByBudgetId,
+  IdPacket,
 } from "../util/models";
+
 interface NewAccountData {
   name: string;
   description?: string;
@@ -18,8 +19,11 @@ interface AccountData extends NewAccountData {
   id: number;
   currentBalance: number;
 }
+
+const modelName = "account";
+
 class Account {
-  static async create(accountData: NewAccountData) {
+  static async create(accountData: NewAccountData): Promise<IdPacket> {
     const {
       name,
       description,
@@ -29,23 +33,23 @@ class Account {
     } = accountData;
     return await create(
       [name, description, startDate, startBalance, budgetId],
-      "account"
+      modelName
     );
   }
 
-  static async findById(accountId: number) {
-    return await findById(accountId, "account");
+  static async findById(accountId: number): Promise<AccountData> {
+    return (await findById(accountId, modelName)) as AccountData;
   }
 
-  static async findAllByBudgetId(budgetId: number) {
-    return await findAllByBudgetId(budgetId, "account");
+  static async findAllByBudgetId(budgetId: number): Promise<AccountData[]> {
+    return (await findAllByBudgetId(budgetId, modelName)) as AccountData[];
   }
 
-  static async findAllByUserId(userId: string) {
-    return await findAllByUserId(userId, "account");
+  static async findAllByUserId(userId: string): Promise<AccountData[]> {
+    return (await findAllByUserId(userId, modelName)) as AccountData[];
   }
 
-  static async update(accountData: AccountData) {
+  static async update(accountData: AccountData): Promise<boolean> {
     const {
       id,
       name,
@@ -57,12 +61,12 @@ class Account {
     return await update(
       id,
       [name, description, startDate, startBalance, budgetId],
-      "account"
+      modelName
     );
   }
 
-  static async removeById(accountId: number) {
-    return await removeById(accountId, "account");
+  static async removeById(accountId: number): Promise<boolean> {
+    return await removeById(accountId, modelName);
   }
 }
 

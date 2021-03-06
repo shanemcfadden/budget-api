@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
-import { queryDb } from "../database/Database";
+import { getQueryPath, queryDb } from "../database/Database";
 
 interface NewUserData {
   email: string;
@@ -12,9 +12,13 @@ interface UserData extends NewUserData {
   _id: string;
 }
 
+const modelName = "user";
+
 class User {
   static async findByEmail(email: string): Promise<UserData | null> {
-    const results = await queryDb("users/findByEmail.sql", [email]);
+    const results = await queryDb(getQueryPath(modelName, "findByEmail"), [
+      email,
+    ]);
 
     if ((results as RowDataPacket).length < 1) return null;
 
@@ -25,7 +29,7 @@ class User {
   static async create(newUserData: NewUserData): Promise<{ _id: string }> {
     const { email, password, firstName, lastName } = newUserData;
     const id = uuid();
-    await queryDb("users/create.sql", [
+    await queryDb(getQueryPath(modelName, "create"), [
       id,
       email,
       password,

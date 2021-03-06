@@ -1,10 +1,8 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
-import sinon, { SinonStub } from "sinon";
+import sinon from "sinon";
 import Account from "../../src/models/account";
 import * as Model from "../../src/util/models";
-import * as Database from "../../src/database/Database";
-import { query } from "express";
 
 describe("Account model", () => {
   const newAccountData = {
@@ -14,7 +12,7 @@ describe("Account model", () => {
     startBalance: 100,
     budgetId: 3,
   };
-  const mockAccountData = {
+  const accountData = {
     ...newAccountData,
     id: 2,
     currentBalance: 300,
@@ -26,20 +24,19 @@ describe("Account model", () => {
     startDate,
     startBalance,
     budgetId,
-  } = mockAccountData;
+  } = accountData;
+  const accountDataArr = [name, description, startDate, startBalance, budgetId];
+  const modelName = "account";
+
   afterEach(() => {
     sinon.restore();
   });
+
   describe("create()", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await Account.create(newAccountData);
-      expect(
-        createStub.calledOnceWith(
-          [name, description, startDate, startBalance, budgetId],
-          "account"
-        )
-      ).to.be.true;
+      expect(createStub.calledOnceWith(accountDataArr, modelName)).to.be.true;
       expect(results).to.deep.equal({ _id: id });
     });
   });
@@ -47,10 +44,10 @@ describe("Account model", () => {
     it("should call util findById() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findById")
-        .resolves(mockAccountData as RowDataPacket);
+        .resolves(accountData as RowDataPacket);
       const results = await Account.findById(id);
-      expect(findStub.calledOnceWith(id, "account")).to.be.true;
-      expect(results).to.deep.equal(mockAccountData);
+      expect(findStub.calledOnceWith(id, modelName)).to.be.true;
+      expect(results).to.deep.equal(accountData);
     });
   });
   describe("findAllByBudgetId()", () => {
@@ -58,10 +55,10 @@ describe("Account model", () => {
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
-        .resolves([mockAccountData as RowDataPacket]);
+        .resolves([accountData as RowDataPacket]);
       const results = await Account.findAllByBudgetId(budgetId);
-      expect(findStub.calledOnceWith(budgetId, "account")).to.be.true;
-      expect(results).to.deep.equal([mockAccountData]);
+      expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
+      expect(results).to.deep.equal([accountData]);
     });
   });
   describe("findAllByUserId()", () => {
@@ -69,23 +66,18 @@ describe("Account model", () => {
     it("should call util findAllByUserId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByUserId")
-        .resolves([mockAccountData as RowDataPacket]);
+        .resolves([accountData as RowDataPacket]);
       const results = await Account.findAllByUserId(userId);
-      expect(findStub.calledOnceWith(userId, "account")).to.be.true;
-      expect(results).to.deep.equal([mockAccountData]);
+      expect(findStub.calledOnceWith(userId, modelName)).to.be.true;
+      expect(results).to.deep.equal([accountData]);
     });
   });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
-      const results = await Account.update(mockAccountData);
-      expect(
-        updateSub.calledOnceWith(
-          id,
-          [name, description, startDate, startBalance, budgetId],
-          "account"
-        )
-      ).to.be.true;
+      const results = await Account.update(accountData);
+      expect(updateSub.calledOnceWith(id, accountDataArr, modelName)).to.be
+        .true;
       expect(results).to.equal(true);
     });
   });
@@ -93,7 +85,7 @@ describe("Account model", () => {
     it("should call util removeById() and return its value", async () => {
       const removeStub = sinon.stub(Model, "removeById").resolves(true);
       const results = await Account.removeById(id);
-      expect(removeStub.calledOnceWith(id, "account")).to.be.true;
+      expect(removeStub.calledOnceWith(id, modelName)).to.be.true;
       expect(results).to.deep.equal(true);
     });
   });

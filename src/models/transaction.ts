@@ -4,6 +4,7 @@ import {
   findAllByBudgetId,
   removeById,
   update,
+  IdPacket,
 } from "../util/models";
 
 interface NewTransactionData {
@@ -18,8 +19,12 @@ interface TransactionData extends NewTransactionData {
   id: number;
 }
 
+const modelName = "transaction";
+
 class Transaction {
-  static async create(newTransactionData: NewTransactionData) {
+  static async create(
+    newTransactionData: NewTransactionData
+  ): Promise<IdPacket> {
     const {
       amount,
       description,
@@ -29,19 +34,19 @@ class Transaction {
     } = newTransactionData;
     return await create(
       [amount, description, date, accountId, categoryId],
-      "transaction"
+      modelName
     );
   }
 
-  static async findById(transactionId: number) {
-    return await findById(transactionId, "transaction");
+  static async findById(transactionId: number): Promise<TransactionData> {
+    return (await findById(transactionId, modelName)) as TransactionData;
   }
 
-  static async findAllByBudgetId(budgetId: number) {
-    return await findAllByBudgetId(budgetId, "transaction");
+  static async findAllByBudgetId(budgetId: number): Promise<TransactionData[]> {
+    return (await findAllByBudgetId(budgetId, modelName)) as TransactionData[];
   }
 
-  static async update(transactionData: TransactionData) {
+  static async update(transactionData: TransactionData): Promise<boolean> {
     const {
       id,
       amount,
@@ -53,12 +58,12 @@ class Transaction {
     return await update(
       id,
       [amount, description, date, accountId, categoryId],
-      "transaction"
+      modelName
     );
   }
 
-  static async removeById(id: number) {
-    return await removeById(id, "transaction");
+  static async removeById(id: number): Promise<boolean> {
+    return await removeById(id, modelName);
   }
 }
 

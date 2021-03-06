@@ -12,7 +12,7 @@ describe("Transaction model", () => {
     accountId: 4,
     categoryId: 2,
   };
-  const mockTransactionData = {
+  const transactionData = {
     ...newTransactionData,
     id: 2,
   };
@@ -23,7 +23,10 @@ describe("Transaction model", () => {
     date,
     accountId,
     categoryId,
-  } = mockTransactionData;
+  } = transactionData;
+  const transactionDataArr = [amount, description, date, accountId, categoryId];
+  const modelName = "transaction";
+
   afterEach(() => {
     sinon.restore();
   });
@@ -31,12 +34,8 @@ describe("Transaction model", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await Transaction.create(newTransactionData);
-      expect(
-        createStub.calledOnceWith(
-          [amount, description, date, accountId, categoryId],
-          "transaction"
-        )
-      ).to.be.true;
+      expect(createStub.calledOnceWith(transactionDataArr, modelName)).to.be
+        .true;
       expect(results).to.deep.equal({ _id: id });
     });
   });
@@ -44,10 +43,10 @@ describe("Transaction model", () => {
     it("should call util findById() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findById")
-        .resolves(mockTransactionData as RowDataPacket);
+        .resolves(transactionData as RowDataPacket);
       const results = await Transaction.findById(id);
-      expect(findStub.calledOnceWith(id, "transaction")).to.be.true;
-      expect(results).to.deep.equal(mockTransactionData);
+      expect(findStub.calledOnceWith(id, modelName)).to.be.true;
+      expect(results).to.deep.equal(transactionData);
     });
   });
   describe("findAllByBudgetId()", () => {
@@ -55,23 +54,18 @@ describe("Transaction model", () => {
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
-        .resolves([mockTransactionData as RowDataPacket]);
+        .resolves([transactionData as RowDataPacket]);
       const results = await Transaction.findAllByBudgetId(budgetId);
-      expect(findStub.calledOnceWith(budgetId, "transaction")).to.be.true;
-      expect(results).to.deep.equal([mockTransactionData]);
+      expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
+      expect(results).to.deep.equal([transactionData]);
     });
   });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
-      const results = await Transaction.update(mockTransactionData);
-      expect(
-        updateSub.calledOnceWith(
-          id,
-          [amount, description, date, accountId, categoryId],
-          "transaction"
-        )
-      ).to.be.true;
+      const results = await Transaction.update(transactionData);
+      expect(updateSub.calledOnceWith(id, transactionDataArr, modelName)).to.be
+        .true;
       expect(results).to.equal(true);
     });
   });
@@ -79,7 +73,7 @@ describe("Transaction model", () => {
     it("should call util removeById() and return its value", async () => {
       const removeStub = sinon.stub(Model, "removeById").resolves(true);
       const results = await Transaction.removeById(id);
-      expect(removeStub.calledOnceWith(id, "transaction")).to.be.true;
+      expect(removeStub.calledOnceWith(id, modelName)).to.be.true;
       expect(results).to.deep.equal(true);
     });
   });

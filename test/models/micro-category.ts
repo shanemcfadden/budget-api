@@ -9,24 +9,23 @@ describe("MicroCategory model", () => {
     description: "Work",
     macroCategoryId: 30,
   };
-  const mockMicroCategoryData = {
+  const microCategoryData = {
     ...newMicroCategoryData,
     id: 2,
   };
-  const { id, description, macroCategoryId } = mockMicroCategoryData;
+  const { id, description, macroCategoryId } = microCategoryData;
+  const microCategoryArr = [description, macroCategoryId];
+  const modelName = "micro-category";
+
   afterEach(() => {
     sinon.restore();
   });
+
   describe("create()", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await MicroCategory.create(newMicroCategoryData);
-      expect(
-        createStub.calledOnceWith(
-          [description, macroCategoryId],
-          "micro-categorie"
-        )
-      ).to.be.true;
+      expect(createStub.calledOnceWith(microCategoryArr, modelName)).to.be.true;
       expect(results).to.deep.equal({ _id: id });
     });
   });
@@ -34,10 +33,10 @@ describe("MicroCategory model", () => {
     it("should call util findById() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findById")
-        .resolves(mockMicroCategoryData as RowDataPacket);
+        .resolves(microCategoryData as RowDataPacket);
       const results = await MicroCategory.findById(id);
-      expect(findStub.calledOnceWith(id, "micro-categorie")).to.be.true;
-      expect(results).to.deep.equal(mockMicroCategoryData);
+      expect(findStub.calledOnceWith(id, modelName)).to.be.true;
+      expect(results).to.deep.equal(microCategoryData);
     });
   });
   describe("findAllByBudgetId()", () => {
@@ -45,23 +44,18 @@ describe("MicroCategory model", () => {
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
-        .resolves([mockMicroCategoryData as RowDataPacket]);
+        .resolves([microCategoryData as RowDataPacket]);
       const results = await MicroCategory.findAllByBudgetId(budgetId);
-      expect(findStub.calledOnceWith(budgetId, "micro-categorie")).to.be.true;
-      expect(results).to.deep.equal([mockMicroCategoryData]);
+      expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
+      expect(results).to.deep.equal([microCategoryData]);
     });
   });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
-      const results = await MicroCategory.update(mockMicroCategoryData);
-      expect(
-        updateSub.calledOnceWith(
-          id,
-          [description, macroCategoryId],
-          "micro-categorie"
-        )
-      ).to.be.true;
+      const results = await MicroCategory.update(microCategoryData);
+      expect(updateSub.calledOnceWith(id, microCategoryArr, modelName)).to.be
+        .true;
       expect(results).to.equal(true);
     });
   });
@@ -69,7 +63,7 @@ describe("MicroCategory model", () => {
     it("should call util removeById() and return its value", async () => {
       const removeStub = sinon.stub(Model, "removeById").resolves(true);
       const results = await MicroCategory.removeById(id);
-      expect(removeStub.calledOnceWith(id, "micro-categorie")).to.be.true;
+      expect(removeStub.calledOnceWith(id, modelName)).to.be.true;
       expect(results).to.deep.equal(true);
     });
   });

@@ -17,24 +17,34 @@ describe("User model", () => {
 
   describe("findByEmail()", () => {
     const { email } = fakeUser;
-    it("should query the database", async () => {
-      queryDbStub = sinon
-        .stub(Database, "queryDb")
-        .resolves([fakeUser] as RowDataPacket[]);
-      await User.findByEmail(email);
-      expect(queryDbStub.calledOnceWith("users/findByEmail.sql", [email])).to.be
-        .true;
-    });
     describe("If user with email exists in the database...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([fakeUser] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await User.findByEmail(email);
+        expect(queryDbStub.calledOnceWith("users/findByEmail.sql", [email])).to
+          .be.true;
+      });
       it("should return complete user object", async () => {
-        sinon.stub(Database, "queryDb").resolves([fakeUser] as RowDataPacket[]);
         const result = await User.findByEmail(email);
         expect(result).to.deep.equal(fakeUser);
       });
     });
     describe("If email doesn't exist in the database...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([] as RowDataPacket[]);
+      });
+      it("should query the database", async () => {
+        await User.findByEmail(email);
+        expect(queryDbStub.calledOnceWith("users/findByEmail.sql", [email])).to
+          .be.true;
+      });
       it("should return null", async () => {
-        sinon.stub(Database, "queryDb").resolves([] as RowDataPacket[]);
         const result = await User.findByEmail(email);
         expect(result).to.be.null;
       });
@@ -56,7 +66,6 @@ describe("User model", () => {
     });
     it("should create a user with a query", async () => {
       const { email, password, firstName, lastName } = fakeUserData;
-
       await User.create(fakeUserData);
       expect(
         queryDbStub.calledOnceWith("users/create.sql", [

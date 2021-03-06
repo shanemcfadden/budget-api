@@ -9,20 +9,23 @@ describe("Budget model", () => {
     title: "The Addams Family budget",
     description: "It's a bit scary...",
   };
-  const mockBudgetData = {
+  const budgetData = {
     ...newBudgetData,
     id: 2,
   };
-  const { id, title, description } = mockBudgetData;
+  const { id, title, description } = budgetData;
+  const budgetDataArr = [title, description];
+  const modelName = "budget";
+
   afterEach(() => {
     sinon.restore();
   });
+
   describe("create()", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await Budget.create(newBudgetData);
-      expect(createStub.calledOnceWith([title, description], "budget")).to.be
-        .true;
+      expect(createStub.calledOnceWith(budgetDataArr, modelName)).to.be.true;
       expect(results).to.deep.equal({ _id: id });
     });
   });
@@ -30,10 +33,10 @@ describe("Budget model", () => {
     it("should call util findById() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findById")
-        .resolves(mockBudgetData as RowDataPacket);
+        .resolves(budgetData as RowDataPacket);
       const results = await Budget.findById(id);
-      expect(findStub.calledOnceWith(id, "budget")).to.be.true;
-      expect(results).to.deep.equal(mockBudgetData);
+      expect(findStub.calledOnceWith(id, modelName)).to.be.true;
+      expect(results).to.deep.equal(budgetData);
     });
   });
   describe("findAllByUserId()", () => {
@@ -41,18 +44,18 @@ describe("Budget model", () => {
     it("should call util findAllByUserId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByUserId")
-        .resolves([mockBudgetData as RowDataPacket]);
+        .resolves([budgetData as RowDataPacket]);
       const results = await Budget.findAllByUserId(userId);
-      expect(findStub.calledOnceWith(userId, "budget")).to.be.true;
-      expect(results).to.deep.equal([mockBudgetData]);
+      expect(findStub.calledOnceWith(userId, modelName)).to.be.true;
+      expect(results).to.deep.equal([budgetData]);
     });
   });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const createStub = sinon.stub(Model, "update").resolves(true);
-      const results = await Budget.update(mockBudgetData);
-      expect(createStub.calledOnceWith(id, [title, description], "budget")).to
-        .be.true;
+      const results = await Budget.update(budgetData);
+      expect(createStub.calledOnceWith(id, budgetDataArr, modelName)).to.be
+        .true;
       expect(results).to.equal(true);
     });
   });
@@ -60,7 +63,7 @@ describe("Budget model", () => {
     it("should call util removeById() and return its value", async () => {
       const removeStub = sinon.stub(Model, "removeById").resolves(true);
       const results = await Budget.removeById(id);
-      expect(removeStub.calledOnceWith(id, "budget")).to.be.true;
+      expect(removeStub.calledOnceWith(id, modelName)).to.be.true;
       expect(results).to.deep.equal(true);
     });
   });

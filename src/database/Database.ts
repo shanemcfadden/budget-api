@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import mysql from "mysql2";
+import { pluralModel } from "../util/models";
 
 const { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE } = process.env;
 
@@ -45,3 +46,7 @@ export const queryDb = async function (
   }
   return results;
 };
+
+export function getQueryPath(modelName: string, queryName: string) {
+  return `${pluralModel(modelName)}/${queryName}.sql`;
+}
