@@ -1,3 +1,5 @@
+DROP TABLE transaction_micro_categories;
+DROP TABLE transaction_macro_categories;
 DROP TABLE transactions;
 DROP TABLE accounts;
 DROP TABLE budget_users;
@@ -72,24 +74,63 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
 ;
 
+CREATE TABLE transaction_macro_categories (
+    id INT AUTO_INCREMENT,
+    description VARCHAR(100) NOT NULL,
+    is_income BOOLEAN NOT NULL,
+    budget_id INT NOT NULL,
+    FOREIGN Key (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+)
+;
+
+INSERT INTO transaction_macro_categories (description, is_income, budget_id)
+    VALUES
+        ('Work', 1, 1),
+        ('Miscellaneous', 1, 1),
+        ('Personal', 0, 1),
+        ('Work', 1, 2),
+        ('Personal', 0, 2)
+;
+
+CREATE TABLE transaction_micro_categories (
+    id INT AUTO_INCREMENT,
+    description VARCHAR(100) NOT NULL,
+    macro_category_id INT NOT NULL,
+    FOREIGN Key (macro_category_id) REFERENCES transaction_macro_categories(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+)
+;
+
+INSERT INTO transaction_micro_categories (description, macro_category_id)
+    VALUES
+        ('Full Time Job', 1),
+        ('Other', 2),
+        ('Travel', 3),
+        ('White house income', 4),
+        ('Malia and Sasha', 5)
+;
+
 CREATE TABLE transactions(
     id INT AUTO_INCREMENT,
     amount DECIMAL(10, 2) NOT NULL,
     description VARCHAR(100),
     date DATE NOT NULL,
     account_id INT NOT NULL,
+    category_id INT NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES transaction_micro_categories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 )
 ;
 
-INSERT INTO transactions (amount, description, date, account_id) 
+INSERT INTO transactions (amount, description, date, account_id, category_id) 
     VALUES
-        (300.50, 'Christmas bonus', '2020-12-25', 1),
-        (40, 'Found in coat pocket', '2021-01-02', 1),
-        (-334.99, 'Flight (Found on flash sale!)', '2021-01-15', 1),
-        (525000, 'Lumpsum of salary', '2010-1-1', 2),
-        (535000, 'Lumpsum of salary', '2011-1-1', 2),
-        (545000, 'Lumpsum of salary', '2012-1-1', 2),
-        (-20000, "Malia's tuition", '2016-1-3', 3)
+        (300.50, 'Christmas bonus', '2020-12-25', 1, 1),
+        (40, 'Found in coat pocket', '2021-01-02', 1, 2),
+        (-334.99, 'Flight (Found on flash sale!)', '2021-01-15', 1, 3),
+        (525000, 'Lumpsum of salary', '2010-1-1', 2, 4),
+        (535000, 'Lumpsum of salary', '2011-1-1', 2, 4),
+        (545000, 'Lumpsum of salary', '2012-1-1', 2, 4),
+        (-20000, "Malia's tuition", '2016-1-3', 3, 5)
 ;
