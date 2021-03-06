@@ -1,13 +1,21 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
 import { getQueryPath, queryDb } from "../database/Database";
+import { findById, removeById, update } from "../util/models";
 
-interface NewUserData {
+interface UserDataBase {
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
 }
+interface UserDataMinusPassword extends UserDataBase {
+  _id: string;
+}
+
+interface NewUserData extends UserDataBase {
+  password: string;
+}
+
 interface UserData extends NewUserData {
   _id: string;
 }
@@ -15,6 +23,10 @@ interface UserData extends NewUserData {
 const modelName = "user";
 
 class User {
+  static async findById(id: string): Promise<UserDataMinusPassword> {
+    return (await findById(id, modelName)) as UserDataMinusPassword;
+  }
+
   static async findByEmail(email: string): Promise<UserData | null> {
     const results = await queryDb(getQueryPath(modelName, "findByEmail"), [
       email,
@@ -37,6 +49,15 @@ class User {
       lastName,
     ]);
     return { _id: id };
+  }
+
+  static async update(userData: UserData): Promise<boolean> {
+    const { _id, email, firstName, lastName } = userData;
+    return await update(_id, [email, firstName, lastName], modelName);
+  }
+
+  static async removeById(id: string): Promise<boolean> {
+    return await removeById(id, modelName);
   }
 }
 
