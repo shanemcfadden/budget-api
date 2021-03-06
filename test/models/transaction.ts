@@ -42,6 +42,17 @@ describe("Transaction model", () => {
       expect(results).to.deep.equal(mockTransactionData);
     });
   });
+  describe("findAllByBudgetId()", () => {
+    const budgetId = 3321;
+    it("should call util findAllByBudgetId() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findAllByBudgetId")
+        .resolves([mockTransactionData as RowDataPacket]);
+      const results = await Transaction.findAllByBudgetId(budgetId);
+      expect(findStub.calledOnceWith(budgetId, "transaction")).to.be.true;
+      expect(results).to.deep.equal([mockTransactionData]);
+    });
+  });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
