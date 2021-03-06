@@ -1,10 +1,4 @@
-import {
-  create,
-  findAllByUserId,
-  findById,
-  removeById,
-  update,
-} from "../util/models";
+import { create, findById, removeById, update } from "../util/models";
 
 interface NewTransactionData {
   amount: number;
