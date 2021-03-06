@@ -18,9 +18,9 @@ app.use((req, res) => {
   res.send("route not found");
 });
 
-app.use(((err, req, res, next) => {
-  res.status(400).send({
-    error: "This is the error handler",
+app.use(((error, req, res, next) => {
+  res.status(error.statusCode || 500).send({
+    error: error,
   });
 }) as ErrorRequestHandler);
 
