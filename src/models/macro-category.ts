@@ -17,17 +17,14 @@ interface MacroCategoryData extends NewMacroCategoryData {
   id: number;
 }
 
-const modelName = "macro-categorie";
+const modelName = "macro-category";
 
 class MacroCategory {
   static async create(
     newTransactionData: NewMacroCategoryData
   ): Promise<IdPacket> {
     const { description, isIncome, budgetId } = newTransactionData;
-    return await create(
-      [description, isIncome, budgetId],
-      modelName // TODO: unify plural model names
-    );
+    return await create([description, isIncome, budgetId], modelName);
   }
 
   static async findById(transactionId: number): Promise<MacroCategoryData> {

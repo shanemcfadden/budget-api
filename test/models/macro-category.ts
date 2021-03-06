@@ -16,7 +16,7 @@ describe("MacroCategory model", () => {
   };
   const { id, description, isIncome, budgetId } = macroCategoryData;
   const macroCategoryArr = [description, isIncome, budgetId];
-  const modelName = "macro-categorie";
+  const modelName = "macro-category";
 
   afterEach(() => {
     sinon.restore();

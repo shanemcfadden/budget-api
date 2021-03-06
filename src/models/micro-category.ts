@@ -16,17 +16,14 @@ interface MicroCategoryData extends NewMicroCategoryData {
   id: number;
 }
 
-const modelName = "micro-categorie";
+const modelName = "micro-category";
 
 class MicroCategory {
   static async create(
     newTransactionData: NewMicroCategoryData
   ): Promise<IdPacket> {
     const { description, macroCategoryId } = newTransactionData;
-    return await create(
-      [description, macroCategoryId],
-      modelName // TODO: unify plural model names
-    );
+    return await create([description, macroCategoryId], modelName);
   }
 
   static async findById(transactionId: number): Promise<MicroCategoryData> {
