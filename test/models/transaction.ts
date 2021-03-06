@@ -10,12 +10,20 @@ describe("Transaction model", () => {
     description: "Coffee",
     date: new Date("2020-01-15"),
     accountId: 4,
+    categoryId: 2,
   };
   const mockTransactionData = {
     ...newTransactionData,
     id: 2,
   };
-  const { id, amount, description, date, accountId } = mockTransactionData;
+  const {
+    id,
+    amount,
+    description,
+    date,
+    accountId,
+    categoryId,
+  } = mockTransactionData;
   afterEach(() => {
     sinon.restore();
   });
@@ -25,7 +33,7 @@ describe("Transaction model", () => {
       const results = await Transaction.create(newTransactionData);
       expect(
         createStub.calledOnceWith(
-          [amount, description, date, accountId],
+          [amount, description, date, accountId, categoryId],
           "transaction"
         )
       ).to.be.true;
@@ -60,7 +68,7 @@ describe("Transaction model", () => {
       expect(
         updateSub.calledOnceWith(
           id,
-          [amount, description, date, accountId],
+          [amount, description, date, accountId, categoryId],
           "transaction"
         )
       ).to.be.true;
