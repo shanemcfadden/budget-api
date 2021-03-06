@@ -1,5 +1,5 @@
 import { OkPacket, RowDataPacket } from "mysql2";
-import { queryDb } from "../database/Database";
+import { getQueryPath, queryDb } from "../database/Database";
 import { capitalize } from "./strings";
 
 type RowId = number | string;
@@ -66,14 +66,10 @@ export async function removeById(id: RowId, model: string) {
   );
 }
 
-function pluralModel(modelName: string): string {
+export function pluralModel(modelName: string): string {
   const oddPlurals: Record<string, string> = {
     "macro-category": "macro-categories",
     "micro-category": "micro-categories",
   };
   return oddPlurals[modelName] || modelName + "s";
-}
-
-function getQueryPath(modelName: string, queryName: string) {
-  return `${pluralModel(modelName)}/${queryName}.sql`;
 }
