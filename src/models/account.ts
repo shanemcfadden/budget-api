@@ -37,19 +37,19 @@ class Account {
     );
   }
 
-  static async findById(accountId: number) {
-    return await findById(accountId, modelName);
+  static async findById(accountId: number): Promise<AccountData> {
+    return (await findById(accountId, modelName)) as AccountData;
   }
 
-  static async findAllByBudgetId(budgetId: number) {
-    return await findAllByBudgetId(budgetId, modelName);
+  static async findAllByBudgetId(budgetId: number): Promise<AccountData[]> {
+    return (await findAllByBudgetId(budgetId, modelName)) as AccountData[];
   }
 
-  static async findAllByUserId(userId: string) {
-    return await findAllByUserId(userId, modelName);
+  static async findAllByUserId(userId: string): Promise<AccountData[]> {
+    return (await findAllByUserId(userId, modelName)) as AccountData[];
   }
 
-  static async update(accountData: AccountData) {
+  static async update(accountData: AccountData): Promise<boolean> {
     const {
       id,
       name,
@@ -65,7 +65,7 @@ class Account {
     );
   }
 
-  static async removeById(accountId: number) {
+  static async removeById(accountId: number): Promise<boolean> {
     return await removeById(accountId, modelName);
   }
 }
