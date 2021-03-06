@@ -76,7 +76,7 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
 CREATE TABLE transaction_macro_categories (
     id INT AUTO_INCREMENT,
     description VARCHAR(100) NOT NULL,
-    is_income TINYINT(1) NOT NULL,
+    is_income BOOLEAN NOT NULL,
     budget_id INT NOT NULL,
     FOREIGN Key (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
