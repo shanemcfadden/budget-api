@@ -5,6 +5,7 @@ import {
   update,
   removeById,
   findAllByUserId,
+  findAllByBudgetId,
 } from "../util/models";
 interface NewAccountData {
   name: string;
@@ -37,7 +38,7 @@ class Account {
   }
 
   static async findAllByBudgetId(budgetId: number) {
-    return await queryDb("accounts/findAllByBudgetId.sql", [budgetId]);
+    return await findAllByBudgetId(budgetId, "account");
   }
 
   static async findAllByUserId(userId: string) {

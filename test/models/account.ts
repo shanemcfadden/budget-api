@@ -54,24 +54,13 @@ describe("Account model", () => {
     });
   });
   describe("findAllByBudgetId()", () => {
-    let queryStub: SinonStub;
     const budgetId = 3321;
-    beforeEach(() => {
-      queryStub = sinon
-        .stub(Database, "queryDb")
-        .resolves([mockAccountData] as RowDataPacket[]);
-    });
-    it("should query database", async () => {
-      await Account.findAllByBudgetId(budgetId);
-      expect(queryStub.calledOnce).to.be.true;
-    });
-    it("should use accounts/findAllByBudgetId.sql query file", async () => {
-      await Account.findAllByBudgetId(budgetId);
-      expect(queryStub.calledWith("accounts/findAllByBudgetId.sql", [budgetId]))
-        .to.be.true;
-    });
-    it("should return an array of accounts", async () => {
+    it("should call util findAllByBudgetId() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findAllByBudgetId")
+        .resolves([mockAccountData as RowDataPacket]);
       const results = await Account.findAllByBudgetId(budgetId);
+      expect(findStub.calledOnceWith(budgetId, "account")).to.be.true;
       expect(results).to.deep.equal([mockAccountData]);
     });
   });
