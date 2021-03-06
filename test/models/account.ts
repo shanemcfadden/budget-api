@@ -1,8 +1,10 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
-import sinon from "sinon";
+import sinon, { SinonStub } from "sinon";
 import Account from "../../src/models/account";
 import * as Model from "../../src/util/models";
+import * as Database from "../../src/database/Database";
+import { query } from "express";
 
 describe("Account model", () => {
   const newAccountData = {
@@ -15,6 +17,7 @@ describe("Account model", () => {
   const mockAccountData = {
     ...newAccountData,
     id: 2,
+    currentBalance: 300,
   };
   const {
     id,
@@ -48,6 +51,28 @@ describe("Account model", () => {
       const results = await Account.findById(id);
       expect(findStub.calledOnceWith(id, "account")).to.be.true;
       expect(results).to.deep.equal(mockAccountData);
+    });
+  });
+  describe("findAllByBudgetId()", () => {
+    let queryStub: SinonStub;
+    const budgetId = 3321;
+    beforeEach(() => {
+      queryStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([mockAccountData] as RowDataPacket[]);
+    });
+    it("should query database", async () => {
+      await Account.findAllByBudgetId(budgetId);
+      expect(queryStub.calledOnce).to.be.true;
+    });
+    it("should use accounts/findAllByBudgetId.sql query file", async () => {
+      await Account.findAllByBudgetId(budgetId);
+      expect(queryStub.calledWith("accounts/findAllByBudgetId.sql", [budgetId]))
+        .to.be.true;
+    });
+    it("should return an array of accounts", async () => {
+      const results = await Account.findAllByBudgetId(budgetId);
+      expect(results).to.deep.equal([mockAccountData]);
     });
   });
   describe("findAllByUserId()", () => {
