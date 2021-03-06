@@ -42,17 +42,6 @@ describe("Transaction model", () => {
       expect(results).to.deep.equal(mockTransactionData);
     });
   });
-  describe("findAllByUserId()", () => {
-    const userId = "asdfwerwqiohon";
-    it("should call util findAllByUserId() and return its value", async () => {
-      const findStub = sinon
-        .stub(Model, "findAllByUserId")
-        .resolves([mockTransactionData as RowDataPacket]);
-      const results = await Transaction.findAllByUserId(userId);
-      expect(findStub.calledOnceWith(userId, "transaction")).to.be.true;
-      expect(results).to.deep.equal([mockTransactionData]);
-    });
-  });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
