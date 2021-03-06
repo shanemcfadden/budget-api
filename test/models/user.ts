@@ -100,11 +100,7 @@ describe("User model", () => {
       const createStub = sinon.stub(Model, "update").resolves(true);
       const results = await User.update(fakeUser);
       expect(
-        createStub.calledOnceWith(
-          _id,
-          [email, password, firstName, lastName],
-          modelName
-        )
+        createStub.calledOnceWith(_id, [email, firstName, lastName], modelName)
       ).to.be.true;
       expect(results).to.equal(true);
     });
