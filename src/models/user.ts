@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
 import { getQueryPath, queryDb } from "../database/Database";
+import { findById, removeById, update } from "../util/models";
 
 interface NewUserData {
   email: string;
@@ -15,6 +16,10 @@ interface UserData extends NewUserData {
 const modelName = "user";
 
 class User {
+  static async findById(id: string): Promise<UserData> {
+    return (await findById(id, modelName)) as UserData;
+  }
+
   static async findByEmail(email: string): Promise<UserData | null> {
     const results = await queryDb(getQueryPath(modelName, "findByEmail"), [
       email,
@@ -37,6 +42,15 @@ class User {
       lastName,
     ]);
     return { _id: id };
+  }
+
+  static async update(userData: UserData): Promise<boolean> {
+    const { _id, email, password, firstName, lastName } = userData;
+    return await update(_id, [email, password, firstName, lastName], modelName);
+  }
+
+  static async removeById(id: string): Promise<boolean> {
+    return await removeById(id, modelName);
   }
 }
 
