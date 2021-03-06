@@ -27,10 +27,6 @@ class Transaction {
     return await findById(transactionId, "transaction");
   }
 
-  static async findAllByUserId(userId: string) {
-    return await findAllByUserId(userId, "transaction");
-  }
-
   static async update(transactionData: TransactionData) {
     const { id, amount, description, date, accountId } = transactionData;
     return await update(
