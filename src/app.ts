@@ -20,7 +20,12 @@ app.use((req, res) => {
 
 app.use(((error, req, res, next) => {
   res.status(error.statusCode || 500).send({
-    error: error,
+    error: {
+      message: error.message,
+      path: req.path,
+      method: req.method,
+      time: Date(),
+    },
   });
 }) as ErrorRequestHandler);
 
