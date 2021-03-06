@@ -1,3 +1,4 @@
+DROP TABLE transaction_micro_categories;
 DROP TABLE transaction_macro_categories;
 DROP TABLE transactions;
 DROP TABLE accounts;
@@ -90,6 +91,15 @@ INSERT INTO transaction_macro_categories (description, is_income, budget_id)
         ('Personal', 0, 1),
         ('Work', 1, 2),
         ('Personal', 0, 2)
+;
+
+CREATE TABLE transaction_micro_categories (
+    id INT AUTO_INCREMENT,
+    description VARCHAR(100) NOT NULL,
+    macro_category_id INT NOT NULL,
+    FOREIGN Key (macro_category_id) REFERENCES transaction_macro_categories(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+)
 ;
 
 CREATE TABLE transactions(
