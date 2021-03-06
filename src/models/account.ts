@@ -14,6 +14,7 @@ interface NewAccountData {
 }
 interface AccountData extends NewAccountData {
   id: number;
+  currentBalance: number;
 }
 class Account {
   static async create(accountData: NewAccountData) {
