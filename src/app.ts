@@ -19,7 +19,7 @@ app.use((req, res) => {
 });
 
 app.use(((error, req, res, next) => {
-  res.status(error.statusCode || 500).send({
+  res.status(error.statusCode || 500).json({
     error: {
       message: error.message,
       path: req.path,
