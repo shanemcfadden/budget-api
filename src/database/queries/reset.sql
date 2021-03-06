@@ -83,6 +83,15 @@ CREATE TABLE transaction_macro_categories (
 )
 ;
 
+INSERT INTO transaction_macro_categories (description, is_income, budget_id)
+    VALUES
+        ('Work', 1, 1),
+        ('Miscellaneous', 1, 1),
+        ('Personal', 0, 1),
+        ('Work', 1, 2),
+        ('Personal', 0, 2)
+;
+
 CREATE TABLE transactions(
     id INT AUTO_INCREMENT,
     amount DECIMAL(10, 2) NOT NULL,
