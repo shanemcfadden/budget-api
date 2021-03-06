@@ -11,6 +11,7 @@ interface NewTransactionData {
   description?: string;
   date: Date;
   accountId: number;
+  categoryId: number;
 }
 
 interface TransactionData extends NewTransactionData {
@@ -19,8 +20,17 @@ interface TransactionData extends NewTransactionData {
 
 class Transaction {
   static async create(newTransactionData: NewTransactionData) {
-    const { amount, description, date, accountId } = newTransactionData;
-    return await create([amount, description, date, accountId], "transaction");
+    const {
+      amount,
+      description,
+      date,
+      accountId,
+      categoryId,
+    } = newTransactionData;
+    return await create(
+      [amount, description, date, accountId, categoryId],
+      "transaction"
+    );
   }
 
   static async findById(transactionId: number) {
@@ -32,10 +42,17 @@ class Transaction {
   }
 
   static async update(transactionData: TransactionData) {
-    const { id, amount, description, date, accountId } = transactionData;
+    const {
+      id,
+      amount,
+      description,
+      date,
+      accountId,
+      categoryId,
+    } = transactionData;
     return await update(
       id,
-      [amount, description, date, accountId],
+      [amount, description, date, accountId, categoryId],
       "transaction"
     );
   }
