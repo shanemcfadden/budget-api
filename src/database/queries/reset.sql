@@ -102,6 +102,15 @@ CREATE TABLE transaction_micro_categories (
 )
 ;
 
+INSERT INTO transaction_micro_categories (description, macro_category_id)
+    VALUES
+        ('Full Time Job', 1),
+        ('Other', 2),
+        ('Travel', 3),
+        ('White house income', 4),
+        ('Malia and Sasha', 5)
+;
+
 CREATE TABLE transactions(
     id INT AUTO_INCREMENT,
     amount DECIMAL(10, 2) NOT NULL,
