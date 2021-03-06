@@ -1,4 +1,10 @@
-import { create, findById, removeById, update } from "../util/models";
+import {
+  create,
+  findById,
+  findAllByBudgetId,
+  removeById,
+  update,
+} from "../util/models";
 
 interface NewTransactionData {
   amount: number;
@@ -19,6 +25,10 @@ class Transaction {
 
   static async findById(transactionId: number) {
     return await findById(transactionId, "transaction");
+  }
+
+  static async findAllByBudgetId(budgetId: number) {
+    return await findAllByBudgetId(budgetId, "transaction");
   }
 
   static async update(transactionData: TransactionData) {
