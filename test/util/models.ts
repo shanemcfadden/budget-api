@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
-import sinon, { SinonStub } from "sinon";
+import sinon, { mock, SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import {
   create,
+  findAllByBudgetId,
   findAllByUserId,
   findById,
   update,
@@ -84,6 +85,29 @@ describe("util/model.ts", () => {
         const result = await findById(id, model);
         expect(result).to.be.null;
       });
+    });
+  });
+  describe("findAllByBudgetId()", () => {
+    let queryStub: SinonStub;
+    const budgetId = 3321;
+    beforeEach(() => {
+      queryStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([mockData] as RowDataPacket[]);
+    });
+    it("should query database", async () => {
+      await findAllByBudgetId(budgetId, model);
+      expect(queryStub.calledOnce).to.be.true;
+    });
+    it("should use accounts/findAllByBudgetId.sql query file", async () => {
+      await findAllByBudgetId(budgetId, model);
+      expect(
+        queryStub.calledWith(model + "s/findAllByBudgetId.sql", [budgetId])
+      ).to.be.true;
+    });
+    it("should return an array of accounts", async () => {
+      const results = await findAllByBudgetId(budgetId, model);
+      expect(results).to.deep.equal([mockData]);
     });
   });
   describe("findAllByUserId()", () => {
