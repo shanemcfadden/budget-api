@@ -1,5 +1,5 @@
 import "./util/env";
-import express from "express";
+import express, { ErrorRequestHandler, Request } from "express";
 import bodyParser from "body-parser";
 import { db } from "./database/Database";
 import AuthRoutes from "./routes/auth";
@@ -17,6 +17,12 @@ app.use("/auth", AuthRoutes);
 app.use((req, res) => {
   res.send("route not found");
 });
+
+app.use(((err, req, res, next) => {
+  res.status(400).send({
+    error: "This is the error handler",
+  });
+}) as ErrorRequestHandler);
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
