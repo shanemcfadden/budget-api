@@ -1,3 +1,4 @@
+import { queryDb } from "../database/Database";
 import {
   create,
   findById,
@@ -33,6 +34,10 @@ class Account {
 
   static async findById(accountId: number) {
     return await findById(accountId, "account");
+  }
+
+  static async findAllByBudgetId(budgetId: number) {
+    return await queryDb("accounts/findAllByBudgetId.sql", [budgetId]);
   }
 
   static async findAllByUserId(userId: string) {
