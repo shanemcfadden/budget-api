@@ -3,6 +3,9 @@ import { queryDb } from "../database/Database";
 import { capitalize } from "./strings";
 
 type RowId = number | string;
+export interface IdPacket {
+  _id: number;
+}
 
 export async function findById(id: RowId, model: string) {
   const results = (await queryDb(`${model}s/findById.sql`, [
@@ -26,7 +29,7 @@ export async function findAllByUserId(id: string, model: string) {
   ])) as RowDataPacket[];
 }
 
-export async function create(data: any[], model: string) {
+export async function create(data: any[], model: string): Promise<IdPacket> {
   const results = (await queryDb(`${model}s/create.sql`, data)) as OkPacket;
 
   return {
