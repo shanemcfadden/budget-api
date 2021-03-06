@@ -4,6 +4,7 @@ import {
   findAllByBudgetId,
   removeById,
   update,
+  IdPacket,
 } from "../util/models";
 
 interface NewMicroCategoryData {
@@ -15,30 +16,39 @@ interface MicroCategoryData extends NewMicroCategoryData {
   id: number;
 }
 
+const modelName = "micro-categorie";
+
 class MicroCategory {
-  static async create(newTransactionData: NewMicroCategoryData) {
+  static async create(
+    newTransactionData: NewMicroCategoryData
+  ): Promise<IdPacket> {
     const { description, macroCategoryId } = newTransactionData;
     return await create(
       [description, macroCategoryId],
-      "micro-categorie" // TODO: unify plural model names
+      modelName // TODO: unify plural model names
     );
   }
 
-  static async findById(transactionId: number) {
-    return await findById(transactionId, "micro-categorie");
+  static async findById(transactionId: number): Promise<MicroCategoryData> {
+    return (await findById(transactionId, modelName)) as MicroCategoryData;
   }
 
-  static async findAllByBudgetId(budgetId: number) {
-    return await findAllByBudgetId(budgetId, "micro-categorie");
+  static async findAllByBudgetId(
+    budgetId: number
+  ): Promise<MicroCategoryData[]> {
+    return (await findAllByBudgetId(
+      budgetId,
+      modelName
+    )) as MicroCategoryData[];
   }
 
-  static async update(transactionData: MicroCategoryData) {
+  static async update(transactionData: MicroCategoryData): Promise<boolean> {
     const { id, description, macroCategoryId } = transactionData;
-    return await update(id, [description, macroCategoryId], "micro-categorie");
+    return await update(id, [description, macroCategoryId], modelName);
   }
 
-  static async removeById(id: number) {
-    return await removeById(id, "micro-categorie");
+  static async removeById(id: number): Promise<boolean> {
+    return await removeById(id, modelName);
   }
 }
 
