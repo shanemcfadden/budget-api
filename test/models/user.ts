@@ -4,6 +4,7 @@ import chaiuuid from "chai-uuid";
 import { RowDataPacket } from "mysql2";
 import User from "../../src/models/user";
 import * as Database from "../../src/database/Database";
+import * as Model from "../../src/util/models";
 import { fakeUser } from "../fixtures";
 
 chai.use(chaiuuid);
@@ -11,6 +12,9 @@ const expect = chai.expect;
 
 describe("User model", () => {
   let queryDbStub: SinonStub;
+  const { email, password, firstName, lastName, _id } = fakeUser;
+  const modelName = "user";
+
   afterEach(() => {
     sinon.restore();
   });
@@ -54,19 +58,18 @@ describe("User model", () => {
     beforeEach(() => {
       queryDbStub = sinon.stub(Database, "queryDb").resolves();
     });
-    const fakeUserData = {
+    const newUserData = {
       ...fakeUser,
       _id: undefined,
     };
     it("should create a unique id for each user", async () => {
-      const result = await User.create(fakeUserData);
+      const result = await User.create(newUserData);
       expect(result).to.have.property("_id");
       // @ts-ignore
       expect(result?._id).to.be.a.uuid("v4");
     });
     it("should create a user with a query", async () => {
-      const { email, password, firstName, lastName } = fakeUserData;
-      await User.create(fakeUserData);
+      await User.create(newUserData);
       expect(
         queryDbStub.calledOnceWith("users/create.sql", [
           sinon.match.string,
@@ -78,8 +81,40 @@ describe("User model", () => {
       ).to.be.true;
     });
     it("should return an object with the user id", async () => {
-      const result = await User.create(fakeUserData);
+      const result = await User.create(newUserData);
       expect(result).to.have.all.keys(["_id"]);
+    });
+  });
+  describe("findById()", () => {
+    it("should call util findById() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findById")
+        .resolves(fakeUser as RowDataPacket);
+      const results = await User.findById(_id);
+      expect(findStub.calledOnceWith(_id, modelName)).to.be.true;
+      expect(results).to.deep.equal(fakeUser);
+    });
+  });
+  describe("update()", () => {
+    it("should call util update() and return its value", async () => {
+      const createStub = sinon.stub(Model, "update").resolves(true);
+      const results = await User.update(fakeUser);
+      expect(
+        createStub.calledOnceWith(
+          _id,
+          [email, password, firstName, lastName],
+          modelName
+        )
+      ).to.be.true;
+      expect(results).to.equal(true);
+    });
+  });
+  describe("removeById()", () => {
+    it("should call util removeById() and return its value", async () => {
+      const removeStub = sinon.stub(Model, "removeById").resolves(true);
+      const results = await User.removeById(_id);
+      expect(removeStub.calledOnceWith(_id, modelName)).to.be.true;
+      expect(results).to.deep.equal(true);
     });
   });
 });
