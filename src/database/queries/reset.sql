@@ -1,3 +1,4 @@
+DROP TABLE transactions;
 DROP TABLE accounts;
 DROP TABLE budget_users;
 DROP TABLE users;
@@ -69,4 +70,26 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (2, 'Checking', 'The Federal Reserve', '2013-1-20', '49000.76'),
         (3, 'Chase Saphire Reserve', 'Chase bank, 21.99%APY', '2015-01-31', '-872.61'),
         (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
+;
+
+CREATE TABLE transactions(
+    id INT AUTO_INCREMENT,
+    amount DECIMAL(10, 2) NOT NULL,
+    description VARCHAR(100),
+    date DATE NOT NULL,
+    account_id INT NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+)
+;
+
+INSERT INTO transactions (amount, description, date, account_id) 
+    VALUES
+        (300.50, 'Christmas bonus', '2020-12-25', 1),
+        (40, 'Found in coat pocket', '2021-01-02', 1),
+        (-334.99, 'Flight (Found on flash sale!)', '2021-01-15', 1),
+        (525000, 'Lumpsum of salary', '2010-1-1', 2),
+        (535000, 'Lumpsum of salary', '2011-1-1', 2),
+        (545000, 'Lumpsum of salary', '2012-1-1', 2),
+        (-20000, "Malia's tuition", '2016-1-3', 3)
 ;
