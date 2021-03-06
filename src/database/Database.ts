@@ -23,7 +23,7 @@ export const db = pool.promise();
 
 export const queryDb = async function (
   queryPath: string,
-  values: any[]
+  values: any[] = []
 ): Promise<PoolQueryResults> {
   const splitPath = queryPath.split("/");
   const completePath = path.join(__dirname, "queries", ...splitPath);
