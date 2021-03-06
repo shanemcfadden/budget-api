@@ -1,4 +1,3 @@
-import { queryDb } from "../database/Database";
 import {
   create,
   findById,
@@ -6,7 +5,9 @@ import {
   removeById,
   findAllByUserId,
   findAllByBudgetId,
+  IdPacket,
 } from "../util/models";
+
 interface NewAccountData {
   name: string;
   description?: string;
@@ -18,8 +19,11 @@ interface AccountData extends NewAccountData {
   id: number;
   currentBalance: number;
 }
+
+const modelName = "account";
+
 class Account {
-  static async create(accountData: NewAccountData) {
+  static async create(accountData: NewAccountData): Promise<IdPacket> {
     const {
       name,
       description,
@@ -29,20 +33,20 @@ class Account {
     } = accountData;
     return await create(
       [name, description, startDate, startBalance, budgetId],
-      "account"
+      modelName
     );
   }
 
   static async findById(accountId: number) {
-    return await findById(accountId, "account");
+    return await findById(accountId, modelName);
   }
 
   static async findAllByBudgetId(budgetId: number) {
-    return await findAllByBudgetId(budgetId, "account");
+    return await findAllByBudgetId(budgetId, modelName);
   }
 
   static async findAllByUserId(userId: string) {
-    return await findAllByUserId(userId, "account");
+    return await findAllByUserId(userId, modelName);
   }
 
   static async update(accountData: AccountData) {
@@ -57,12 +61,12 @@ class Account {
     return await update(
       id,
       [name, description, startDate, startBalance, budgetId],
-      "account"
+      modelName
     );
   }
 
   static async removeById(accountId: number) {
-    return await removeById(accountId, "account");
+    return await removeById(accountId, modelName);
   }
 }
 
