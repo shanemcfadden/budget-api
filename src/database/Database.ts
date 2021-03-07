@@ -3,6 +3,7 @@ import path from "path";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import mysql from "mysql2";
 import { pluralModel } from "../util/models";
+import { ServerError } from "../util/errors";
 
 const { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE } = process.env;
 
@@ -35,14 +36,13 @@ export const queryDb = async function (
   try {
     query = await fs.readFile(completePath, "utf-8");
   } catch {
-    throw new Error("query path invalid");
+    throw new ServerError(500, "Internal server error");
   }
 
   try {
     [results] = await db.query(query, values);
-  } catch (err) {
-    console.log(err);
-    throw new Error("Could not complete query");
+  } catch {
+    throw new ServerError(500, "Internal server error");
   }
   return results;
 };

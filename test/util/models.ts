@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
-import sinon, { mock, SinonStub } from "sinon";
+import sinon, { SinonStub } from "sinon";
 import * as Database from "../../src/database/Database";
 import {
   create,

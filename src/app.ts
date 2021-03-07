@@ -3,6 +3,7 @@ import express from "express";
 import { db } from "./database/Database";
 import AuthRoutes from "./routes/auth";
 import isAuth from "./middleware/isAuth";
+import { errorRequestHandler } from "./util/errors";
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use("/auth", AuthRoutes);
 app.use((req, res) => {
   res.send("route not found");
 });
+
+app.use(errorRequestHandler);
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
