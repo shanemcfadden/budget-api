@@ -14,6 +14,7 @@ export function handleErrors(error: ServerError | Error, next: NextFunction) {
   if (error instanceof ServerError) {
     next(error);
   } else {
+    console.log(error);
     next(new ServerError(500, "Internal server error"));
   }
 }
