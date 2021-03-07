@@ -17,7 +17,7 @@ export const login: RequestHandler = async (req, res, next) => {
     const hashedPassword = user.password;
     const passwordMatches = await bcrypt.compare(password, hashedPassword);
     if (!passwordMatches) {
-      throw new ServerError(401, "Authentication failed");
+      throw new ServerError(401, "Authentification failed");
     }
 
     const userId = user._id;
