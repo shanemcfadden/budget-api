@@ -1,8 +1,8 @@
 import "../../src/util/env";
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
-import jwt, { sign } from "jsonwebtoken";
-import sinon, { fake, SinonSpy, SinonStub } from "sinon";
+import jwt from "jsonwebtoken";
+import sinon, { SinonSpy, SinonStub } from "sinon";
 import bcrypt from "bcrypt";
 import { MockResponse } from "../types";
 import { fakeUser, mockJWT } from "../fixtures";
@@ -15,7 +15,7 @@ const { JWT_SECRET } = process.env;
 let req: Request;
 let res: MockResponse;
 const next = (() => {}) as NextFunction;
-let errorHandlerStub: SinonStub;
+let errorHandlerSpy: SinonSpy;
 
 describe("Auth Controller", () => {
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("Auth Controller", () => {
         return;
       },
     };
-    errorHandlerStub = sinon.stub(Errors, "handleErrors");
+    errorHandlerSpy = sinon.spy(Errors, "handleErrors");
   });
   afterEach(async () => {
     sinon.restore();
@@ -52,11 +52,11 @@ describe("Auth Controller", () => {
       });
       it("should throw an error", async () => {
         await login(req, res as Response, next);
-        expect(errorHandlerStub.calledOnce).to.be.true;
+        expect(errorHandlerSpy.calledOnce).to.be.true;
       });
       it("should throw the error rejected by findByEmail()", async () => {
         await login(req, res as Response, next);
-        expect(errorHandlerStub.calledWith(fakeError)).to.be.true;
+        expect(errorHandlerSpy.calledWith(fakeError)).to.be.true;
       });
       it("should not send a response", async () => {
         await login(req, res as Response, next);
@@ -80,7 +80,7 @@ describe("Auth Controller", () => {
         });
         it("should not throw an error", async () => {
           await login(req, res as Response, next);
-          expect(errorHandlerStub.called).to.be.false;
+          expect(errorHandlerSpy.called).to.be.false;
         });
         it("should set response status to 200", async () => {
           await login(req, res as Response, next);
@@ -118,16 +118,16 @@ describe("Auth Controller", () => {
         });
         it("should throw an error", async () => {
           await login(req, res as Response, next);
-          expect(errorHandlerStub.calledOnce).to.be.true;
+          expect(errorHandlerSpy.calledOnce).to.be.true;
         });
         it("error should have status code of 404", async () => {
           await login(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.statusCode).to.equal(404);
         });
         it("error should have message of 'User not found'", async () => {
           await login(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.message).to.equal("User not found");
         });
         it("should not send a response", async () => {
@@ -143,16 +143,16 @@ describe("Auth Controller", () => {
         });
         it("should throw an error", async () => {
           await login(req, res as Response, next);
-          expect(errorHandlerStub.calledOnce).to.be.true;
+          expect(errorHandlerSpy.calledOnce).to.be.true;
         });
         it("error should have status code of 401", async () => {
           await login(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.statusCode).to.equal(401);
         });
         it("error should have message of 'Authentification failed'", async () => {
           await login(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.message).to.equal("Authentification failed");
         });
         it("should not send a response", async () => {
@@ -174,8 +174,6 @@ describe("Auth Controller", () => {
         },
       } as Request;
     });
-
-    // TODO: Describe if findByEmail throws error
     describe("if findByEmail throws an error...", () => {
       const fakeError = new Errors.ServerError(500, "Fake message");
       beforeEach(() => {
@@ -183,11 +181,11 @@ describe("Auth Controller", () => {
       });
       it("should throw an error", async () => {
         await signup(req, res as Response, next);
-        expect(errorHandlerStub.calledOnce).to.be.true;
+        expect(errorHandlerSpy.calledOnce).to.be.true;
       });
       it("should throw the error rejected by findByEmail()", async () => {
         await signup(req, res as Response, next);
-        expect(errorHandlerStub.calledWith(fakeError)).to.be.true;
+        expect(errorHandlerSpy.calledWith(fakeError)).to.be.true;
       });
       it("should not send a response", async () => {
         await signup(req, res as Response, next);
@@ -215,7 +213,7 @@ describe("Auth Controller", () => {
         });
         it("should not throw an error", async () => {
           await signup(req, res as Response, next);
-          expect(errorHandlerStub.called).to.be.false;
+          expect(errorHandlerSpy.called).to.be.false;
         });
         it("should create a user", async () => {
           const { email, firstName, lastName, password } = fakeUser;
@@ -254,16 +252,16 @@ describe("Auth Controller", () => {
         });
         it("should throw an error.", async () => {
           await signup(req, res as Response, next);
-          expect(errorHandlerStub.calledOnce).to.be.true;
+          expect(errorHandlerSpy.calledOnce).to.be.true;
         });
         it("error should have status code of 401", async () => {
           await signup(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.statusCode).to.equal(401);
         });
         it("error should have message of 'Account already associated with this email'", async () => {
           await signup(req, res as Response, next);
-          const error = errorHandlerStub.getCall(0).args[0];
+          const error = errorHandlerSpy.getCall(0).args[0];
           expect(error.message).to.equal(
             "Account already associated with this email"
           );
