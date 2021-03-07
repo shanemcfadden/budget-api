@@ -8,12 +8,14 @@ import { MockResponse } from "../types";
 import { fakeUser, mockJWT } from "../fixtures";
 import { login, signup } from "../../src/controllers/auth";
 import User from "../../src/models/user";
+import * as Errors from "../../src/util/errors";
 
 const { JWT_SECRET } = process.env;
 
 let req: Request;
 let res: MockResponse;
-let next: SinonSpy;
+const next = (() => {}) as NextFunction;
+let errorHandlerStub: SinonStub;
 
 describe("Auth Controller", () => {
   beforeEach(() => {
@@ -27,7 +29,7 @@ describe("Auth Controller", () => {
         return;
       },
     };
-    next = sinon.spy();
+    errorHandlerStub = sinon.stub(Errors, "handleErrors");
   });
   afterEach(async () => {
     sinon.restore();
@@ -58,20 +60,20 @@ describe("Auth Controller", () => {
       });
 
       it("should not throw an error", async () => {
-        await login(req, res as Response, next as NextFunction);
-        expect(next.called).to.be.false;
+        await login(req, res as Response, next);
+        expect(errorHandlerStub.called).to.be.false;
       });
       it("should set response status to 200", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.statusCode).to.equal(200);
       });
       it("should send success message in res body", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.body).to.have.property("message");
         expect(res.body?.message).to.equal(LOGIN_SUCCESS_MESSAGE);
       });
       it("should set a JWT with the user id that expires in 1 hour", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(
           jwtSignStub.calledWith({ userId: fakeUser._id }, JWT_SECRET, {
             expiresIn: "1h",
@@ -79,12 +81,12 @@ describe("Auth Controller", () => {
         ).to.be.true;
       });
       it("should return a JWT in the response", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.body).to.have.property("token");
         expect(res.body?.token).to.equal(mockJWT);
       });
       it("should only have message and token in json body", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.body).to.deep.equal({
           message: LOGIN_SUCCESS_MESSAGE,
           token: mockJWT,
@@ -96,11 +98,11 @@ describe("Auth Controller", () => {
         sinon.stub(User, "findByEmail").resolves(null);
       });
       it("should throw an error", async () => {
-        await login(req, res as Response, next as NextFunction);
-        expect(next.calledOnce).to.be.true;
+        await login(req, res as Response, next);
+        expect(errorHandlerStub.calledOnce).to.be.true;
       });
       it("should not send a response", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.statusCode).to.be.undefined;
         expect(res.body).to.be.undefined;
       });
@@ -111,11 +113,11 @@ describe("Auth Controller", () => {
         sinon.stub(bcrypt, "compare").resolves(false);
       });
       it("should throw an error", async () => {
-        await login(req, res as Response, next as NextFunction);
-        expect(next.calledOnce).to.be.true;
+        await login(req, res as Response, next);
+        expect(errorHandlerStub.calledOnce).to.be.true;
       });
       it("should not send a response", async () => {
-        await login(req, res as Response, next as NextFunction);
+        await login(req, res as Response, next);
         expect(res.statusCode).to.be.undefined;
         expect(res.body).to.be.undefined;
       });
@@ -152,23 +154,23 @@ describe("Auth Controller", () => {
       });
       it("should create a user", async () => {
         const { email, firstName, lastName, password } = fakeUser;
-        await signup(req, res as Response, next as NextFunction);
+        await signup(req, res as Response, next);
         expect(createUserStub.calledOnce).to.be.true;
         expect(
           createUserStub.calledWith({ email, firstName, lastName, password })
         ).to.be.true;
       });
       it("should set response status to 201", async () => {
-        await signup(req, res as Response, next as NextFunction);
+        await signup(req, res as Response, next);
         expect(res.statusCode).to.equal(201);
       });
       it("should send success message in res body", async () => {
-        await signup(req, res as Response, next as NextFunction);
+        await signup(req, res as Response, next);
         expect(res.body).to.have.property("message");
         expect(res.body?.message).to.equal(SIGNUP_SUCCESS_MESSAGE);
       });
       it("should set a JWT with the user id that expires in 1 hour", async () => {
-        await signup(req, res as Response, next as NextFunction);
+        await signup(req, res as Response, next);
         expect(
           jwtSignStub.calledWith({ userId: fakeUser._id }, JWT_SECRET, {
             expiresIn: "1h",
@@ -176,7 +178,7 @@ describe("Auth Controller", () => {
         ).to.be.true;
       });
       it("should return a JWT in the response", async () => {
-        await signup(req, res as Response, next as NextFunction);
+        await signup(req, res as Response, next);
         expect(res.body).to.have.property("token");
         expect(res.body?.token).to.equal(mockJWT);
       });
@@ -184,8 +186,8 @@ describe("Auth Controller", () => {
     describe("if email is a duplicate...", async () => {
       it("should throw an error.", async () => {
         sinon.stub(User, "findByEmail").resolves(fakeUser);
-        await signup(req, res as Response, next as NextFunction);
-        expect(next.calledOnce).to.be.true;
+        await signup(req, res as Response, next);
+        expect(errorHandlerStub.calledOnce).to.be.true;
       });
     });
   });
