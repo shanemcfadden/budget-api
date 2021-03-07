@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import { db } from "./database/Database";
 import AuthRoutes from "./routes/auth";
 import isAuth from "./middleware/isAuth";
+import { errorRequestHandler } from "./util/errors";
 
 const app = express();
 
@@ -18,16 +19,7 @@ app.use((req, res) => {
   res.send("route not found");
 });
 
-app.use(((error, req, res, next) => {
-  res.status(error.statusCode || 500).json({
-    error: {
-      message: error.message,
-      path: req.path,
-      method: req.method,
-      time: Date(),
-    },
-  });
-}) as ErrorRequestHandler);
+app.use(errorRequestHandler);
 
 app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);

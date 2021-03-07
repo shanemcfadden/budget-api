@@ -1,4 +1,4 @@
-import { NextFunction } from "express";
+import { ErrorRequestHandler, NextFunction } from "express";
 
 export class ServerError {
   statusCode: number;
@@ -17,3 +17,19 @@ export function handleErrors(error: ServerError | Error, next: NextFunction) {
     next(new ServerError(500, "Internal server error"));
   }
 }
+
+export const errorRequestHandler: ErrorRequestHandler = function (
+  error,
+  req,
+  res,
+  next
+) {
+  res.status(error.statusCode).json({
+    error: {
+      message: error.message,
+      path: req.path,
+      method: req.method,
+      time: Date(),
+    },
+  });
+};
