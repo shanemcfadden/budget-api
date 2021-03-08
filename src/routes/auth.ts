@@ -5,6 +5,7 @@ import {
   throwAllValidationErrorMessages,
   throwFirstValidationErrorMessage,
 } from "../middleware/validator";
+import isValidPassword from "../util/isValidPassword";
 
 const router = Router();
 
@@ -13,13 +14,7 @@ router.post(
   body("email", "Invalid email or password").isEmail().normalizeEmail(),
   body("password", "Invalid email or password")
     .trim()
-    .custom((value) => {
-      const validPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-      if (value.match(validPassword)) {
-        return true;
-      }
-      throw new Error();
-    }),
+    .custom(isValidPassword()),
   throwFirstValidationErrorMessage,
   login
 );
@@ -38,15 +33,11 @@ router.put(
       return true;
     })
     .trim()
-    .custom((value) => {
-      const validPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-      if (value.match(validPassword)) {
-        return true;
-      }
-      throw new Error(
-        "Password must be 8-20 characters long with at least one of the following: uppercase letter, lowercase letter, number, special character"
-      );
-    }),
+    .custom(
+      isValidPassword(
+        "Password must be 8-20 characters long and contain at least one uppercase letter, lowercase letter, number, and special character"
+      )
+    ),
   body("firstName", "First name is required")
     .trim()
     .isLength({ min: 1, max: 100 }),
