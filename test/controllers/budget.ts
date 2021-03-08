@@ -46,10 +46,12 @@ describe("Budget controller", () => {
       });
     });
     describe("if user is authenticated...", () => {
-      req = {
-        isAuth: true,
-        userId: "asdriou2342",
-      } as ExtendedRequest;
+      beforeEach(() => {
+        req = {
+          isAuth: true,
+          userId: "asdriou2342",
+        } as ExtendedRequest;
+      });
       describe("if Budget model resolves...", () => {
         const fakeBudgetResults = [
           { id: 2, title: "Vacation budget", description: "Cannot wait" },
@@ -69,7 +71,8 @@ describe("Budget controller", () => {
         beforeEach(() => {
           sinon.stub(Budget, "findAllByUserId").rejects(mockError);
         });
-        it("should throw the rejected error", () => {
+        it("should throw the rejected error", async () => {
+          await getBudgets(req, res as Response, next);
           expect(errorHandlerSpy.calledOnce).to.be.true;
           const error = errorHandlerSpy.getCall(0).args[0];
           expect(error).to.deep.equal(mockError);
