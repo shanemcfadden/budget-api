@@ -6,18 +6,7 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-
-interface NewTransactionData {
-  amount: number;
-  description?: string;
-  date: Date;
-  accountId: number;
-  categoryId: number;
-}
-
-interface TransactionData extends NewTransactionData {
-  id: number;
-}
+import { NewTransactionData, TransactionData } from "../types/models";
 
 const modelName = "transaction";
 

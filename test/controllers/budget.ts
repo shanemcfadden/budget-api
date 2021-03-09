@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { NextFunction, Response } from "express";
 import sinon, { SinonSpy } from "sinon";
 import { getBudgets } from "../../src/controllers/budget";
-import { ExtendedRequest } from "../../src/types";
+import { ExtendedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";

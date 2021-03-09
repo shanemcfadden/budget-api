@@ -7,18 +7,7 @@ import {
   findAllByBudgetId,
   IdPacket,
 } from "../util/models";
-
-interface NewAccountData {
-  name: string;
-  description?: string;
-  startDate: Date;
-  startBalance: number;
-  budgetId: number;
-}
-interface AccountData extends NewAccountData {
-  id: number;
-  currentBalance: number;
-}
+import { NewAccountData, AccountData } from "../types/models";
 
 const modelName = "account";
 

@@ -6,14 +6,7 @@ import {
   removeById,
   update,
 } from "../util/models";
-
-interface NewBudgetData {
-  title?: string;
-  description?: string;
-}
-interface BudgetData extends NewBudgetData {
-  id: number;
-}
+import { NewBudgetData, BudgetData } from "../types/models";
 
 const modelName = "budget";
 

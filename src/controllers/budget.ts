@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import Budget from "../models/budget";
-import { CustomRequestHandler } from "../types";
+import { CustomRequestHandler } from "../types/express";
 import { handleErrors, ServerError } from "../util/errors";
 
 export const getBudgets: CustomRequestHandler = async (req, res, next) => {
