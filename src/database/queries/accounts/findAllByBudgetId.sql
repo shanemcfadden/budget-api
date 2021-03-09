@@ -1,4 +1,5 @@
 SELECT 
+    accounts.id AS id,
     name, 
     accounts.description AS description,
     start_date AS startDate, 
