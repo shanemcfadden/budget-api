@@ -16,11 +16,11 @@ CREATE TABLE users(
 
 INSERT INTO users (id, email, pw, first_name, last_name)
     VALUES 
-        ('1', 'test@test.com', '$2b$12$RKlftCLGSo0VkcpG0yqJfezbnHAbgsR8kXfsXQb2UrIws9A1MU1wq', 'Jane', 'Doe'), 
+        ('1', 'test@test.com', '$2b$12$vSgxenb.N/h1amtlwhRZKOxzWQUTO4AV9ie1iaMg11MQQhDYZ4uTu', 'Jane', 'Doe'), 
         ('2', 'test2@test.com', 'password', 'John', 'Smith'),
         ('3', 'test3@test.com', 'ThisisHashed', 'Franz', 'Liszt'),
         ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach'),
-        ('5', 'renegade@whitehouse.gov', 'secretpw', 'Barack', 'Obama'),
+        ('5', 'renegade@whitehouse.gov', '$2b$12$vSgxenb.N/h1amtlwhRZKOxzWQUTO4AV9ie1iaMg11MQQhDYZ4uTu', 'Barack', 'Obama'),
         ('6', 'renaissance@whitehouse.gov', 'evenMOREsecretpw', 'Michelle', 'Obama')
 ;
 
