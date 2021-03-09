@@ -1,3 +1,20 @@
+export interface UserDataBase {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+export interface UserDataMinusPassword extends UserDataBase {
+  _id: string;
+}
+
+export interface NewUserData extends UserDataBase {
+  password: string;
+}
+
+export interface UserData extends NewUserData {
+  _id: string;
+}
+
 export interface NewBudgetData {
   title?: string;
   description?: string;

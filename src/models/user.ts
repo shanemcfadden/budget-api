@@ -2,23 +2,7 @@ import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
 import { getQueryPath, queryDb } from "../database/Database";
 import { findById, removeById, update } from "../util/models";
-
-interface UserDataBase {
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-interface UserDataMinusPassword extends UserDataBase {
-  _id: string;
-}
-
-interface NewUserData extends UserDataBase {
-  password: string;
-}
-
-interface UserData extends NewUserData {
-  _id: string;
-}
+import { UserDataMinusPassword, NewUserData, UserData } from "../types/models";
 
 const modelName = "user";
 
