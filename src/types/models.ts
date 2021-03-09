@@ -23,21 +23,33 @@ export interface BudgetData extends NewBudgetData {
   id: number;
 }
 
-interface ExtensiveBudgetData extends BudgetData {
-  accounts: Record<number, NewAccountData>;
+export interface ExtensiveBudgetData extends BudgetData {
+  accounts: Record<number, AccountDataWithoutBudgetId>;
   transactions: Record<number, NewTransactionData>;
+  microCategories: Record<number, NewMicroCategoryData>;
+  macroCategories: Record<number, MacroCategoryDataWithoutBudgetId>;
 }
 
-export interface NewAccountData {
+export interface AccountDataBase {
   name: string;
   description?: string;
   startDate: Date;
   startBalance: number;
+}
+export interface NewAccountData extends AccountDataBase {
   budgetId: number;
 }
-export interface AccountData extends NewAccountData {
-  id: number;
+
+export interface AccountDataWithoutBudgetId extends AccountDataBase {
   currentBalance: number;
+}
+
+export interface CoreAccountData extends NewAccountData {
+  currentBalance: number;
+}
+
+export interface CompleteAccountData extends CoreAccountData {
+  id: number;
 }
 
 export interface NewTransactionData {
@@ -49,6 +61,18 @@ export interface NewTransactionData {
 }
 
 export interface TransactionData extends NewTransactionData {
+  id: number;
+}
+
+export interface MacroCategoryDataWithoutBudgetId {
+  description: string;
+  isIncome: boolean;
+}
+export interface NewMacroCategoryData extends MacroCategoryDataWithoutBudgetId {
+  budgetId: number;
+}
+
+export interface MacroCategoryData extends NewMacroCategoryData {
   id: number;
 }
 

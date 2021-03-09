@@ -6,16 +6,7 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-
-interface NewMacroCategoryData {
-  description: string;
-  isIncome: boolean;
-  budgetId: number;
-}
-
-interface MacroCategoryData extends NewMacroCategoryData {
-  id: number;
-}
+import { NewMacroCategoryData, MacroCategoryData } from "../types/models";
 
 const modelName = "macro-category";
 
