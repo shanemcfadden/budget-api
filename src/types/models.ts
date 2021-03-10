@@ -29,8 +29,7 @@ export interface BudgetAccountTransactionData extends BudgetData {
 }
 
 export interface CompleteBudgetData extends BudgetAccountTransactionData {
-  microCategories: Record<number, NewMicroCategoryData>;
-  macroCategories: Record<number, MacroCategoryDataWithoutBudgetId>;
+  categories: CategoriesData;
 }
 
 export interface AccountDataBase {
@@ -65,6 +64,14 @@ export interface NewTransactionData {
 
 export interface TransactionData extends NewTransactionData {
   id: number;
+}
+
+export interface CategoriesData {
+  [index: number]: {
+    description: string;
+    isIncome: boolean;
+    microCategories: Record<number, string>;
+  };
 }
 
 export interface MacroCategoryDataWithoutBudgetId {
