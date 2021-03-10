@@ -1,7 +1,12 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
 import { getQueryPath, queryDb } from "../database/Database";
-import { findById, removeById, update } from "../util/models";
+import {
+  findAllByBudgetId,
+  findById,
+  removeById,
+  update,
+} from "../util/models";
 import { UserDataMinusPassword, NewUserData, UserData } from "../types/models";
 
 const modelName = "user";
@@ -20,6 +25,15 @@ class User {
 
     const user = (results as RowDataPacket)[0];
     return user;
+  }
+
+  static async findAllByBudgetId(
+    budgetId: number
+  ): Promise<UserDataMinusPassword[]> {
+    return (await findAllByBudgetId(
+      budgetId,
+      modelName
+    )) as UserDataMinusPassword[];
   }
 
   static async create(newUserData: NewUserData): Promise<{ _id: string }> {

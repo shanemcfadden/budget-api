@@ -95,6 +95,17 @@ describe("User model", () => {
       expect(results).to.deep.equal(fakeUser);
     });
   });
+  describe("findAllByBudgetId()", () => {
+    const fakeBudgetId = 304;
+    it("should call util findAllByBudgetId() and return its value", async () => {
+      const findStub = sinon
+        .stub(Model, "findAllByBudgetId")
+        .resolves([fakeUser] as RowDataPacket[]);
+      const results = await User.findAllByBudgetId(fakeBudgetId);
+      expect(findStub.calledOnceWith(fakeBudgetId, modelName)).to.be.true;
+      expect(results).to.deep.equal(fakeUser);
+    });
+  });
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const createStub = sinon.stub(Model, "update").resolves(true);
