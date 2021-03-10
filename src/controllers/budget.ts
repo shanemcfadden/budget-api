@@ -1,19 +1,12 @@
 import { RequestHandler } from "express";
-import Account from "../models/account";
 import Budget from "../models/budget";
-import MacroCategory from "../models/macro-category";
-import MicroCategory from "../models/micro-category";
-import Transaction from "../models/transaction";
+import User from "../models/user";
 import { CustomRequestHandler } from "../types/express";
-import { ExtensiveBudgetData } from "../types/models";
 import { handleErrors, ServerError } from "../util/errors";
 
 export const getBudgets: CustomRequestHandler = async (req, res, next) => {
   try {
-    if (!req.isAuth) {
-      throw new ServerError(401, "Unauthenticated user");
-    }
-    if (!req.userId) {
+    if (!req.isAuth || !req.userId) {
       throw new ServerError(401, "Unauthenticated user");
     }
     const results = await Budget.findAllByUserId(req.userId);
@@ -25,53 +18,20 @@ export const getBudgets: CustomRequestHandler = async (req, res, next) => {
 
 export const getBudget: CustomRequestHandler = async (req, res, next) => {
   try {
-    if (!req.isAuth) {
-      throw new ServerError(401, "Unauthenticated user");
-    }
-    if (!req.userId) {
+    if (!req.isAuth || !req.userId) {
       throw new ServerError(401, "Unauthenticated user");
     }
     const budgetId = +req.params.id;
-    const [
-      userBudgets,
-      budget,
-      accounts,
-      transactions,
-      categories,
-    ] = await Promise.all([
-      Budget.findAllByUserId(req.userId),
-      Budget.findById(budgetId),
-      Account.findAllByBudgetId(budgetId),
-      Transaction.findAllByBudgetId(budgetId),
-      MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
+    const [budgetUsers, budgetData] = await Promise.all([
+      User.findAllByBudgetId(budgetId),
+      Budget.findDetailsById(budgetId),
     ]);
 
-    const matchingBudgets = userBudgets.filter(({ id }) => id === budgetId);
-    if (!matchingBudgets.length) throw new ServerError(403, "Access denied");
+    if (!budgetUsers.filter((userData) => userData._id === req.userId).length) {
+      throw new ServerError(403, "Access denied");
+    }
 
-    const accountDictionary = accounts.reduce(
-      (
-        dictionary,
-        { id, name, description, startDate, startBalance, currentBalance }
-      ) => {
-        dictionary[id] = {
-          name,
-          description,
-          startBalance,
-          startDate,
-          currentBalance,
-        };
-        return dictionary;
-      },
-      {}
-    );
-
-    res.status(200).json({
-      budget,
-      accountDictionary,
-      transactions,
-      categories,
-    });
+    res.status(200).json(budgetData);
   } catch (err) {
     handleErrors(err, next);
   }

@@ -11,9 +11,11 @@ import {
   NewBudgetData,
   BudgetData,
   BudgetAccountTransactionData,
+  CompleteBudgetData,
 } from "../types/models";
 import { queryDb } from "../database/Database";
 import { ServerError } from "../util/errors";
+import MacroCategory from "./macro-category";
 
 const modelName = "budget";
 
@@ -21,6 +23,17 @@ class Budget {
   static async create(newBudgetData: NewBudgetData): Promise<IdPacket> {
     const { title, description } = newBudgetData;
     return await create([title, description], modelName);
+  }
+
+  static async findDetailsById(budgetId: number): Promise<CompleteBudgetData> {
+    const [budgetAccountTransactionData, categoryData] = await Promise.all([
+      Budget.findByIdWithAccountsAndTransactions(budgetId),
+      MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
+    ]);
+    return {
+      ...budgetAccountTransactionData,
+      categories: categoryData,
+    };
   }
 
   static async findById(budgetId: number): Promise<BudgetData> {
@@ -34,10 +47,9 @@ class Budget {
     budgetId: number
   ): Promise<BudgetAccountTransactionData> {
     const rawData = (await queryDb(
-      "budgets/findByIdWithAccountsAndTransactions",
+      "budgets/findByIdWithAccountsAndTransactions.sql",
       [budgetId]
     )) as RowDataPacket[];
-
     if (!rawData[0]) throw new ServerError(404, "Budget not found");
     const budgetData: BudgetAccountTransactionData = {
       id: budgetId,
@@ -64,20 +76,20 @@ class Budget {
         budgetData.accounts[accountId] = {
           name: accountName,
           startDate: accountStartDate,
-          startBalance: accountStartBalance,
-          currentBalance: accountStartBalance,
+          startBalance: +accountStartBalance,
+          currentBalance: +accountStartBalance,
         };
       }
       if (transactionId) {
         budgetData.transactions.push({
           id: transactionId,
-          amount: transactionAmount,
+          amount: +transactionAmount,
           description: transactionDescription,
           date: transactionDate,
           accountId: transactionAccountId,
           categoryId: transactionCategoryId,
         });
-        budgetData.accounts[accountId].currentBalance += transactionAmount;
+        budgetData.accounts[accountId].currentBalance += +transactionAmount;
       }
     });
     return budgetData;
