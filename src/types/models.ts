@@ -23,9 +23,12 @@ export interface BudgetData extends NewBudgetData {
   id: number;
 }
 
-export interface ExtensiveBudgetData extends BudgetData {
+export interface BudgetAccountTransactionData extends BudgetData {
   accounts: Record<number, AccountDataWithoutBudgetId>;
-  transactions: Record<number, NewTransactionData>;
+  transactions: TransactionData[];
+}
+
+export interface CompleteBudgetData extends BudgetAccountTransactionData {
   microCategories: Record<number, NewMicroCategoryData>;
   macroCategories: Record<number, MacroCategoryDataWithoutBudgetId>;
 }
