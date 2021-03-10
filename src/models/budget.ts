@@ -10,12 +10,13 @@ import {
 import {
   NewBudgetData,
   BudgetData,
-  BudgetAccountTransactionData,
   CompleteBudgetData,
+  BudgetAccountData,
 } from "../types/models";
 import { queryDb } from "../database/Database";
 import { ServerError } from "../util/errors";
 import MacroCategory from "./macro-category";
+import Transaction from "./transaction";
 
 const modelName = "budget";
 
@@ -26,12 +27,18 @@ class Budget {
   }
 
   static async findDetailsById(budgetId: number): Promise<CompleteBudgetData> {
-    const [budgetAccountTransactionData, categoryData] = await Promise.all([
-      Budget.findByIdWithAccountsAndTransactions(budgetId),
+    const [
+      budgetAccountData,
+      transactionData,
+      categoryData,
+    ] = await Promise.all([
+      Budget.findByIdWithAccountData(budgetId),
+      Transaction.findAllByBudgetId(budgetId),
       MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
     ]);
     return {
-      ...budgetAccountTransactionData,
+      ...budgetAccountData,
+      transactions: transactionData,
       categories: categoryData,
     };
   }
@@ -40,58 +47,38 @@ class Budget {
     return (await findById(budgetId, modelName)) as BudgetData;
   }
 
-  // NOTE: Current balance only works when retrieving every transaction
-  // Perhaps in future, calculate current balance in table and specify number of transactions
-  // in function args
-  static async findByIdWithAccountsAndTransactions(
+  static async findByIdWithAccountData(
     budgetId: number
-  ): Promise<BudgetAccountTransactionData> {
-    const rawData = (await queryDb(
-      "budgets/findByIdWithAccountsAndTransactions.sql",
-      [budgetId]
-    )) as RowDataPacket[];
+  ): Promise<BudgetAccountData> {
+    const rawData = (await queryDb("budgets/findByIdWithAccountData.sql", [
+      budgetId,
+    ])) as RowDataPacket[];
+
     if (!rawData[0]) throw new ServerError(404, "Budget not found");
-    const budgetData: BudgetAccountTransactionData = {
+    const budgetData: BudgetAccountData = {
       id: budgetId,
       title: rawData[0].budgetTitle,
       description: rawData[0].budgetDescription,
       accounts: {},
-      transactions: [],
     };
-
-    rawData.forEach((dataRow) => {
-      const {
-        transactionId,
-        transactionAmount,
-        transactionDescription,
-        transactionDate,
-        transactionAccountId,
-        transactionCategoryId,
+    rawData.forEach(
+      ({
         accountId,
         accountName,
-        accountStartDate,
-        accountStartBalance,
-      } = dataRow;
-      if (!budgetData.accounts[accountId]) {
+        accountDescription,
+        startDate,
+        startBalance,
+        currentBalance,
+      }) => {
         budgetData.accounts[accountId] = {
           name: accountName,
-          startDate: accountStartDate,
-          startBalance: +accountStartBalance,
-          currentBalance: +accountStartBalance,
+          description: accountDescription,
+          startDate,
+          startBalance: +startBalance,
+          currentBalance: +currentBalance,
         };
       }
-      if (transactionId) {
-        budgetData.transactions.push({
-          id: transactionId,
-          amount: +transactionAmount,
-          description: transactionDescription,
-          date: transactionDate,
-          accountId: transactionAccountId,
-          categoryId: transactionCategoryId,
-        });
-        budgetData.accounts[accountId].currentBalance += +transactionAmount;
-      }
-    });
+    );
     return budgetData;
   }
 

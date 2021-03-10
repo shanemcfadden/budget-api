@@ -23,12 +23,13 @@ export interface BudgetData extends NewBudgetData {
   id: number;
 }
 
-export interface BudgetAccountTransactionData extends BudgetData {
+export interface BudgetAccountData extends BudgetData {
   accounts: Record<number, AccountDataWithoutBudgetId>;
-  transactions: TransactionData[];
 }
 
-export interface CompleteBudgetData extends BudgetAccountTransactionData {
+// TODO: Make the following type irrelevant
+export interface CompleteBudgetData extends BudgetData {
+  transactions: TransactionData[];
   categories: CategoriesData;
 }
 
