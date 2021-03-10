@@ -37,15 +37,13 @@ export const getBudget: CustomRequestHandler = async (req, res, next) => {
       budget,
       accounts,
       transactions,
-      microCategories,
-      macroCategories,
+      categories,
     ] = await Promise.all([
       Budget.findAllByUserId(req.userId),
       Budget.findById(budgetId),
       Account.findAllByBudgetId(budgetId),
       Transaction.findAllByBudgetId(budgetId),
-      MicroCategory.findAllByBudgetId(budgetId),
-      MacroCategory.findAllByBudgetId(budgetId),
+      MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
     ]);
 
     const matchingBudgets = userBudgets.filter(({ id }) => id === budgetId);
@@ -68,36 +66,11 @@ export const getBudget: CustomRequestHandler = async (req, res, next) => {
       {}
     );
 
-    const categoriesDictionary = macroCategories.reduce(
-      (
-        dictionary: Record<
-          number,
-          {
-            description: string;
-            isIncome: boolean;
-            microCategories: Record<number, string>;
-          }
-        >,
-        { id, description, isIncome }
-      ) => {
-        dictionary[id] = {
-          description,
-          isIncome: !!isIncome,
-          microCategories: {},
-        };
-        return dictionary;
-      },
-      {}
-    );
-
-    microCategories.forEach(({ id, description, macroCategoryId }) => {
-      categoriesDictionary[macroCategoryId].microCategories[id] = description;
-    });
     res.status(200).json({
       budget,
       accountDictionary,
       transactions,
-      categoriesDictionary,
+      categories,
     });
   } catch (err) {
     handleErrors(err, next);

@@ -32,13 +32,11 @@ export const queryDb = async function (
 
   let query: string;
   let results: PoolQueryResults;
-
   try {
     query = await fs.readFile(completePath, "utf-8");
   } catch {
     throw new ServerError(500, "Internal server error");
   }
-
   try {
     [results] = await db.query(query, values);
   } catch {
