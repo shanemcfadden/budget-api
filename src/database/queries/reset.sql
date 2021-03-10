@@ -1,6 +1,6 @@
+DROP TABLE transactions;
 DROP TABLE transaction_micro_categories;
 DROP TABLE transaction_macro_categories;
-DROP TABLE transactions;
 DROP TABLE accounts;
 DROP TABLE budget_users;
 DROP TABLE users;
@@ -90,7 +90,8 @@ INSERT INTO transaction_macro_categories (description, is_income, budget_id)
         ('Miscellaneous', 1, 1),
         ('Personal', 0, 1),
         ('Work', 1, 2),
-        ('Personal', 0, 2)
+        ('Personal', 0, 2),
+        ('Freelance Work', 1, 2)
 ;
 
 CREATE TABLE transaction_micro_categories (
@@ -108,7 +109,8 @@ INSERT INTO transaction_micro_categories (description, macro_category_id)
         ('Other', 2),
         ('Travel', 3),
         ('White house income', 4),
-        ('Malia and Sasha', 5)
+        ('Malia and Sasha', 5),
+        ('Food', 5)
 ;
 
 CREATE TABLE transactions(
