@@ -6,7 +6,11 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-import { NewMacroCategoryData, MacroCategoryData } from "../types/models";
+import {
+  NewMacroCategoryData,
+  MacroCategoryData,
+  CategoriesData,
+} from "../types/models";
 import { queryDb } from "../database/Database";
 
 const modelName = "macro-category";
@@ -35,7 +39,9 @@ class MacroCategory {
     )) as MacroCategoryData[];
   }
 
-  static async findAllByBudgetIdWithMicroCategories(budgetId: number) {
+  static async findAllByBudgetIdWithMicroCategories(
+    budgetId: number
+  ): Promise<CategoriesData> {
     const rawData = (await queryDb(
       "macro-categories/findAllByBudgetIdWithMicroCategories.sql",
       [budgetId]
