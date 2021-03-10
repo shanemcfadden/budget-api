@@ -71,7 +71,8 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (2, 'Retirement', 'Vanguard Mutual Fund', '2009-1-20', '100000'),
         (2, 'Checking', 'The Federal Reserve', '2013-1-20', '49000.76'),
         (3, 'Chase Saphire Reserve', 'Chase bank, 21.99%APY', '2015-01-31', '-872.61'),
-        (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
+        (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60'),
+        (2, 'Savings', 'The Federal Reserve', '2013-1-20', '100000')
 ;
 
 CREATE TABLE transaction_macro_categories (
