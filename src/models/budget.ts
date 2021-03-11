@@ -26,6 +26,11 @@ class Budget {
     return await create([title, description], modelName);
   }
 
+  static async addUser(budgetId: number, userId: string): Promise<boolean> {
+    await queryDb("budgets/addUser.sql", [budgetId, userId]);
+    return true;
+  }
+
   static async findDetailsById(budgetId: number): Promise<CompleteBudgetData> {
     const [
       budgetAccountData,

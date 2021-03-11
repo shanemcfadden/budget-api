@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { RowDataPacket } from "mysql2";
+import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import Budget from "../../src/models/budget";
 import * as Model from "../../src/util/models";
@@ -35,6 +35,24 @@ describe("Budget model", () => {
       const results = await Budget.create(newBudgetData);
       expect(createStub.calledOnceWith(budgetDataArr, modelName)).to.be.true;
       expect(results).to.deep.equal({ _id: id });
+    });
+  });
+  describe("addUser()", () => {
+    let queryDbStub: SinonStub;
+    const userId = "asdflkjqwerknzvj";
+    beforeEach(() => {
+      queryDbStub = sinon.stub(Database, "queryDb").resolves({} as OkPacket);
+    });
+    it("should query the database", async () => {
+      await Budget.addUser(id, userId);
+      expect(queryDbStub.calledOnce).to.be.true;
+      const args = queryDbStub.getCall(0).args;
+      expect(args[0]).to.equal("budgets/addUser.sql");
+      expect(args[1]).to.deep.equal([id, userId]);
+    });
+    it("should return true if no errors are thrown", async () => {
+      const result = await Budget.addUser(id, userId);
+      expect(result).to.be.true;
     });
   });
   describe("findById()", () => {
