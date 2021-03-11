@@ -8,8 +8,13 @@ import {
   fakeBudgetAccountData,
   fakeBudgetAccountRows,
   fakeBudgetData,
+  fakeCategoriesData,
+  fakeCompleteBudgetData,
+  fakeTransactions,
 } from "../fixtures";
 import { ServerError } from "../../src/util/errors";
+import Transaction from "../../src/models/transaction";
+import MacroCategory from "../../src/models/macro-category";
 
 describe("Budget model", () => {
   const { id, title, description } = fakeBudgetData;
@@ -95,7 +100,21 @@ describe("Budget model", () => {
       });
     });
   });
-  describe("findDetailsById", () => {});
+  describe("findDetailsById()", () => {
+    beforeEach(() => {
+      sinon
+        .stub(Budget, "findByIdWithAccountData")
+        .resolves(fakeBudgetAccountData);
+      sinon.stub(Transaction, "findAllByBudgetId").resolves(fakeTransactions);
+      sinon
+        .stub(MacroCategory, "findAllByBudgetIdWithMicroCategories")
+        .resolves(fakeCategoriesData);
+    });
+    it("should return complete budget details", async () => {
+      const results = await Budget.findDetailsById(id);
+      expect(results).to.deep.equal(fakeCompleteBudgetData);
+    });
+  });
   describe("findAllByUserId()", () => {
     const userId = "asdfwerwqiohon";
     it("should call util findAllByUserId() and return its value", async () => {
