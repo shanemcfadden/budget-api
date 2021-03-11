@@ -9,14 +9,19 @@ import {
   MicroCategoryData,
   TransactionData,
   UserData,
+  UserDataMinusPassword,
 } from "../src/types/models";
 
-export const fakeUser: UserData = {
+export const fakeUserMinusPassword: UserDataMinusPassword = {
   email: "fake@email.com",
-  password: "passwordhash",
   _id: "fakeid123",
   firstName: "Jane",
   lastName: "Doe",
+};
+
+export const fakeUser: UserData = {
+  ...fakeUserMinusPassword,
+  password: "passwordhash",
 };
 
 export const mockJWT =
