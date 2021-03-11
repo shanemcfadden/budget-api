@@ -1,5 +1,14 @@
 import { RowDataPacket } from "mysql2";
-import { BudgetData, CompleteAccountData, UserData } from "../src/types/models";
+import {
+  BudgetAccountData,
+  BudgetData,
+  CategoriesData,
+  CompleteAccountData,
+  MacroCategoryData,
+  MicroCategoryData,
+  TransactionData,
+  UserData,
+} from "../src/types/models";
 
 export const fakeUser: UserData = {
   email: "fake@email.com",
@@ -60,7 +69,7 @@ export const fakeBudgetAccountRows: RowDataPacket[] = [
   } as RowDataPacket,
 ];
 
-export const fakeBudgetAccountData = {
+export const fakeBudgetAccountData: BudgetAccountData = {
   ...fakeBudgetData,
   accounts: {
     [fakeAccounts[0].id]: {
@@ -79,3 +88,83 @@ export const fakeBudgetAccountData = {
     },
   },
 };
+
+export const fakeMacroCategories: MacroCategoryData[] = [
+  {
+    id: 45,
+    description: "Work",
+    isIncome: true,
+    budgetId: fakeBudgetData.id,
+  },
+  {
+    id: 50,
+    description: "Personal",
+    isIncome: false,
+    budgetId: fakeBudgetData.id,
+  },
+];
+
+export const fakeMicroCategories: MicroCategoryData[] = [
+  {
+    id: 300,
+    description: "Bonuses",
+    macroCategoryId: fakeMacroCategories[0].id,
+  },
+  {
+    id: 345,
+    description: "Food",
+    macroCategoryId: fakeMacroCategories[1].id,
+  },
+];
+
+export const fakeCategoriesData: CategoriesData = {
+  [fakeMacroCategories[0].id]: {
+    description: fakeMacroCategories[0].description,
+    isIncome: fakeMacroCategories[0].isIncome,
+    microCategories: {
+      [fakeMicroCategories[0].id]: fakeMicroCategories[0].description,
+    },
+  },
+  [fakeMacroCategories[1].id]: {
+    description: fakeMacroCategories[1].description,
+    isIncome: fakeMacroCategories[1].isIncome,
+    microCategories: {
+      [fakeMicroCategories[1].id]: fakeMicroCategories[1].description,
+    },
+  },
+};
+
+export const fakeTransactions: TransactionData[] = [
+  {
+    id: 2,
+    amount: -3.55,
+    description: "Coffee",
+    date: new Date("2021-01-15"),
+    accountId: fakeAccounts[0].id,
+    categoryId: fakeMicroCategories[1].id,
+  },
+  {
+    id: 2,
+    amount: 300,
+    description: "Paycheck",
+    date: new Date("2021-01-14"),
+    accountId: fakeAccounts[0].id,
+    categoryId: fakeMicroCategories[0].id,
+  },
+  {
+    id: 2,
+    amount: -4.55,
+    description: "Sandwich",
+    date: new Date("2021-01-13"),
+    accountId: fakeAccounts[1].id,
+    categoryId: fakeMicroCategories[1].id,
+  },
+  {
+    id: 2,
+    amount: 500,
+    description: "Gift from sofa cushions",
+    date: new Date("2021-01-12"),
+    accountId: fakeAccounts[1].id,
+    categoryId: fakeMicroCategories[0].id,
+  },
+];
