@@ -103,7 +103,7 @@ describe("User model", () => {
         .resolves([fakeUser] as RowDataPacket[]);
       const results = await User.findAllByBudgetId(fakeBudgetId);
       expect(findStub.calledOnceWith(fakeBudgetId, modelName)).to.be.true;
-      expect(results).to.deep.equal(fakeUser);
+      expect(results).to.deep.equal([fakeUser]);
     });
   });
   describe("update()", () => {
