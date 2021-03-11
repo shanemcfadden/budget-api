@@ -1,9 +1,14 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
-import sinon from "sinon";
+import sinon, { SinonStub } from "sinon";
 import MacroCategory from "../../src/models/macro-category";
 import * as Model from "../../src/util/models";
-import { fakeMacroCategories } from "../fixtures";
+import * as Database from "../../src/database/Database";
+import {
+  fakeCategoriesData,
+  fakeMacroCategories,
+  fakeMacroMicroCategoryRows,
+} from "../fixtures";
 
 describe("MacroCategory model", () => {
   const macroCategoryData = fakeMacroCategories[0];
@@ -39,7 +44,6 @@ describe("MacroCategory model", () => {
     });
   });
   describe("findAllByBudgetId()", () => {
-    const budgetId = 3321;
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
@@ -47,6 +51,29 @@ describe("MacroCategory model", () => {
       const results = await MacroCategory.findAllByBudgetId(budgetId);
       expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
       expect(results).to.deep.equal([macroCategoryData]);
+    });
+  });
+  describe("findAllByBudgetIdWithMicroCategories()", () => {
+    let queryDbStub: SinonStub;
+    beforeEach(() => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves(fakeMacroMicroCategoryRows);
+    });
+    it("should query the database", async () => {
+      await MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId);
+      expect(queryDbStub.calledOnce).to.be.true;
+      expect(
+        queryDbStub.calledOnceWith(
+          "macro-categories/findAllByBudgetIdWithMicroCategories.sql"
+        )
+      ).to.be.true;
+    });
+    it("should return the categories data", async () => {
+      const results = await MacroCategory.findAllByBudgetIdWithMicroCategories(
+        budgetId
+      );
+      expect(results).to.deep.equal(fakeCategoriesData);
     });
   });
   describe("update()", () => {
