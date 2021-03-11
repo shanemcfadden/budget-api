@@ -1,11 +1,13 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
 import sinon, { SinonSpy } from "sinon";
-import { getBudgets } from "../../src/controllers/budget";
+import { getBudget, getBudgets } from "../../src/controllers/budget";
 import { ExtendedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";
+import { fakeCompleteBudgetData, fakeUserMinusPassword } from "../fixtures";
+import User from "../../src/models/user";
 
 describe("Budget controller", () => {
   let req: ExtendedRequest;
@@ -31,7 +33,9 @@ describe("Budget controller", () => {
   });
   describe("getBudgets()", () => {
     describe("if user is not authenticated...", () => {
-      req = {} as ExtendedRequest;
+      beforeEach(() => {
+        req = {} as ExtendedRequest;
+      });
       it("should throw an authentication error", async () => {
         await getBudgets(req, res as Response, next);
         expect(errorHandlerSpy.calledOnce).to.be.true;
@@ -80,7 +84,111 @@ describe("Budget controller", () => {
       });
     });
   });
-  //   describe("getBudget()");
+  describe("getBudget()", () => {
+    describe("if user is not authenticated...", () => {
+      beforeEach(() => {
+        req = ({
+          params: {
+            id: "243",
+          },
+        } as unknown) as ExtendedRequest;
+      });
+      it("should throw an authentication error", async () => {
+        await getBudget(req, res as Response, next);
+        expect(errorHandlerSpy.calledOnce).to.be.true;
+        const error = errorHandlerSpy.getCall(0).args[0];
+        expect(error.statusCode).to.equal(401);
+        expect(error.message).to.equal("Unauthenticated user");
+      });
+      it("should not send a response", async () => {
+        await getBudget(req, res as Response, next);
+        expect(res.statusCode).to.be.undefined;
+        expect(res.body).to.be.undefined;
+      });
+    });
+    describe("if user is authenticated...", () => {
+      beforeEach(() => {
+        req = ({
+          isAuth: true,
+          userId: fakeUserMinusPassword._id,
+          params: {
+            id: fakeCompleteBudgetData.id.toString(),
+          },
+        } as unknown) as ExtendedRequest;
+      });
+      describe("if budget exists...", () => {
+        beforeEach(() => {
+          sinon
+            .stub(Budget, "findDetailsById")
+            .resolves(fakeCompleteBudgetData);
+        });
+        describe("if user has permission to get budget...", () => {
+          beforeEach(() => {
+            sinon
+              .stub(User, "findAllByBudgetId")
+              .resolves([fakeUserMinusPassword]);
+          });
+          it("should send a 200 response", async () => {
+            await getBudget(req, res as Response, next);
+            expect(res.statusCode).to.exist;
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should return budget data in the response json", async () => {
+            await getBudget(req, res as Response, next);
+            expect(res.body).to.exist;
+            expect(res.body).to.deep.equal(fakeCompleteBudgetData);
+          });
+        });
+        describe("if user does not have permission to get budget", () => {
+          beforeEach(() => {
+            sinon.stub(User, "findAllByBudgetId").resolves([
+              {
+                _id: "1234767652a1",
+                email: "asdfrew@basdr.com",
+                firstName: "NotAnAuthorized",
+                lastName: "User",
+              },
+            ]);
+          });
+          it("should throw an error", async () => {
+            await getBudget(req, res as Response, next);
+            expect(errorHandlerSpy.calledOnce).to.be.true;
+            const error = errorHandlerSpy.getCall(0).args[0];
+            expect(error.statusCode).to.equal(403);
+            expect(error.message).to.equal("Access denied");
+          });
+          it("should not send a response", async () => {
+            await getBudget(req, res as Response, next);
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          });
+        });
+      });
+      describe("if budget does not exist...", () => {
+        const budgetNotFoundError = new Errors.ServerError(
+          404,
+          "Budget not found"
+        );
+        beforeEach(() => {
+          sinon.stub(Budget, "findDetailsById").rejects(budgetNotFoundError);
+          sinon
+            .stub(User, "findAllByBudgetId")
+            .resolves([fakeUserMinusPassword]);
+        });
+        it("should pass along error received by first rejected promise", async () => {
+          await getBudget(req, res as Response, next);
+          expect(errorHandlerSpy.calledOnce).to.be.true;
+          const error = errorHandlerSpy.getCall(0).args[0];
+          expect(error).to.deep.equal(budgetNotFoundError);
+        });
+        it("should not send a response", async () => {
+          await getBudget(req, res as Response, next);
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        });
+      });
+    });
+  });
   //   describe("postBudget()");
   //   describe("patchBudget()");
   //   describe("deleteBudget()");
