@@ -3,18 +3,16 @@ import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
 import MacroCategory from "../../src/models/macro-category";
 import * as Model from "../../src/util/models";
+import { fakeMacroCategories } from "../fixtures";
 
 describe("MacroCategory model", () => {
-  const newMacroCategoryData = {
-    description: "Work",
-    isIncome: true,
-    budgetId: 4,
-  };
-  const macroCategoryData = {
-    ...newMacroCategoryData,
-    id: 2,
-  };
+  const macroCategoryData = fakeMacroCategories[0];
   const { id, description, isIncome, budgetId } = macroCategoryData;
+  const newMacroCategoryData = {
+    description,
+    isIncome,
+    budgetId,
+  };
   const macroCategoryArr = [description, isIncome, budgetId];
   const modelName = "macro-category";
 

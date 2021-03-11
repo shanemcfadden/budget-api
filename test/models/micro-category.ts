@@ -3,17 +3,15 @@ import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
 import MicroCategory from "../../src/models/micro-category";
 import * as Model from "../../src/util/models";
+import { fakeMicroCategories } from "../fixtures";
 
 describe("MicroCategory model", () => {
-  const newMicroCategoryData = {
-    description: "Work",
-    macroCategoryId: 30,
-  };
-  const microCategoryData = {
-    ...newMicroCategoryData,
-    id: 2,
-  };
+  const microCategoryData = fakeMicroCategories[0];
   const { id, description, macroCategoryId } = microCategoryData;
+  const newMicroCategoryData = {
+    description,
+    macroCategoryId,
+  };
   const microCategoryArr = [description, macroCategoryId];
   const modelName = "micro-category";
 
