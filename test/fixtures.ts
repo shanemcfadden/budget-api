@@ -118,6 +118,25 @@ export const fakeMicroCategories: MicroCategoryData[] = [
   },
 ];
 
+export const fakeMacroMicroCategoryRows: RowDataPacket[] = [
+  {
+    id: fakeMacroCategories[0].id,
+    macroCategoryDescription: fakeMacroCategories[0].description,
+    isIncome: fakeMacroCategories[0].isIncome,
+    budgetId: fakeMacroCategories[0].budgetId,
+    microCategoryId: fakeMicroCategories[0].id,
+    microCategoryDescription: fakeMicroCategories[0].description,
+  } as RowDataPacket,
+  {
+    id: fakeMacroCategories[1].id,
+    macroCategoryDescription: fakeMacroCategories[1].description,
+    isIncome: fakeMacroCategories[1].isIncome,
+    budgetId: fakeMacroCategories[1].budgetId,
+    microCategoryId: fakeMicroCategories[1].id,
+    microCategoryDescription: fakeMicroCategories[1].description,
+  } as RowDataPacket,
+];
+
 export const fakeCategoriesData: CategoriesData = {
   [fakeMacroCategories[0].id]: {
     description: fakeMacroCategories[0].description,
