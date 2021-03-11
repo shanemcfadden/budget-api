@@ -4,6 +4,7 @@ import {
   BudgetData,
   CategoriesData,
   CompleteAccountData,
+  CompleteBudgetData,
   MacroCategoryData,
   MicroCategoryData,
   TransactionData,
@@ -168,3 +169,9 @@ export const fakeTransactions: TransactionData[] = [
     categoryId: fakeMicroCategories[0].id,
   },
 ];
+
+export const fakeCompleteBudgetData: CompleteBudgetData = {
+  ...fakeBudgetAccountData,
+  transactions: fakeTransactions,
+  categories: fakeCategoriesData,
+};
