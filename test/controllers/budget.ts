@@ -4,6 +4,7 @@ import sinon, { SinonSpy } from "sinon";
 import {
   getBudget,
   getBudgets,
+  patchBudget,
   postBudget,
 } from "../../src/controllers/budget";
 import { ExtendedRequest } from "../../src/types/express";
@@ -12,6 +13,7 @@ import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";
 import { fakeCompleteBudgetData, fakeUserMinusPassword } from "../fixtures";
 import User from "../../src/models/user";
+import { findAllByBudgetId } from "../../src/util/models";
 
 describe("Budget controller", () => {
   let req: ExtendedRequest;
@@ -284,6 +286,114 @@ describe("Budget controller", () => {
       });
     });
   });
-  //   describe("patchBudget()");
+  describe("patchBudget()", () => {
+    describe("if user is authenticated...", () => {
+      beforeEach(() => {
+        req = ({
+          userId: fakeUserMinusPassword._id,
+          isAuth: true,
+          body: {
+            title: "new title",
+            description: "new description",
+          },
+          params: {
+            id: fakeCompleteBudgetData.id.toString(),
+          },
+        } as unknown) as ExtendedRequest;
+      });
+      describe("if user is authorized to edit the budget...", () => {
+        beforeEach(() => {
+          sinon
+            .stub(User, "findAllByBudgetId")
+            .resolves([fakeUserMinusPassword]);
+        });
+        describe("if budget is patched successfully...", () => {
+          beforeEach(() => {
+            sinon.stub(Budget, "update").resolves(true);
+          });
+          it("should send a 200 response", async () => {
+            await patchBudget(req, res as Response, next);
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should send a success message", async () => {
+            await patchBudget(req, res as Response, next);
+            expect(res.body?.message).to.equal("Budget updated successfully");
+          });
+          it("should include budget id in the response json", async () => {
+            await patchBudget(req, res as Response, next);
+            expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
+          });
+        });
+        describe("if budget is not patched successfully...", () => {
+          const serverError = new Errors.ServerError(
+            500,
+            "Internal server error"
+          );
+          beforeEach(() => {
+            sinon.stub(Budget, "update").rejects(serverError);
+          });
+          it("should pass along the given error", async () => {
+            await patchBudget(req, res as Response, next);
+            expect(errorHandlerSpy.calledOnce).to.be.true;
+            const error = errorHandlerSpy.getCall(0).args[0];
+            expect(error).to.deep.equal(serverError);
+          });
+          it("should not send a response", async () => {
+            await patchBudget(req, res as Response, next);
+            expect(res.body).to.be.undefined;
+            expect(res.statusCode).to.be.undefined;
+          });
+        });
+      });
+      describe("if user is not authorized to edit the budget...", () => {
+        beforeEach(() => {
+          sinon.stub(User, "findAllByBudgetId").resolves([
+            {
+              _id: "asdflkj21kl1239",
+              email: "wrong@user.com",
+              firstName: "NotAuthorized",
+              lastName: "User",
+            },
+          ]);
+        });
+        it("should send a 403 error", async () => {
+          await patchBudget(req, res as Response, next);
+          expect(errorHandlerSpy.calledOnce).to.be.true;
+          const error = errorHandlerSpy.getCall(0).args[0];
+          expect(error).to.deep.equal(
+            new Errors.ServerError(403, "Access denied")
+          );
+        });
+        it("should not send a response", async () => {
+          await patchBudget(req, res as Response, next);
+          expect(res.body).to.be.undefined;
+          expect(res.statusCode).to.be.undefined;
+        });
+      });
+    });
+    describe("if user is not authenticated...", () => {
+      beforeEach(() => {
+        req = ({
+          params: {
+            id: fakeCompleteBudgetData.id.toString(),
+          },
+        } as unknown) as ExtendedRequest;
+      });
+      it("should pass along a 401 error", async () => {
+        await patchBudget(req, res as Response, next);
+        expect(errorHandlerSpy.calledOnce).to.be.true;
+        const error = errorHandlerSpy.getCall(0).args[0];
+        expect(error).to.deep.equal(
+          new Errors.ServerError(401, "Unauthenticated user")
+        );
+      });
+      it("should not send a response", async () => {
+        await patchBudget(req, res as Response, next);
+
+        expect(res.body).to.be.undefined;
+        expect(res.statusCode).to.be.undefined;
+      });
+    });
+  });
   //   describe("deleteBudget()");
 });
