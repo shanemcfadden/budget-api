@@ -70,6 +70,19 @@ export const patchBudget: CustomRequestHandler = async (req, res, next) => {
   }
 };
 
-export const deleteBudget: RequestHandler = (req, res, next) => {
-  res.send("DELETE /budget/:id");
+export const deleteBudget: CustomRequestHandler = async (req, res, next) => {
+  try {
+    if (!req.isAuth || !req.userId) {
+      throw new ServerError(401, "Unauthenticated user");
+    }
+    const budgetId = +req.params.id;
+    const budgetUsers = await User.findAllByBudgetId(budgetId);
+    if (!budgetUsers.filter((userData) => userData._id === req.userId).length) {
+      throw new ServerError(403, "Access denied");
+    }
+    await Budget.removeById(budgetId);
+    res.status(200).json({ message: "Budget deleted successfully" });
+  } catch (err) {
+    handleErrors(err, next);
+  }
 };
