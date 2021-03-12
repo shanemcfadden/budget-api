@@ -75,13 +75,17 @@ class Budget {
         startBalance,
         currentBalance,
       }) => {
-        budgetData.accounts[accountId] = {
-          name: accountName,
-          description: accountDescription,
-          startDate,
-          startBalance: +startBalance,
-          currentBalance: +currentBalance,
-        };
+        // Prevents budgets without accounts from being filled with NULL data
+        // caused by RIGHT JOIN
+        if (accountId) {
+          budgetData.accounts[accountId] = {
+            name: accountName,
+            description: accountDescription,
+            startDate,
+            startBalance: +startBalance,
+            currentBalance: +currentBalance,
+          };
+        }
       }
     );
     return budgetData;

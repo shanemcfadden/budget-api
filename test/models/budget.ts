@@ -85,6 +85,30 @@ describe("Budget model", () => {
         const results = await Budget.findByIdWithAccountData(id);
         expect(results).to.deep.equal(fakeBudgetAccountData);
       });
+      describe("if budget does not have any accounts...", () => {
+        beforeEach(() => {
+          queryDbStub.reset();
+          queryDbStub.resolves([
+            {
+              budgetTitle: fakeBudgetData.title,
+              budgetDescription: fakeBudgetData.description,
+              accountId: null,
+              accountName: null,
+              accountDescription: null,
+              startDate: null,
+              startBalance: 0,
+              currentBalance: 0,
+            },
+          ]);
+        });
+        it("should return budget details with an empty section for accounts", async () => {
+          const results = await Budget.findByIdWithAccountData(id);
+          expect(results).to.deep.equal({
+            ...fakeBudgetData,
+            accounts: {},
+          });
+        });
+      });
     });
     describe("if budget does not exist", () => {
       beforeEach(() => {
