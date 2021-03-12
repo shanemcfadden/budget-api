@@ -1,4 +1,3 @@
-import { RequestHandler } from "express";
 import Budget from "../models/budget";
 import User from "../models/user";
 import { CustomRequestHandler } from "../types/express";
