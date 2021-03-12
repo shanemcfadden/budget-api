@@ -1,7 +1,11 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
 import sinon, { SinonSpy } from "sinon";
-import { getBudget, getBudgets } from "../../src/controllers/budget";
+import {
+  getBudget,
+  getBudgets,
+  postBudget,
+} from "../../src/controllers/budget";
 import { ExtendedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
@@ -189,7 +193,97 @@ describe("Budget controller", () => {
       });
     });
   });
-  //   describe("postBudget()");
+  describe("postBudget()", () => {
+    describe("if user is authenticated...", () => {
+      beforeEach(() => {
+        req = ({
+          isAuth: true,
+          userId: fakeUserMinusPassword._id,
+          body: {
+            title: fakeCompleteBudgetData.title,
+            description: fakeCompleteBudgetData.description,
+          },
+        } as unknown) as ExtendedRequest;
+      });
+      describe("if budget is created successfully...", () => {
+        beforeEach(() => {
+          sinon
+            .stub(Budget, "create")
+            .resolves({ _id: fakeCompleteBudgetData.id });
+        });
+        describe("if user is added to budget successfully...", () => {
+          beforeEach(() => {
+            sinon.stub(Budget, "addUser").resolves(true);
+          });
+          it("should respond with a status code of 200", async () => {
+            await postBudget(req, res as Response, next);
+            expect(res.statusCode).to.exist;
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should respond with a success message in the body", async () => {
+            await postBudget(req, res as Response, next);
+            expect(res.body?.message).to.equal("Budget created successfully");
+          });
+          it("should respond with the new budget id in the body", async () => {
+            await postBudget(req, res as Response, next);
+            expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
+          });
+        });
+        describe("if user is not added successfully...", () => {
+          const serverError = new Errors.ServerError(500, "Server error");
+          beforeEach(() => {
+            sinon.stub(Budget, "addUser").rejects(serverError);
+          });
+          it("should pass along error received by first rejected promise", async () => {
+            await postBudget(req, res as Response, next);
+            expect(errorHandlerSpy.calledOnce).to.be.true;
+            const error = errorHandlerSpy.getCall(0).args[0];
+            expect(error).to.deep.equal(serverError);
+          });
+          it("should not send a response", async () => {
+            await postBudget(req, res as Response, next);
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          });
+        });
+      });
+      describe("if budget is not created...", () => {
+        const serverError = new Errors.ServerError(500, "Server error");
+        beforeEach(() => {
+          sinon.stub(Budget, "create").rejects(serverError);
+        });
+        it("should pass along error received by first rejected promise", async () => {
+          await postBudget(req, res as Response, next);
+          expect(errorHandlerSpy.calledOnce).to.be.true;
+          const error = errorHandlerSpy.getCall(0).args[0];
+          expect(error).to.deep.equal(serverError);
+        });
+        it("should not send a response", async () => {
+          await postBudget(req, res as Response, next);
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        });
+      });
+    });
+    describe("if user is not authenticated...", () => {
+      beforeEach(() => {
+        req = {} as ExtendedRequest;
+      });
+      afterEach(() => {});
+      it("should pass along a 401 error", async () => {
+        const serverError = new Errors.ServerError(401, "Unauthenticated user");
+        await postBudget(req, res as Response, next);
+        expect(errorHandlerSpy.calledOnce).to.be.true;
+        const error = errorHandlerSpy.getCall(0).args[0];
+        expect(error).to.deep.equal(serverError);
+      });
+      it("should not send a response", async () => {
+        await postBudget(req, res as Response, next);
+        expect(res.statusCode).to.be.undefined;
+        expect(res.body).to.be.undefined;
+      });
+    });
+  });
   //   describe("patchBudget()");
   //   describe("deleteBudget()");
 });

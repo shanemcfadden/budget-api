@@ -37,8 +37,19 @@ export const getBudget: CustomRequestHandler = async (req, res, next) => {
   }
 };
 
-export const postBudget: RequestHandler = (req, res, next) => {
-  res.send("POST /budget");
+export const postBudget: CustomRequestHandler = async (req, res, next) => {
+  try {
+    if (!req.isAuth || !req.userId) {
+      throw new ServerError(401, "Unauthenticated user");
+    }
+    const { title, description } = req.body;
+    const budgetId = (await Budget.create({ title, description }))._id;
+    const success = await Budget.addUser(budgetId, req.userId);
+
+    res.status(200).json({ budgetId, message: "Budget created successfully" });
+  } catch (err) {
+    handleErrors(err, next);
+  }
 };
 
 export const patchBudget: RequestHandler = (req, res, next) => {
