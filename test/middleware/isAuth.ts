@@ -3,7 +3,7 @@ import { Response, NextFunction } from "express";
 import sinon, { SinonStub } from "sinon";
 import jwt from "jsonwebtoken";
 import isAuth from "../../src/middleware/isAuth";
-import { ExtendedRequest } from "../../src/types";
+import { ExtendedRequest } from "../../src/types/express";
 
 describe("isAuth middleware", () => {
   let req: ExtendedRequest;

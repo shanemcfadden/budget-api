@@ -6,16 +6,12 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-
-interface NewMacroCategoryData {
-  description: string;
-  isIncome: boolean;
-  budgetId: number;
-}
-
-interface MacroCategoryData extends NewMacroCategoryData {
-  id: number;
-}
+import {
+  NewMacroCategoryData,
+  MacroCategoryData,
+  CategoriesData,
+} from "../types/models";
+import { queryDb } from "../database/Database";
 
 const modelName = "macro-category";
 
@@ -41,6 +37,58 @@ class MacroCategory {
       budgetId,
       modelName
     )) as MacroCategoryData[];
+  }
+
+  static async findAllByBudgetIdWithMicroCategories(
+    budgetId: number
+  ): Promise<CategoriesData> {
+    const rawData = (await queryDb(
+      "macro-categories/findAllByBudgetIdWithMicroCategories.sql",
+      [budgetId]
+    )) as {
+      id: number;
+      macroCategoryDescription: string;
+      isIncome: number;
+      budgetId: number;
+      microCategoryId: number;
+      microCategoryDescription: string;
+    }[];
+
+    const data = rawData.reduce(
+      (
+        output: Record<
+          number,
+          {
+            description: string;
+            isIncome: boolean;
+            microCategories: Record<number, string>;
+          }
+        >,
+        {
+          id,
+          macroCategoryDescription,
+          isIncome,
+          microCategoryId,
+          microCategoryDescription,
+        }
+      ) => {
+        if (!output[id]) {
+          output[id] = {
+            description: macroCategoryDescription,
+            isIncome: !!isIncome,
+            microCategories: {},
+          };
+        }
+        if (microCategoryId != null) {
+          output[id].microCategories[
+            microCategoryId
+          ] = microCategoryDescription;
+        }
+        return output;
+      },
+      {}
+    );
+    return data;
   }
 
   static async update(transactionData: MacroCategoryData): Promise<boolean> {

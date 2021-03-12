@@ -1,3 +1,4 @@
+import { RowDataPacket } from "mysql2";
 import {
   create,
   findAllByUserId,
@@ -6,14 +7,16 @@ import {
   removeById,
   update,
 } from "../util/models";
-
-interface NewBudgetData {
-  title?: string;
-  description?: string;
-}
-interface BudgetData extends NewBudgetData {
-  id: number;
-}
+import {
+  NewBudgetData,
+  BudgetData,
+  CompleteBudgetData,
+  BudgetAccountData,
+} from "../types/models";
+import { queryDb } from "../database/Database";
+import { ServerError } from "../util/errors";
+import MacroCategory from "./macro-category";
+import Transaction from "./transaction";
 
 const modelName = "budget";
 
@@ -23,8 +26,69 @@ class Budget {
     return await create([title, description], modelName);
   }
 
+  static async addUser(budgetId: number, userId: string): Promise<boolean> {
+    await queryDb("budgets/addUser.sql", [budgetId, userId]);
+    return true;
+  }
+
+  static async findDetailsById(budgetId: number): Promise<CompleteBudgetData> {
+    const [
+      budgetAccountData,
+      transactionData,
+      categoryData,
+    ] = await Promise.all([
+      Budget.findByIdWithAccountData(budgetId),
+      Transaction.findAllByBudgetId(budgetId),
+      MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
+    ]);
+    return {
+      ...budgetAccountData,
+      transactions: transactionData,
+      categories: categoryData,
+    };
+  }
+
   static async findById(budgetId: number): Promise<BudgetData> {
     return (await findById(budgetId, modelName)) as BudgetData;
+  }
+
+  static async findByIdWithAccountData(
+    budgetId: number
+  ): Promise<BudgetAccountData> {
+    const rawData = (await queryDb("budgets/findByIdWithAccountData.sql", [
+      budgetId,
+    ])) as RowDataPacket[];
+
+    if (!rawData[0]) throw new ServerError(404, "Budget not found");
+    const budgetData: BudgetAccountData = {
+      id: budgetId,
+      title: rawData[0].budgetTitle,
+      description: rawData[0].budgetDescription,
+      accounts: {},
+    };
+    rawData.forEach(
+      ({
+        accountId,
+        accountName,
+        accountDescription,
+        startDate,
+        startBalance,
+        currentBalance,
+      }) => {
+        // Prevents budgets without accounts from being filled with NULL data
+        // caused by RIGHT JOIN
+        if (accountId) {
+          budgetData.accounts[accountId] = {
+            name: accountName,
+            description: accountDescription,
+            startDate,
+            startBalance: +startBalance,
+            currentBalance: +currentBalance,
+          };
+        }
+      }
+    );
+    return budgetData;
   }
 
   static async findAllByUserId(userId: string): Promise<BudgetData[]> {

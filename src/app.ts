@@ -2,6 +2,7 @@ import "./util/env";
 import express from "express";
 import { db } from "./database/Database";
 import AuthRoutes from "./routes/auth";
+import BudgetRoutes from "./routes/budget";
 import isAuth from "./middleware/isAuth";
 import { errorRequestHandler } from "./util/errors";
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(isAuth);
 
 app.use("/auth", AuthRoutes);
+app.use("/budget", BudgetRoutes);
 
 app.use((req, res) => {
   res.send("route not found");

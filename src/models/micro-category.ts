@@ -6,15 +6,7 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-
-interface NewMicroCategoryData {
-  description: string;
-  macroCategoryId: number;
-}
-
-interface MicroCategoryData extends NewMicroCategoryData {
-  id: number;
-}
+import { MicroCategoryData, NewMicroCategoryData } from "../types/models";
 
 const modelName = "micro-category";
 

@@ -3,19 +3,10 @@ import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
 import Transaction from "../../src/models/transaction";
 import * as Model from "../../src/util/models";
+import { fakeTransactions } from "../fixtures";
 
 describe("Transaction model", () => {
-  const newTransactionData = {
-    amount: 3.55,
-    description: "Coffee",
-    date: new Date("2020-01-15"),
-    accountId: 4,
-    categoryId: 2,
-  };
-  const transactionData = {
-    ...newTransactionData,
-    id: 2,
-  };
+  const transactionData = fakeTransactions[0];
   const {
     id,
     amount,
@@ -24,6 +15,13 @@ describe("Transaction model", () => {
     accountId,
     categoryId,
   } = transactionData;
+  const newTransactionData = {
+    amount,
+    description,
+    date,
+    accountId,
+    categoryId,
+  };
   const transactionDataArr = [amount, description, date, accountId, categoryId];
   const modelName = "transaction";
 

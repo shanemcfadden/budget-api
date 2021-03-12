@@ -7,18 +7,7 @@ import {
   findAllByBudgetId,
   IdPacket,
 } from "../util/models";
-
-interface NewAccountData {
-  name: string;
-  description?: string;
-  startDate: Date;
-  startBalance: number;
-  budgetId: number;
-}
-interface AccountData extends NewAccountData {
-  id: number;
-  currentBalance: number;
-}
+import { NewAccountData, CompleteAccountData } from "../types/models";
 
 const modelName = "account";
 
@@ -37,19 +26,24 @@ class Account {
     );
   }
 
-  static async findById(accountId: number): Promise<AccountData> {
-    return (await findById(accountId, modelName)) as AccountData;
+  static async findById(accountId: number): Promise<CompleteAccountData> {
+    return (await findById(accountId, modelName)) as CompleteAccountData;
   }
 
-  static async findAllByBudgetId(budgetId: number): Promise<AccountData[]> {
-    return (await findAllByBudgetId(budgetId, modelName)) as AccountData[];
+  static async findAllByBudgetId(
+    budgetId: number
+  ): Promise<CompleteAccountData[]> {
+    return (await findAllByBudgetId(
+      budgetId,
+      modelName
+    )) as CompleteAccountData[];
   }
 
-  static async findAllByUserId(userId: string): Promise<AccountData[]> {
-    return (await findAllByUserId(userId, modelName)) as AccountData[];
+  static async findAllByUserId(userId: string): Promise<CompleteAccountData[]> {
+    return (await findAllByUserId(userId, modelName)) as CompleteAccountData[];
   }
 
-  static async update(accountData: AccountData): Promise<boolean> {
+  static async update(accountData: CompleteAccountData): Promise<boolean> {
     const {
       id,
       name,

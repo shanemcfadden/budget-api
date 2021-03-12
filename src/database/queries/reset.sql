@@ -1,6 +1,6 @@
+DROP TABLE transactions;
 DROP TABLE transaction_micro_categories;
 DROP TABLE transaction_macro_categories;
-DROP TABLE transactions;
 DROP TABLE accounts;
 DROP TABLE budget_users;
 DROP TABLE users;
@@ -16,11 +16,11 @@ CREATE TABLE users(
 
 INSERT INTO users (id, email, pw, first_name, last_name)
     VALUES 
-        ('1', 'test@test.com', '$2b$12$RKlftCLGSo0VkcpG0yqJfezbnHAbgsR8kXfsXQb2UrIws9A1MU1wq', 'Jane', 'Doe'), 
+        ('1', 'test@test.com', '$2b$12$vSgxenb.N/h1amtlwhRZKOxzWQUTO4AV9ie1iaMg11MQQhDYZ4uTu', 'Jane', 'Doe'), 
         ('2', 'test2@test.com', 'password', 'John', 'Smith'),
         ('3', 'test3@test.com', 'ThisisHashed', 'Franz', 'Liszt'),
         ('4', 'test4@test.com', 'moreHash', 'Amy', 'Beach'),
-        ('5', 'renegade@whitehouse.gov', 'secretpw', 'Barack', 'Obama'),
+        ('5', 'renegade@whitehouse.gov', '$2b$12$vSgxenb.N/h1amtlwhRZKOxzWQUTO4AV9ie1iaMg11MQQhDYZ4uTu', 'Barack', 'Obama'),
         ('6', 'renaissance@whitehouse.gov', 'evenMOREsecretpw', 'Michelle', 'Obama')
 ;
 
@@ -71,7 +71,8 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (2, 'Retirement', 'Vanguard Mutual Fund', '2009-1-20', '100000'),
         (2, 'Checking', 'The Federal Reserve', '2013-1-20', '49000.76'),
         (3, 'Chase Saphire Reserve', 'Chase bank, 21.99%APY', '2015-01-31', '-872.61'),
-        (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60')
+        (3, 'Business Checking', 'Wells Fargo', '2014-12-02', '60'),
+        (2, 'Savings', 'The Federal Reserve', '2013-1-20', '100000')
 ;
 
 CREATE TABLE transaction_macro_categories (
@@ -90,7 +91,8 @@ INSERT INTO transaction_macro_categories (description, is_income, budget_id)
         ('Miscellaneous', 1, 1),
         ('Personal', 0, 1),
         ('Work', 1, 2),
-        ('Personal', 0, 2)
+        ('Personal', 0, 2),
+        ('Freelance Work', 1, 2)
 ;
 
 CREATE TABLE transaction_micro_categories (
@@ -108,7 +110,8 @@ INSERT INTO transaction_micro_categories (description, macro_category_id)
         ('Other', 2),
         ('Travel', 3),
         ('White house income', 4),
-        ('Malia and Sasha', 5)
+        ('Malia and Sasha', 5),
+        ('Food', 5)
 ;
 
 CREATE TABLE transactions(
