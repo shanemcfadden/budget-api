@@ -1,19 +1,21 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
-import sinon, { mock } from "sinon";
-import {
-  deleteBudgetBase,
-  getBudgetBase,
-  getBudgetsBase,
-  patchBudgetBase,
-  postBudgetBase,
-} from "../../src/controllers/budget";
+import sinon from "sinon";
+import { BudgetControllerBase } from "../../src/controllers/budget";
 import { AuthenticatedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";
 import { fakeCompleteBudgetData, fakeUserMinusPassword } from "../fixtures";
 import User from "../../src/models/user";
+
+const {
+  getBudget,
+  getBudgets,
+  postBudget,
+  patchBudget,
+  deleteBudget,
+} = BudgetControllerBase;
 
 describe("Budget controller", () => {
   let req: AuthenticatedRequest;
@@ -40,7 +42,7 @@ describe("Budget controller", () => {
   afterEach(() => {
     sinon.restore();
   });
-  describe("getBudgetsBase()", () => {
+  describe("getBudgets()", () => {
     beforeEach(() => {
       req = {
         isAuth: true,
@@ -56,7 +58,7 @@ describe("Budget controller", () => {
         sinon.stub(Budget, "findAllByUserId").resolves(fakeBudgetResults);
       });
       it("should send a 200 response with the resolved results", async () => {
-        await getBudgetsBase(req, res as Response, next);
+        await getBudgets(req, res as Response, next);
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.deep.equal(fakeBudgetResults);
       });
@@ -67,15 +69,15 @@ describe("Budget controller", () => {
       });
       it("should throw the rejected error", async () => {
         try {
-          await getBudgetsBase(req, res as Response, next);
-          throw new Error("getBudgetsBase should reject");
+          await getBudgets(req, res as Response, next);
+          throw new Error("getBudgets should reject");
         } catch (err) {
           expect(err).to.deep.equal(mockInternalServerError);
         }
       });
     });
   });
-  describe("getBudgetBase()", () => {
+  describe("getBudget()", () => {
     beforeEach(() => {
       req = ({
         isAuth: true,
@@ -96,12 +98,12 @@ describe("Budget controller", () => {
             .resolves([fakeUserMinusPassword]);
         });
         it("should send a 200 response", async () => {
-          await getBudgetBase(req, res as Response, next);
+          await getBudget(req, res as Response, next);
           expect(res.statusCode).to.exist;
           expect(res.statusCode).to.equal(200);
         });
         it("should return budget data in the response json", async () => {
-          await getBudgetBase(req, res as Response, next);
+          await getBudget(req, res as Response, next);
           expect(res.body).to.exist;
           expect(res.body).to.deep.equal(fakeCompleteBudgetData);
         });
@@ -119,15 +121,15 @@ describe("Budget controller", () => {
         });
         it("should throw an error", async () => {
           try {
-            await getBudgetBase(req, res as Response, next);
-            throw new Error("getBudgetBase should reject");
+            await getBudget(req, res as Response, next);
+            throw new Error("getBudget should reject");
           } catch (err) {
             expect(err).to.deep.equal(error403);
           }
         });
         it("should not send a response", async () => {
           try {
-            await getBudgetBase(req, res as Response, next);
+            await getBudget(req, res as Response, next);
           } catch {
           } finally {
             expect(res.statusCode).to.be.undefined;
@@ -147,15 +149,15 @@ describe("Budget controller", () => {
       });
       it("should pass along error received by first rejected promise", async () => {
         try {
-          await getBudgetBase(req, res as Response, next);
-          throw new Error("getBudgetBase should reject");
+          await getBudget(req, res as Response, next);
+          throw new Error("getBudget should reject");
         } catch (err) {
           expect(err).to.deep.equal(budgetNotFoundError);
         }
       });
       it("should not send a response", async () => {
         try {
-          await getBudgetBase(req, res as Response, next);
+          await getBudget(req, res as Response, next);
         } catch {
         } finally {
           expect(res.statusCode).to.be.undefined;
@@ -164,7 +166,7 @@ describe("Budget controller", () => {
       });
     });
   });
-  describe("postBudgetBase()", () => {
+  describe("postBudget()", () => {
     beforeEach(() => {
       req = ({
         isAuth: true,
@@ -186,16 +188,16 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "addUser").resolves(true);
         });
         it("should respond with a status code of 200", async () => {
-          await postBudgetBase(req, res as Response, next);
+          await postBudget(req, res as Response, next);
           expect(res.statusCode).to.exist;
           expect(res.statusCode).to.equal(200);
         });
         it("should respond with a success message in the body", async () => {
-          await postBudgetBase(req, res as Response, next);
+          await postBudget(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget created successfully");
         });
         it("should respond with the new budget id in the body", async () => {
-          await postBudgetBase(req, res as Response, next);
+          await postBudget(req, res as Response, next);
           expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
@@ -205,15 +207,15 @@ describe("Budget controller", () => {
         });
         it("should pass along error received by first rejected promise", async () => {
           try {
-            await postBudgetBase(req, res as Response, next);
-            throw new Error("postBudgetBase should reject");
+            await postBudget(req, res as Response, next);
+            throw new Error("postBudget should reject");
           } catch (err) {
             expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
           try {
-            await postBudgetBase(req, res as Response, next);
+            await postBudget(req, res as Response, next);
           } catch {
           } finally {
             expect(res.statusCode).to.be.undefined;
@@ -228,15 +230,15 @@ describe("Budget controller", () => {
       });
       it("should pass along error received by first rejected promise", async () => {
         try {
-          await postBudgetBase(req, res as Response, next);
-          throw new Error("postBudgetBase should reject");
+          await postBudget(req, res as Response, next);
+          throw new Error("postBudget should reject");
         } catch (err) {
           expect(err).to.deep.equal(mockInternalServerError);
         }
       });
       it("should not send a response", async () => {
         try {
-          await postBudgetBase(req, res as Response, next);
+          await postBudget(req, res as Response, next);
         } catch {
         } finally {
           expect(res.statusCode).to.be.undefined;
@@ -245,7 +247,7 @@ describe("Budget controller", () => {
       });
     });
   });
-  describe("patchBudgetBase()", () => {
+  describe("patchBudget()", () => {
     beforeEach(() => {
       req = ({
         userId: fakeUserMinusPassword._id,
@@ -268,15 +270,15 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "update").resolves(true);
         });
         it("should send a 200 response", async () => {
-          await patchBudgetBase(req, res as Response, next);
+          await patchBudget(req, res as Response, next);
           expect(res.statusCode).to.equal(200);
         });
         it("should send a success message", async () => {
-          await patchBudgetBase(req, res as Response, next);
+          await patchBudget(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget updated successfully");
         });
         it("should include budget id in the response json", async () => {
-          await patchBudgetBase(req, res as Response, next);
+          await patchBudget(req, res as Response, next);
           expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
@@ -286,15 +288,15 @@ describe("Budget controller", () => {
         });
         it("should pass along the given error", async () => {
           try {
-            await patchBudgetBase(req, res as Response, next);
-            throw new Error("patchBudgetBase should reject");
+            await patchBudget(req, res as Response, next);
+            throw new Error("patchBudget should reject");
           } catch (err) {
             expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
           try {
-            await patchBudgetBase(req, res as Response, next);
+            await patchBudget(req, res as Response, next);
           } catch {
           } finally {
             expect(res.body).to.be.undefined;
@@ -316,15 +318,15 @@ describe("Budget controller", () => {
       });
       it("should send a 403 error", async () => {
         try {
-          await patchBudgetBase(req, res as Response, next);
-          throw new Error("patchBudgetBase should reject");
+          await patchBudget(req, res as Response, next);
+          throw new Error("patchBudget should reject");
         } catch (err) {
           expect(err).to.deep.equal(error403);
         }
       });
       it("should not send a response", async () => {
         try {
-          await patchBudgetBase(req, res as Response, next);
+          await patchBudget(req, res as Response, next);
         } catch {
         } finally {
           expect(res.body).to.be.undefined;
@@ -333,7 +335,7 @@ describe("Budget controller", () => {
       });
     });
   });
-  describe("deleteBudgetBase()", () => {
+  describe("deleteBudget()", () => {
     beforeEach(() => {
       req = ({
         userId: fakeUserMinusPassword._id,
@@ -352,11 +354,11 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "removeById").resolves(true);
         });
         it("should send a 200 response", async () => {
-          await deleteBudgetBase(req, res as Response, next);
+          await deleteBudget(req, res as Response, next);
           expect(res.statusCode).to.equal(200);
         });
         it("should send a success message", async () => {
-          await deleteBudgetBase(req, res as Response, next);
+          await deleteBudget(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget deleted successfully");
         });
       });
@@ -366,15 +368,15 @@ describe("Budget controller", () => {
         });
         it("should pass along the given error", async () => {
           try {
-            await deleteBudgetBase(req, res as Response, next);
-            throw new Error("deleteBudgetBase should reject");
+            await deleteBudget(req, res as Response, next);
+            throw new Error("deleteBudget should reject");
           } catch (err) {
             expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
           try {
-            await deleteBudgetBase(req, res as Response, next);
+            await deleteBudget(req, res as Response, next);
           } catch {
           } finally {
             expect(res.body).to.be.undefined;
@@ -396,15 +398,15 @@ describe("Budget controller", () => {
       });
       it("should send a 403 error", async () => {
         try {
-          await deleteBudgetBase(req, res as Response, next);
-          throw new Error("deleteBudgetBase should reject");
+          await deleteBudget(req, res as Response, next);
+          throw new Error("deleteBudget should reject");
         } catch (err) {
           expect(err).to.deep.equal(error403);
         }
       });
       it("should not send a response", async () => {
         try {
-          await deleteBudgetBase(req, res as Response, next);
+          await deleteBudget(req, res as Response, next);
         } catch {
         } finally {
           expect(res.body).to.be.undefined;

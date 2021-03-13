@@ -2,15 +2,15 @@ import Budget from "../models/budget";
 import User from "../models/user";
 import { Controller } from "../types/controllers";
 import { AuthenticatedRequestHandler } from "../types/express";
-import { catchControllerErrors, ServerError } from "../util/errors";
+import { handleControllerErrors, ServerError } from "../util/errors";
 
-const BudgetController: Controller = {
-  getBudgetsBase: (async (req, res, next) => {
+export const BudgetControllerBase: Controller = {
+  getBudgets: (async (req, res, next) => {
     const results = await Budget.findAllByUserId(req.userId!);
     res.status(200).json(results);
   }) as AuthenticatedRequestHandler,
 
-  getBudgetBase: (async (req, res, next) => {
+  getBudget: (async (req, res, next) => {
     const budgetId = +req.params.id;
     const [budgetUsers, budgetData] = await Promise.all([
       User.findAllByBudgetId(budgetId),
@@ -23,14 +23,14 @@ const BudgetController: Controller = {
   }) as AuthenticatedRequestHandler,
 
   // TODO: change status code to 200 with set location header
-  postBudgetBase: (async (req, res, next) => {
+  postBudget: (async (req, res, next) => {
     const { title, description } = req.body;
     const budgetId = (await Budget.create({ title, description }))._id;
     await Budget.addUser(budgetId, req.userId);
     res.status(200).json({ budgetId, message: "Budget created successfully" });
   }) as AuthenticatedRequestHandler,
 
-  patchBudgetBase: (async (req, res, next) => {
+  patchBudget: (async (req, res, next) => {
     const budgetId = +req.params.id;
     const budgetUsers = await User.findAllByBudgetId(budgetId);
     if (!budgetUsers.filter((userData) => userData._id === req.userId).length) {
@@ -41,7 +41,7 @@ const BudgetController: Controller = {
     res.status(200).json({ budgetId, message: "Budget updated successfully" });
   }) as AuthenticatedRequestHandler,
 
-  deleteBudgetBase: (async (req, res, next) => {
+  deleteBudget: (async (req, res, next) => {
     const budgetId = +req.params.id;
     const budgetUsers = await User.findAllByBudgetId(budgetId);
     if (!budgetUsers.filter((userData) => userData._id === req.userId).length) {
@@ -52,16 +52,4 @@ const BudgetController: Controller = {
   }) as AuthenticatedRequestHandler,
 };
 
-export const deleteBudget = catchControllerErrors(
-  BudgetController.deleteBudgetBase
-);
-export const getBudget = catchControllerErrors(BudgetController.getBudgetBase);
-export const getBudgets = catchControllerErrors(
-  BudgetController.getBudgetsBase
-);
-export const patchBudget = catchControllerErrors(
-  BudgetController.patchBudgetBase
-);
-export const postBudget = catchControllerErrors(
-  BudgetController.postBudgetBase
-);
+export default handleControllerErrors(BudgetControllerBase);
