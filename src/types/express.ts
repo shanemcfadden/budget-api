@@ -5,6 +5,15 @@ export interface ExtendedRequest extends Request {
   userId?: string;
 }
 
-export interface CustomRequestHandler {
+export interface ExtendedRequestHandler {
   (req: ExtendedRequest, res: Response, next: NextFunction): void;
+}
+
+export interface AuthenticatedRequest extends Request {
+  isAuth: true;
+  userId: string;
+}
+
+export interface AuthenticatedRequestHandler {
+  (req: AuthenticatedRequest, res: Response, next: NextFunction): void;
 }

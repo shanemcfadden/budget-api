@@ -2,10 +2,10 @@ import { expect } from "chai";
 import { Response, NextFunction } from "express";
 import sinon, { SinonStub } from "sinon";
 import jwt from "jsonwebtoken";
-import isAuth from "../../src/middleware/isAuth";
+import authenticateBearer from "../../src/middleware/authenticateBearer";
 import { ExtendedRequest } from "../../src/types/express";
 
-describe("isAuth middleware", () => {
+describe("authenticateBearer middleware", () => {
   let req: ExtendedRequest;
   let res: Response;
   let next: SinonStub;
@@ -36,16 +36,16 @@ describe("isAuth middleware", () => {
           userId: mockUserId,
         } as unknown) as void); // sinon stubs don't recognize overloads
       });
-      it("should attach isAuth=true to request object", () => {
-        isAuth(req, res, next as NextFunction);
+      it("should attach authenticateBearer=true to request object", () => {
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.isAuth).to.be.true;
       });
       it("should attach userId to request object", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.userId).to.equal(mockUserId);
       });
       it("should call next at the end of the middleware", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(next.calledOnce).to.be.true;
       });
     });
@@ -57,16 +57,16 @@ describe("isAuth middleware", () => {
           expiredAt: 1408621000,
         });
       });
-      it("should not attach isAuth to request object", () => {
-        isAuth(req, res, next as NextFunction);
+      it("should not attach authenticateBearer to request object", () => {
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.isAuth).to.be.undefined;
       });
       it("should not attach userId to request object", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.userId).to.be.undefined;
       });
       it("should call next at the end of the middleware", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(next.calledOnce).to.be.true;
       });
     });
@@ -77,16 +77,16 @@ describe("isAuth middleware", () => {
           message: "jwt malformed",
         });
       });
-      it("should not attach isAuth to request object", () => {
-        isAuth(req, res, next as NextFunction);
+      it("should not attach authenticateBearer to request object", () => {
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.isAuth).to.be.undefined;
       });
       it("should not attach userId to request object", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(req.userId).to.be.undefined;
       });
       it("should call next at the end of the middleware", () => {
-        isAuth(req, res, next as NextFunction);
+        authenticateBearer(req, res, next as NextFunction);
         expect(next.calledOnce).to.be.true;
       });
     });
@@ -99,16 +99,16 @@ describe("isAuth middleware", () => {
         get(name: string): string | undefined {},
       };
     });
-    it("should not attach isAuth to request object", () => {
-      isAuth(req, res, next as NextFunction);
+    it("should not attach authenticateBearer to request object", () => {
+      authenticateBearer(req, res, next as NextFunction);
       expect(req.isAuth).to.be.undefined;
     });
     it("should not attach userId to request object", () => {
-      isAuth(req, res, next as NextFunction);
+      authenticateBearer(req, res, next as NextFunction);
       expect(req.userId).to.be.undefined;
     });
     it("should call next at the end of the middleware", () => {
-      isAuth(req, res, next as NextFunction);
+      authenticateBearer(req, res, next as NextFunction);
       expect(next.calledOnce).to.be.true;
     });
   });
