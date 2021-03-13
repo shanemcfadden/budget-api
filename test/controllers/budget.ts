@@ -6,7 +6,11 @@ import { AuthenticatedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";
-import { fakeCompleteBudgetData, fakeUserMinusPassword } from "../fixtures";
+import {
+  fakeCompleteBudgetData,
+  fakeUserMinusPassword,
+  mockInternalServerError,
+} from "../fixtures";
 import User from "../../src/models/user";
 
 const {
@@ -22,10 +26,6 @@ describe("Budget controller", () => {
   let res: MockResponse;
   const next = (() => {}) as NextFunction;
   const error403 = new Errors.ServerError(403, "Access denied");
-  const mockInternalServerError = new Errors.ServerError(
-    500,
-    "Mock internal server error"
-  );
 
   beforeEach(() => {
     res = {

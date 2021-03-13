@@ -2,10 +2,10 @@ import "../../src/util/env";
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import sinon, { SinonSpy, SinonStub } from "sinon";
+import sinon, { SinonStub } from "sinon";
 import bcrypt from "bcrypt";
 import { MockResponse } from "../types";
-import { fakeUser, mockJWT } from "../fixtures";
+import { fakeUser, mockJWT, mockInternalServerError } from "../fixtures";
 import { AuthControllerBase } from "../../src/controllers/auth";
 import User from "../../src/models/user";
 import * as Errors from "../../src/util/errors";
@@ -47,16 +47,15 @@ describe("Auth Controller", () => {
     });
 
     describe("if findByEmail throws an error...", () => {
-      const fakeError = new Errors.ServerError(500, "Fake");
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").rejects(fakeError);
+        sinon.stub(User, "findByEmail").rejects(mockInternalServerError);
       });
       it("should throw the error rejected by findByEmail()", async () => {
         try {
           await login(req, res as Response, next);
           throw new Error("login should throw an error");
         } catch (err) {
-          expect(err).to.deep.equal(fakeError);
+          expect(err).to.deep.equal(mockInternalServerError);
         }
       });
       it("should not send a response", async () => {
@@ -179,16 +178,15 @@ describe("Auth Controller", () => {
       } as Request;
     });
     describe("if findByEmail throws an error...", () => {
-      const fakeError = new Errors.ServerError(500, "Fake message");
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").rejects(fakeError);
+        sinon.stub(User, "findByEmail").rejects(mockInternalServerError);
       });
       it("should throw the error rejected by findByEmail()", async () => {
         try {
           await signup(req, res as Response, next);
           throw new Error("signup should reject");
         } catch (err) {
-          expect(err).to.deep.equal(fakeError);
+          expect(err).to.deep.equal(mockInternalServerError);
         }
       });
       it("should not send a response", async () => {
