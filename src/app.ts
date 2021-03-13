@@ -5,6 +5,7 @@ import AuthRoutes from "./routes/auth";
 import BudgetRoutes from "./routes/budget";
 import authenticateBearer from "./middleware/authenticateBearer";
 import { errorRequestHandler } from "./util/errors";
+import mustBeAuthenticated from "./middleware/mustBeAuthenticated";
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(authenticateBearer);
 
 app.use("/auth", AuthRoutes);
-app.use("/budget", BudgetRoutes);
+app.use("/budget", mustBeAuthenticated, BudgetRoutes);
 
 app.use((req, res) => {
   res.send("route not found");
