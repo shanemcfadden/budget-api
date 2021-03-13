@@ -8,7 +8,11 @@ interface JWTPayload {
   userId?: string;
 }
 
-const isAuth = (req: ExtendedRequest, res: Response, next: NextFunction) => {
+const authenticateBearer = (
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.get("Authorization");
   if (!authHeader) {
     next();
@@ -30,4 +34,4 @@ const isAuth = (req: ExtendedRequest, res: Response, next: NextFunction) => {
   next();
 };
 
-export default isAuth;
+export default authenticateBearer;
