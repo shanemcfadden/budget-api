@@ -1,4 +1,5 @@
 import { ErrorRequestHandler, NextFunction, RequestHandler } from "express";
+import { AuthenticatedRequestHandler } from "../types/express";
 
 export class ServerError {
   statusCode: number;
@@ -10,16 +11,16 @@ export class ServerError {
   }
 }
 
-export function catchControllerErrors(
-  controller: RequestHandler
-): RequestHandler {
-  return (req, res, next) => {
+export function catchControllerErrors<T extends AuthenticatedRequestHandler>(
+  controller: T
+): T {
+  return (async (req, res, next) => {
     try {
-      controller(req, res, next);
+      await controller(req, res, next);
     } catch (err) {
       handleErrors(err, next);
     }
-  };
+  }) as T;
 }
 
 export function handleErrors(error: ServerError | Error, next: NextFunction) {
