@@ -57,6 +57,15 @@ class User {
   static async removeById(id: string): Promise<boolean> {
     return await removeById(id, modelName);
   }
+
+  static async hasPermissionToEditBudget(
+    userId: string,
+    budgetId: number
+  ): Promise<boolean> {
+    const authorizedUsers = await User.findAllByBudgetId(budgetId);
+    return !!authorizedUsers.filter((userData) => userData._id === userId)
+      .length;
+  }
 }
 
 export default User;

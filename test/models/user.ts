@@ -14,6 +14,7 @@ describe("User model", () => {
   let queryDbStub: SinonStub;
   const { email, password, firstName, lastName, _id } = fakeUser;
   const modelName = "user";
+  const fakeBudgetId = 304;
 
   afterEach(() => {
     sinon.restore();
@@ -96,7 +97,6 @@ describe("User model", () => {
     });
   });
   describe("findAllByBudgetId()", () => {
-    const fakeBudgetId = 304;
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
@@ -122,6 +122,31 @@ describe("User model", () => {
       const results = await User.removeById(_id);
       expect(removeStub.calledOnceWith(_id, modelName)).to.be.true;
       expect(results).to.deep.equal(true);
+    });
+  });
+  describe("hasPermissionToEditBudget()", () => {
+    let findAllByBudgetIdStub: SinonStub;
+    describe("if user is not listed in findAllByBudgetId...", () => {
+      beforeEach(() => {
+        findAllByBudgetIdStub = sinon
+          .stub(User, "findAllByBudgetId")
+          .resolves([]);
+      });
+      it("should return false", async () => {
+        const result = await User.hasPermissionToEditBudget(_id, fakeBudgetId);
+        expect(result).to.be.false;
+      });
+    });
+    describe("if user is listed in results of findAllByBudgetId...", () => {
+      beforeEach(() => {
+        findAllByBudgetIdStub = sinon
+          .stub(User, "findAllByBudgetId")
+          .resolves([fakeUser]);
+      });
+      it("should return true", async () => {
+        const result = await User.hasPermissionToEditBudget(_id, fakeBudgetId);
+        expect(result).to.be.true;
+      });
     });
   });
 });
