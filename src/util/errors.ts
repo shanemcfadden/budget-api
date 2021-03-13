@@ -1,4 +1,5 @@
 import { ErrorRequestHandler, NextFunction, RequestHandler } from "express";
+import { Controller } from "../types/controllers";
 import { AuthenticatedRequestHandler } from "../types/express";
 
 export class ServerError {
@@ -11,12 +12,20 @@ export class ServerError {
   }
 }
 
-export function catchControllerErrors<T extends AuthenticatedRequestHandler>(
-  controller: T
+export function handleControllerErrors(controller: Controller): Controller {
+  const newController: Controller = {};
+  Object.keys(controller).forEach((key) => {
+    newController[key] = handleMiddlewareErrors(controller[key]);
+  });
+  return newController;
+}
+
+export function handleMiddlewareErrors<T extends AuthenticatedRequestHandler>(
+  middleware: T
 ): T {
   return (async (req, res, next) => {
     try {
-      await controller(req, res, next);
+      await middleware(req, res, next);
     } catch (err) {
       handleErrors(err, next);
     }
