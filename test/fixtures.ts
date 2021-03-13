@@ -11,6 +11,7 @@ import {
   UserData,
   UserDataMinusPassword,
 } from "../src/types/models";
+import { ServerError } from "../src/util/errors";
 
 export const fakeUserMinusPassword: UserDataMinusPassword = {
   email: "fake@email.com",
@@ -199,3 +200,8 @@ export const fakeCompleteBudgetData: CompleteBudgetData = {
   transactions: fakeTransactions,
   categories: fakeCategoriesData,
 };
+
+export const mockInternalServerError = new ServerError(
+  500,
+  "Mock internal server error"
+);

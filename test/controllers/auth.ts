@@ -2,20 +2,22 @@ import "../../src/util/env";
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import sinon, { SinonSpy, SinonStub } from "sinon";
+import sinon, { SinonStub } from "sinon";
 import bcrypt from "bcrypt";
 import { MockResponse } from "../types";
-import { fakeUser, mockJWT } from "../fixtures";
-import { login, signup } from "../../src/controllers/auth";
+import { fakeUser, mockJWT, mockInternalServerError } from "../fixtures";
+import { AuthControllerBase } from "../../src/controllers/auth";
 import User from "../../src/models/user";
 import * as Errors from "../../src/util/errors";
+import { ExtendedRequestHandler } from "../../src/types/express";
 
 const { JWT_SECRET } = process.env;
+const login = AuthControllerBase.login as ExtendedRequestHandler;
+const signup = AuthControllerBase.signup as ExtendedRequestHandler;
 
 let req: Request;
 let res: MockResponse;
 const next = (() => {}) as NextFunction;
-let errorHandlerSpy: SinonSpy;
 
 describe("Auth Controller", () => {
   beforeEach(() => {
@@ -29,7 +31,6 @@ describe("Auth Controller", () => {
         return;
       },
     };
-    errorHandlerSpy = sinon.spy(Errors, "handleErrors");
   });
   afterEach(async () => {
     sinon.restore();
@@ -46,22 +47,25 @@ describe("Auth Controller", () => {
     });
 
     describe("if findByEmail throws an error...", () => {
-      const fakeError = new Errors.ServerError(500, "Fake");
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").rejects(fakeError);
-      });
-      it("should throw an error", async () => {
-        await login(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
+        sinon.stub(User, "findByEmail").rejects(mockInternalServerError);
       });
       it("should throw the error rejected by findByEmail()", async () => {
-        await login(req, res as Response, next);
-        expect(errorHandlerSpy.calledWith(fakeError)).to.be.true;
+        try {
+          await login(req, res as Response, next);
+          throw new Error("login should throw an error");
+        } catch (err) {
+          expect(err).to.deep.equal(mockInternalServerError);
+        }
       });
       it("should not send a response", async () => {
-        await login(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
+        try {
+          await login(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
       });
     });
     describe("if findByEmail does not throw an error...", () => {
@@ -80,7 +84,6 @@ describe("Auth Controller", () => {
         });
         it("should not throw an error", async () => {
           await login(req, res as Response, next);
-          expect(errorHandlerSpy.called).to.be.false;
         });
         it("should set response status to 200", async () => {
           await login(req, res as Response, next);
@@ -116,24 +119,24 @@ describe("Auth Controller", () => {
         beforeEach(() => {
           sinon.stub(User, "findByEmail").resolves(null);
         });
-        it("should throw an error", async () => {
-          await login(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-        });
-        it("error should have status code of 404", async () => {
-          await login(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.statusCode).to.equal(404);
-        });
-        it("error should have message of 'User not found'", async () => {
-          await login(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.message).to.equal("User not found");
+        it('should throw a 404 "User not found" error', async () => {
+          try {
+            await login(req, res as Response, next);
+            throw new Error("login should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(
+              new Errors.ServerError(404, "User not found")
+            );
+          }
         });
         it("should not send a response", async () => {
-          await login(req, res as Response, next);
-          expect(res.statusCode).to.be.undefined;
-          expect(res.body).to.be.undefined;
+          try {
+            await login(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
         });
       });
       describe("If password is incorrect...", () => {
@@ -141,24 +144,24 @@ describe("Auth Controller", () => {
           sinon.stub(User, "findByEmail").resolves(fakeUser);
           sinon.stub(bcrypt, "compare").resolves(false);
         });
-        it("should throw an error", async () => {
-          await login(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-        });
-        it("error should have status code of 401", async () => {
-          await login(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.statusCode).to.equal(401);
-        });
-        it("error should have message of 'Authentification failed'", async () => {
-          await login(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.message).to.equal("Authentification failed");
+        it('should throw a 401 "Authentication failed" error', async () => {
+          try {
+            await login(req, res as Response, next);
+            throw new Error("login should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(
+              new Errors.ServerError(401, "Authentification failed")
+            );
+          }
         });
         it("should not send a response", async () => {
-          await login(req, res as Response, next);
-          expect(res.statusCode).to.be.undefined;
-          expect(res.body).to.be.undefined;
+          try {
+            await login(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
         });
       });
     });
@@ -175,22 +178,25 @@ describe("Auth Controller", () => {
       } as Request;
     });
     describe("if findByEmail throws an error...", () => {
-      const fakeError = new Errors.ServerError(500, "Fake message");
       beforeEach(() => {
-        sinon.stub(User, "findByEmail").rejects(fakeError);
-      });
-      it("should throw an error", async () => {
-        await signup(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
+        sinon.stub(User, "findByEmail").rejects(mockInternalServerError);
       });
       it("should throw the error rejected by findByEmail()", async () => {
-        await signup(req, res as Response, next);
-        expect(errorHandlerSpy.calledWith(fakeError)).to.be.true;
+        try {
+          await signup(req, res as Response, next);
+          throw new Error("signup should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(mockInternalServerError);
+        }
       });
       it("should not send a response", async () => {
-        await signup(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
+        try {
+          await signup(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
       });
     });
     describe("if findByEmail does not throw an error...", () => {
@@ -213,7 +219,6 @@ describe("Auth Controller", () => {
         });
         it("should not throw an error", async () => {
           await signup(req, res as Response, next);
-          expect(errorHandlerSpy.called).to.be.false;
         });
         it("should create a user", async () => {
           const { email, firstName, lastName, password } = fakeUser;
@@ -250,21 +255,27 @@ describe("Auth Controller", () => {
         beforeEach(() => {
           sinon.stub(User, "findByEmail").resolves(fakeUser);
         });
-        it("should throw an error.", async () => {
-          await signup(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
+        it('should throw a 401 "Account already associated with this email" error', async () => {
+          try {
+            await signup(req, res as Response, next);
+            throw new Error("signup should throw an error");
+          } catch (err) {
+            expect(err).to.deep.equal(
+              new Errors.ServerError(
+                401,
+                "Account already associated with this email"
+              )
+            );
+          }
         });
-        it("error should have status code of 401", async () => {
-          await signup(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.statusCode).to.equal(401);
-        });
-        it("error should have message of 'Account already associated with this email'", async () => {
-          await signup(req, res as Response, next);
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.message).to.equal(
-            "Account already associated with this email"
-          );
+        it("should not return a response", async () => {
+          try {
+            await signup(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
         });
       });
     });

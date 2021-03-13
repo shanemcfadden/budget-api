@@ -1,13 +1,14 @@
 import bcrypt from "bcrypt";
-import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
-import { handleErrors, ServerError } from "../util/errors";
+import { Controller } from "../types/controllers";
+import { ExtendedRequestHandler } from "../types/express";
+import { handleControllerErrors, ServerError } from "../util/errors";
 
 const { JWT_SECRET } = process.env;
 
-export const login: RequestHandler = async (req, res, next) => {
-  try {
+export const AuthControllerBase: Controller = {
+  login: (async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findByEmail(email);
     if (!user) {
@@ -23,13 +24,9 @@ export const login: RequestHandler = async (req, res, next) => {
     const userId = user._id;
     const token = jwt.sign({ userId }, JWT_SECRET!, { expiresIn: "1h" });
     res.status(200).json({ message: "Login successful", token });
-  } catch (err) {
-    handleErrors(err, next);
-  }
-};
+  }) as ExtendedRequestHandler,
 
-export const signup: RequestHandler = async (req, res, next) => {
-  try {
+  signup: (async (req, res, next) => {
     const { email, password, firstName, lastName } = req.body;
     const user = await User.findByEmail(email);
     if (user) {
@@ -46,7 +43,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     const userId = newUser._id;
     const token = jwt.sign({ userId }, JWT_SECRET!, { expiresIn: "1h" });
     res.status(201).json({ message: "Sign up successful", token });
-  } catch (err) {
-    handleErrors(err, next);
-  }
+  }) as ExtendedRequestHandler,
 };
+
+export default handleControllerErrors(AuthControllerBase);

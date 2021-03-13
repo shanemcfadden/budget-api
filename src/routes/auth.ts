@@ -1,6 +1,6 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import { body } from "express-validator";
-import { login, signup } from "../controllers/auth";
+import AuthController from "../controllers/auth";
 import {
   throwAllValidationErrorMessages,
   throwFirstValidationErrorMessage,
@@ -16,7 +16,7 @@ router.post(
     .trim()
     .custom(isValidPassword()),
   throwFirstValidationErrorMessage,
-  login
+  AuthController.login as RequestHandler
 );
 
 router.put(
@@ -45,7 +45,7 @@ router.put(
     .trim()
     .isLength({ min: 1, max: 100 }),
   throwAllValidationErrorMessages,
-  signup
+  AuthController.signup as RequestHandler
 );
 
 export default router;
