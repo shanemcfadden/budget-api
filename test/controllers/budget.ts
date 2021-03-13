@@ -38,23 +38,6 @@ describe("Budget controller", () => {
     sinon.restore();
   });
   describe("getBudgets()", () => {
-    describe("if user is not authenticated...", () => {
-      beforeEach(() => {
-        req = {} as AuthenticatedRequest;
-      });
-      it("should throw an authentication error", async () => {
-        await getBudgets(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error.statusCode).to.equal(401);
-        expect(error.message).to.equal("Unauthenticated user");
-      });
-      it("should not send a response", async () => {
-        await getBudgets(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
-      });
-    });
     describe("if user is authenticated...", () => {
       beforeEach(() => {
         req = {
@@ -91,101 +74,53 @@ describe("Budget controller", () => {
     });
   });
   describe("getBudget()", () => {
-    describe("if user is not authenticated...", () => {
-      beforeEach(() => {
-        req = ({
-          params: {
-            id: "243",
-          },
-        } as unknown) as AuthenticatedRequest;
-      });
-      it("should throw an authentication error", async () => {
-        await getBudget(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error.statusCode).to.equal(401);
-        expect(error.message).to.equal("Unauthenticated user");
-      });
-      it("should not send a response", async () => {
-        await getBudget(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
-      });
+    beforeEach(() => {
+      req = ({
+        isAuth: true,
+        userId: fakeUserMinusPassword._id,
+        params: {
+          id: fakeCompleteBudgetData.id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
     });
-    describe("if user is authenticated...", () => {
+    describe("if budget exists...", () => {
       beforeEach(() => {
-        req = ({
-          isAuth: true,
-          userId: fakeUserMinusPassword._id,
-          params: {
-            id: fakeCompleteBudgetData.id.toString(),
-          },
-        } as unknown) as AuthenticatedRequest;
+        sinon.stub(Budget, "findDetailsById").resolves(fakeCompleteBudgetData);
       });
-      describe("if budget exists...", () => {
+      describe("if user has permission to get budget...", () => {
         beforeEach(() => {
-          sinon
-            .stub(Budget, "findDetailsById")
-            .resolves(fakeCompleteBudgetData);
-        });
-        describe("if user has permission to get budget...", () => {
-          beforeEach(() => {
-            sinon
-              .stub(User, "findAllByBudgetId")
-              .resolves([fakeUserMinusPassword]);
-          });
-          it("should send a 200 response", async () => {
-            await getBudget(req, res as Response, next);
-            expect(res.statusCode).to.exist;
-            expect(res.statusCode).to.equal(200);
-          });
-          it("should return budget data in the response json", async () => {
-            await getBudget(req, res as Response, next);
-            expect(res.body).to.exist;
-            expect(res.body).to.deep.equal(fakeCompleteBudgetData);
-          });
-        });
-        describe("if user does not have permission to get budget", () => {
-          beforeEach(() => {
-            sinon.stub(User, "findAllByBudgetId").resolves([
-              {
-                _id: "1234767652a1",
-                email: "asdfrew@basdr.com",
-                firstName: "NotAnAuthorized",
-                lastName: "User",
-              },
-            ]);
-          });
-          it("should throw an error", async () => {
-            await getBudget(req, res as Response, next);
-            expect(errorHandlerSpy.calledOnce).to.be.true;
-            const error = errorHandlerSpy.getCall(0).args[0];
-            expect(error.statusCode).to.equal(403);
-            expect(error.message).to.equal("Access denied");
-          });
-          it("should not send a response", async () => {
-            await getBudget(req, res as Response, next);
-            expect(res.statusCode).to.be.undefined;
-            expect(res.body).to.be.undefined;
-          });
-        });
-      });
-      describe("if budget does not exist...", () => {
-        const budgetNotFoundError = new Errors.ServerError(
-          404,
-          "Budget not found"
-        );
-        beforeEach(() => {
-          sinon.stub(Budget, "findDetailsById").rejects(budgetNotFoundError);
           sinon
             .stub(User, "findAllByBudgetId")
             .resolves([fakeUserMinusPassword]);
         });
-        it("should pass along error received by first rejected promise", async () => {
+        it("should send a 200 response", async () => {
+          await getBudget(req, res as Response, next);
+          expect(res.statusCode).to.exist;
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should return budget data in the response json", async () => {
+          await getBudget(req, res as Response, next);
+          expect(res.body).to.exist;
+          expect(res.body).to.deep.equal(fakeCompleteBudgetData);
+        });
+      });
+      describe("if user does not have permission to get budget", () => {
+        beforeEach(() => {
+          sinon.stub(User, "findAllByBudgetId").resolves([
+            {
+              _id: "1234767652a1",
+              email: "asdfrew@basdr.com",
+              firstName: "NotAnAuthorized",
+              lastName: "User",
+            },
+          ]);
+        });
+        it("should throw an error", async () => {
           await getBudget(req, res as Response, next);
           expect(errorHandlerSpy.calledOnce).to.be.true;
           const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(budgetNotFoundError);
+          expect(error.statusCode).to.equal(403);
+          expect(error.message).to.equal("Access denied");
         });
         it("should not send a response", async () => {
           await getBudget(req, res as Response, next);
@@ -194,65 +129,67 @@ describe("Budget controller", () => {
         });
       });
     });
+    describe("if budget does not exist...", () => {
+      const budgetNotFoundError = new Errors.ServerError(
+        404,
+        "Budget not found"
+      );
+      beforeEach(() => {
+        sinon.stub(Budget, "findDetailsById").rejects(budgetNotFoundError);
+        sinon.stub(User, "findAllByBudgetId").resolves([fakeUserMinusPassword]);
+      });
+      it("should pass along error received by first rejected promise", async () => {
+        await getBudget(req, res as Response, next);
+        expect(errorHandlerSpy.calledOnce).to.be.true;
+        const error = errorHandlerSpy.getCall(0).args[0];
+        expect(error).to.deep.equal(budgetNotFoundError);
+      });
+      it("should not send a response", async () => {
+        await getBudget(req, res as Response, next);
+        expect(res.statusCode).to.be.undefined;
+        expect(res.body).to.be.undefined;
+      });
+    });
   });
   describe("postBudget()", () => {
-    describe("if user is authenticated...", () => {
+    beforeEach(() => {
+      req = ({
+        isAuth: true,
+        userId: fakeUserMinusPassword._id,
+        body: {
+          title: fakeCompleteBudgetData.title,
+          description: fakeCompleteBudgetData.description,
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if budget is created successfully...", () => {
       beforeEach(() => {
-        req = ({
-          isAuth: true,
-          userId: fakeUserMinusPassword._id,
-          body: {
-            title: fakeCompleteBudgetData.title,
-            description: fakeCompleteBudgetData.description,
-          },
-        } as unknown) as AuthenticatedRequest;
+        sinon
+          .stub(Budget, "create")
+          .resolves({ _id: fakeCompleteBudgetData.id });
       });
-      describe("if budget is created successfully...", () => {
+      describe("if user is added to budget successfully...", () => {
         beforeEach(() => {
-          sinon
-            .stub(Budget, "create")
-            .resolves({ _id: fakeCompleteBudgetData.id });
+          sinon.stub(Budget, "addUser").resolves(true);
         });
-        describe("if user is added to budget successfully...", () => {
-          beforeEach(() => {
-            sinon.stub(Budget, "addUser").resolves(true);
-          });
-          it("should respond with a status code of 200", async () => {
-            await postBudget(req, res as Response, next);
-            expect(res.statusCode).to.exist;
-            expect(res.statusCode).to.equal(200);
-          });
-          it("should respond with a success message in the body", async () => {
-            await postBudget(req, res as Response, next);
-            expect(res.body?.message).to.equal("Budget created successfully");
-          });
-          it("should respond with the new budget id in the body", async () => {
-            await postBudget(req, res as Response, next);
-            expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
-          });
+        it("should respond with a status code of 200", async () => {
+          await postBudget(req, res as Response, next);
+          expect(res.statusCode).to.exist;
+          expect(res.statusCode).to.equal(200);
         });
-        describe("if user is not added successfully...", () => {
-          const serverError = new Errors.ServerError(500, "Server error");
-          beforeEach(() => {
-            sinon.stub(Budget, "addUser").rejects(serverError);
-          });
-          it("should pass along error received by first rejected promise", async () => {
-            await postBudget(req, res as Response, next);
-            expect(errorHandlerSpy.calledOnce).to.be.true;
-            const error = errorHandlerSpy.getCall(0).args[0];
-            expect(error).to.deep.equal(serverError);
-          });
-          it("should not send a response", async () => {
-            await postBudget(req, res as Response, next);
-            expect(res.statusCode).to.be.undefined;
-            expect(res.body).to.be.undefined;
-          });
+        it("should respond with a success message in the body", async () => {
+          await postBudget(req, res as Response, next);
+          expect(res.body?.message).to.equal("Budget created successfully");
+        });
+        it("should respond with the new budget id in the body", async () => {
+          await postBudget(req, res as Response, next);
+          expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
-      describe("if budget is not created...", () => {
+      describe("if user is not added successfully...", () => {
         const serverError = new Errors.ServerError(500, "Server error");
         beforeEach(() => {
-          sinon.stub(Budget, "create").rejects(serverError);
+          sinon.stub(Budget, "addUser").rejects(serverError);
         });
         it("should pass along error received by first rejected promise", async () => {
           await postBudget(req, res as Response, next);
@@ -267,13 +204,12 @@ describe("Budget controller", () => {
         });
       });
     });
-    describe("if user is not authenticated...", () => {
+    describe("if budget is not created...", () => {
+      const serverError = new Errors.ServerError(500, "Server error");
       beforeEach(() => {
-        req = {} as AuthenticatedRequest;
+        sinon.stub(Budget, "create").rejects(serverError);
       });
-      afterEach(() => {});
-      it("should pass along a 401 error", async () => {
-        const serverError = new Errors.ServerError(401, "Unauthenticated user");
+      it("should pass along error received by first rejected promise", async () => {
         await postBudget(req, res as Response, next);
         expect(errorHandlerSpy.calledOnce).to.be.true;
         const error = errorHandlerSpy.getCall(0).args[0];
@@ -287,82 +223,53 @@ describe("Budget controller", () => {
     });
   });
   describe("patchBudget()", () => {
-    describe("if user is authenticated...", () => {
+    beforeEach(() => {
+      req = ({
+        userId: fakeUserMinusPassword._id,
+        isAuth: true,
+        body: {
+          title: "new title",
+          description: "new description",
+        },
+        params: {
+          id: fakeCompleteBudgetData.id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to edit the budget...", () => {
       beforeEach(() => {
-        req = ({
-          userId: fakeUserMinusPassword._id,
-          isAuth: true,
-          body: {
-            title: "new title",
-            description: "new description",
-          },
-          params: {
-            id: fakeCompleteBudgetData.id.toString(),
-          },
-        } as unknown) as AuthenticatedRequest;
+        sinon.stub(User, "findAllByBudgetId").resolves([fakeUserMinusPassword]);
       });
-      describe("if user is authorized to edit the budget...", () => {
+      describe("if budget is patched successfully...", () => {
         beforeEach(() => {
-          sinon
-            .stub(User, "findAllByBudgetId")
-            .resolves([fakeUserMinusPassword]);
+          sinon.stub(Budget, "update").resolves(true);
         });
-        describe("if budget is patched successfully...", () => {
-          beforeEach(() => {
-            sinon.stub(Budget, "update").resolves(true);
-          });
-          it("should send a 200 response", async () => {
-            await patchBudget(req, res as Response, next);
-            expect(res.statusCode).to.equal(200);
-          });
-          it("should send a success message", async () => {
-            await patchBudget(req, res as Response, next);
-            expect(res.body?.message).to.equal("Budget updated successfully");
-          });
-          it("should include budget id in the response json", async () => {
-            await patchBudget(req, res as Response, next);
-            expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
-          });
+        it("should send a 200 response", async () => {
+          await patchBudget(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
         });
-        describe("if budget is not patched successfully...", () => {
-          const serverError = new Errors.ServerError(
-            500,
-            "Internal server error"
-          );
-          beforeEach(() => {
-            sinon.stub(Budget, "update").rejects(serverError);
-          });
-          it("should pass along the given error", async () => {
-            await patchBudget(req, res as Response, next);
-            expect(errorHandlerSpy.calledOnce).to.be.true;
-            const error = errorHandlerSpy.getCall(0).args[0];
-            expect(error).to.deep.equal(serverError);
-          });
-          it("should not send a response", async () => {
-            await patchBudget(req, res as Response, next);
-            expect(res.body).to.be.undefined;
-            expect(res.statusCode).to.be.undefined;
-          });
+        it("should send a success message", async () => {
+          await patchBudget(req, res as Response, next);
+          expect(res.body?.message).to.equal("Budget updated successfully");
+        });
+        it("should include budget id in the response json", async () => {
+          await patchBudget(req, res as Response, next);
+          expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
-      describe("if user is not authorized to edit the budget...", () => {
+      describe("if budget is not patched successfully...", () => {
+        const serverError = new Errors.ServerError(
+          500,
+          "Internal server error"
+        );
         beforeEach(() => {
-          sinon.stub(User, "findAllByBudgetId").resolves([
-            {
-              _id: "asdflkj21kl1239",
-              email: "wrong@user.com",
-              firstName: "NotAuthorized",
-              lastName: "User",
-            },
-          ]);
+          sinon.stub(Budget, "update").rejects(serverError);
         });
-        it("should send a 403 error", async () => {
+        it("should pass along the given error", async () => {
           await patchBudget(req, res as Response, next);
           expect(errorHandlerSpy.calledOnce).to.be.true;
           const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(
-            new Errors.ServerError(403, "Access denied")
-          );
+          expect(error).to.deep.equal(serverError);
         });
         it("should not send a response", async () => {
           await patchBudget(req, res as Response, next);
@@ -371,99 +278,72 @@ describe("Budget controller", () => {
         });
       });
     });
-    describe("if user is not authenticated...", () => {
+    describe("if user is not authorized to edit the budget...", () => {
       beforeEach(() => {
-        req = ({
-          params: {
-            id: fakeCompleteBudgetData.id.toString(),
+        sinon.stub(User, "findAllByBudgetId").resolves([
+          {
+            _id: "asdflkj21kl1239",
+            email: "wrong@user.com",
+            firstName: "NotAuthorized",
+            lastName: "User",
           },
-        } as unknown) as AuthenticatedRequest;
+        ]);
       });
-      it("should pass along a 401 error", async () => {
+      it("should send a 403 error", async () => {
         await patchBudget(req, res as Response, next);
         expect(errorHandlerSpy.calledOnce).to.be.true;
         const error = errorHandlerSpy.getCall(0).args[0];
         expect(error).to.deep.equal(
-          new Errors.ServerError(401, "Unauthenticated user")
+          new Errors.ServerError(403, "Access denied")
         );
       });
       it("should not send a response", async () => {
         await patchBudget(req, res as Response, next);
-
         expect(res.body).to.be.undefined;
         expect(res.statusCode).to.be.undefined;
       });
     });
   });
   describe("deleteBudget()", () => {
-    describe("if user is authenticated...", () => {
+    beforeEach(() => {
+      req = ({
+        userId: fakeUserMinusPassword._id,
+        isAuth: true,
+        params: {
+          id: fakeCompleteBudgetData.id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to edit the budget...", () => {
       beforeEach(() => {
-        req = ({
-          userId: fakeUserMinusPassword._id,
-          isAuth: true,
-          params: {
-            id: fakeCompleteBudgetData.id.toString(),
-          },
-        } as unknown) as AuthenticatedRequest;
+        sinon.stub(User, "findAllByBudgetId").resolves([fakeUserMinusPassword]);
       });
-      describe("if user is authorized to edit the budget...", () => {
+      describe("if budget is deleted successfully...", () => {
         beforeEach(() => {
-          sinon
-            .stub(User, "findAllByBudgetId")
-            .resolves([fakeUserMinusPassword]);
+          sinon.stub(Budget, "removeById").resolves(true);
         });
-        describe("if budget is deleted successfully...", () => {
-          beforeEach(() => {
-            sinon.stub(Budget, "removeById").resolves(true);
-          });
-          it("should send a 200 response", async () => {
-            await deleteBudget(req, res as Response, next);
-            expect(res.statusCode).to.equal(200);
-          });
-          it("should send a success message", async () => {
-            await deleteBudget(req, res as Response, next);
-            expect(res.body?.message).to.equal("Budget deleted successfully");
-          });
+        it("should send a 200 response", async () => {
+          await deleteBudget(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
         });
-        describe("if budget is not deleted successfully...", () => {
-          const serverError = new Errors.ServerError(
-            500,
-            "Internal server error"
-          );
-          beforeEach(() => {
-            sinon.stub(Budget, "removeById").rejects(serverError);
-          });
-          it("should pass along the given error", async () => {
-            await deleteBudget(req, res as Response, next);
-            expect(errorHandlerSpy.calledOnce).to.be.true;
-            const error = errorHandlerSpy.getCall(0).args[0];
-            expect(error).to.deep.equal(serverError);
-          });
-          it("should not send a response", async () => {
-            await deleteBudget(req, res as Response, next);
-            expect(res.body).to.be.undefined;
-            expect(res.statusCode).to.be.undefined;
-          });
+        it("should send a success message", async () => {
+          await deleteBudget(req, res as Response, next);
+          expect(res.body?.message).to.equal("Budget deleted successfully");
         });
       });
-      describe("if user is not authorized to edit the budget...", () => {
+      describe("if budget is not deleted successfully...", () => {
+        const serverError = new Errors.ServerError(
+          500,
+          "Internal server error"
+        );
         beforeEach(() => {
-          sinon.stub(User, "findAllByBudgetId").resolves([
-            {
-              _id: "asdflkj21kl1239",
-              email: "wrong@user.com",
-              firstName: "NotAuthorized",
-              lastName: "User",
-            },
-          ]);
+          sinon.stub(Budget, "removeById").rejects(serverError);
         });
-        it("should send a 403 error", async () => {
+        it("should pass along the given error", async () => {
           await deleteBudget(req, res as Response, next);
           expect(errorHandlerSpy.calledOnce).to.be.true;
           const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(
-            new Errors.ServerError(403, "Access denied")
-          );
+          expect(error).to.deep.equal(serverError);
         });
         it("should not send a response", async () => {
           await deleteBudget(req, res as Response, next);
@@ -472,20 +352,23 @@ describe("Budget controller", () => {
         });
       });
     });
-    describe("if user is not authenticated...", () => {
+    describe("if user is not authorized to edit the budget...", () => {
       beforeEach(() => {
-        req = ({
-          params: {
-            id: fakeCompleteBudgetData.id.toString(),
+        sinon.stub(User, "findAllByBudgetId").resolves([
+          {
+            _id: "asdflkj21kl1239",
+            email: "wrong@user.com",
+            firstName: "NotAuthorized",
+            lastName: "User",
           },
-        } as unknown) as AuthenticatedRequest;
+        ]);
       });
-      it("should pass along a 401 error", async () => {
+      it("should send a 403 error", async () => {
         await deleteBudget(req, res as Response, next);
         expect(errorHandlerSpy.calledOnce).to.be.true;
         const error = errorHandlerSpy.getCall(0).args[0];
         expect(error).to.deep.equal(
-          new Errors.ServerError(401, "Unauthenticated user")
+          new Errors.ServerError(403, "Access denied")
         );
       });
       it("should not send a response", async () => {
