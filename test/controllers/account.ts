@@ -1,0 +1,145 @@
+import { NextFunction, Response } from "express";
+import Sinon, { SinonStub } from "sinon";
+import { AccountControllerBase } from "../../src/controllers/account";
+import Account from "../../src/models/account";
+import User from "../../src/models/user";
+import { AuthenticatedRequest } from "../../src/types/express";
+import { MockResponse } from "../types";
+import { fakeAccounts, fakeUser, mockInternalServerError } from "../fixtures";
+import { expect } from "chai";
+import * as Errors from "../../src/util/errors";
+
+const { postAccount, patchAccount, deleteAccount } = AccountControllerBase;
+
+describe("AccountController", () => {
+  const fakeAccount = fakeAccounts[0];
+  const error403 = new Errors.ServerError(403, "Access denied");
+  const {
+    id,
+    name,
+    description,
+    startBalance,
+    startDate,
+    budgetId,
+  } = fakeAccount;
+  let req: AuthenticatedRequest;
+  let res: MockResponse;
+  const next = (() => {}) as NextFunction;
+  beforeEach(() => {
+    res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (object) {
+        this.body = object;
+        return;
+      },
+    };
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
+  describe("postAccount()", () => {
+    beforeEach(() => {
+      req = {
+        userId: fakeUser._id,
+        isAuth: true,
+        body: {
+          name,
+          description,
+          startBalance,
+          startDate: startDate.toString(),
+          budgetId,
+        },
+      } as AuthenticatedRequest;
+    });
+    describe("if user is authorized to add an account to the given budget...", () => {
+      let createAccountStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditBudget").resolves(true);
+      });
+      describe("if the account creation is successful...", () => {
+        beforeEach(() => {
+          createAccountStub = Sinon.stub(Account, "create").resolves({
+            _id: id,
+          });
+        });
+        it("should create the account", async () => {
+          await postAccount(req, res as Response, next);
+          expect(createAccountStub.calledOnce).to.be.true;
+          expect(
+            createAccountStub.calledWith({
+              name,
+              description,
+              startDate,
+              startBalance,
+              budgetId,
+            })
+          ).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await postAccount(req, res as Response, next);
+          expect(res.statusCode).to.exist;
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should have a success message in the response body", async () => {
+          await postAccount(req, res as Response, next);
+          expect(res.body?.message).to.equal("Account created successfully");
+        });
+        it("should have the new account id in the response body", async () => {
+          await postAccount(req, res as Response, next);
+          expect(res.body?.accountId).to.equal(id);
+        });
+      });
+      describe("if the account creation results in an error", () => {
+        beforeEach(() => {
+          createAccountStub = Sinon.stub(Account, "create").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should throw said error", async () => {
+          try {
+            await postAccount(req, res as Response, next);
+            throw new Error("postAccount should throw here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await postAccount(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to add an account to the given budget...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditBudget").resolves(false);
+      });
+      it("should throw a 403 error", async () => {
+        try {
+          await postAccount(req, res as Response, next);
+          throw new Error("postAccount should throw here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await postAccount(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
+      });
+    });
+  });
+  //   describe("patchAccount()");
+  //   describe("deleteAccount()");
+});

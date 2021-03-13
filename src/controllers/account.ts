@@ -1,10 +1,29 @@
+import Account from "../models/account";
+import User from "../models/user";
 import { Controller } from "../types/controllers";
 import { AuthenticatedRequestHandler } from "../types/express";
-import { handleControllerErrors } from "../util/errors";
+import { handleControllerErrors, ServerError } from "../util/errors";
 
 export const AccountControllerBase: Controller = {
   postAccount: (async (req, res, next) => {
-    res.send("POST /account");
+    const { name, description, startBalance, startDate, budgetId } = req.body;
+    const userHasPermission = await User.hasPermissionToEditBudget(
+      req.userId,
+      budgetId
+    );
+    if (!userHasPermission) throw new ServerError(403, "Access denied");
+    const newAccountIdPacket = await Account.create({
+      name,
+      description,
+      startBalance,
+      startDate: new Date(startDate),
+      budgetId,
+    });
+
+    res.status(200).json({
+      message: "Account created successfully",
+      accountId: newAccountIdPacket._id,
+    });
   }) as AuthenticatedRequestHandler,
   patchAccount: (async (req, res, next) => {
     res.send("PATCH /account");
