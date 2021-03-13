@@ -8,7 +8,7 @@ import {
   patchBudget,
   postBudget,
 } from "../../src/controllers/budget";
-import { ExtendedRequest } from "../../src/types/express";
+import { AuthenticatedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
 import Budget from "../../src/models/budget";
 import * as Errors from "../../src/util/errors";
@@ -16,7 +16,7 @@ import { fakeCompleteBudgetData, fakeUserMinusPassword } from "../fixtures";
 import User from "../../src/models/user";
 
 describe("Budget controller", () => {
-  let req: ExtendedRequest;
+  let req: AuthenticatedRequest;
   let res: MockResponse;
   const next = (() => {}) as NextFunction;
   let errorHandlerSpy: SinonSpy;
@@ -40,7 +40,7 @@ describe("Budget controller", () => {
   describe("getBudgets()", () => {
     describe("if user is not authenticated...", () => {
       beforeEach(() => {
-        req = {} as ExtendedRequest;
+        req = {} as AuthenticatedRequest;
       });
       it("should throw an authentication error", async () => {
         await getBudgets(req, res as Response, next);
@@ -60,7 +60,7 @@ describe("Budget controller", () => {
         req = {
           isAuth: true,
           userId: "asdriou2342",
-        } as ExtendedRequest;
+        } as AuthenticatedRequest;
       });
       describe("if Budget model resolves...", () => {
         const fakeBudgetResults = [
@@ -97,7 +97,7 @@ describe("Budget controller", () => {
           params: {
             id: "243",
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       it("should throw an authentication error", async () => {
         await getBudget(req, res as Response, next);
@@ -120,7 +120,7 @@ describe("Budget controller", () => {
           params: {
             id: fakeCompleteBudgetData.id.toString(),
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       describe("if budget exists...", () => {
         beforeEach(() => {
@@ -205,7 +205,7 @@ describe("Budget controller", () => {
             title: fakeCompleteBudgetData.title,
             description: fakeCompleteBudgetData.description,
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       describe("if budget is created successfully...", () => {
         beforeEach(() => {
@@ -269,7 +269,7 @@ describe("Budget controller", () => {
     });
     describe("if user is not authenticated...", () => {
       beforeEach(() => {
-        req = {} as ExtendedRequest;
+        req = {} as AuthenticatedRequest;
       });
       afterEach(() => {});
       it("should pass along a 401 error", async () => {
@@ -299,7 +299,7 @@ describe("Budget controller", () => {
           params: {
             id: fakeCompleteBudgetData.id.toString(),
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       describe("if user is authorized to edit the budget...", () => {
         beforeEach(() => {
@@ -377,7 +377,7 @@ describe("Budget controller", () => {
           params: {
             id: fakeCompleteBudgetData.id.toString(),
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       it("should pass along a 401 error", async () => {
         await patchBudget(req, res as Response, next);
@@ -404,7 +404,7 @@ describe("Budget controller", () => {
           params: {
             id: fakeCompleteBudgetData.id.toString(),
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       describe("if user is authorized to edit the budget...", () => {
         beforeEach(() => {
@@ -478,7 +478,7 @@ describe("Budget controller", () => {
           params: {
             id: fakeCompleteBudgetData.id.toString(),
           },
-        } as unknown) as ExtendedRequest;
+        } as unknown) as AuthenticatedRequest;
       });
       it("should pass along a 401 error", async () => {
         await deleteBudget(req, res as Response, next);
