@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
-import sinon from "sinon";
+import sinon, { mock } from "sinon";
 import {
   deleteBudgetBase,
   getBudgetBase,
@@ -20,6 +20,10 @@ describe("Budget controller", () => {
   let res: MockResponse;
   const next = (() => {}) as NextFunction;
   const error403 = new Errors.ServerError(403, "Access denied");
+  const mockInternalServerError = new Errors.ServerError(
+    500,
+    "Mock internal server error"
+  );
 
   beforeEach(() => {
     res = {
@@ -58,16 +62,15 @@ describe("Budget controller", () => {
       });
     });
     describe("if Budget model rejects...", () => {
-      const mockError = new Errors.ServerError(500, "This is a mock error");
       beforeEach(() => {
-        sinon.stub(Budget, "findAllByUserId").rejects(mockError);
+        sinon.stub(Budget, "findAllByUserId").rejects(mockInternalServerError);
       });
       it("should throw the rejected error", async () => {
         try {
           await getBudgetsBase(req, res as Response, next);
           throw new Error("getBudgetsBase should reject");
         } catch (err) {
-          expect(err).to.deep.equal(mockError);
+          expect(err).to.deep.equal(mockInternalServerError);
         }
       });
     });
@@ -197,16 +200,15 @@ describe("Budget controller", () => {
         });
       });
       describe("if user is not added successfully...", () => {
-        const serverError = new Errors.ServerError(500, "Server error");
         beforeEach(() => {
-          sinon.stub(Budget, "addUser").rejects(serverError);
+          sinon.stub(Budget, "addUser").rejects(mockInternalServerError);
         });
         it("should pass along error received by first rejected promise", async () => {
           try {
             await postBudgetBase(req, res as Response, next);
             throw new Error("postBudgetBase should reject");
           } catch (err) {
-            expect(err).to.deep.equal(serverError);
+            expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
@@ -221,16 +223,15 @@ describe("Budget controller", () => {
       });
     });
     describe("if budget is not created...", () => {
-      const serverError = new Errors.ServerError(500, "Server error");
       beforeEach(() => {
-        sinon.stub(Budget, "create").rejects(serverError);
+        sinon.stub(Budget, "create").rejects(mockInternalServerError);
       });
       it("should pass along error received by first rejected promise", async () => {
         try {
           await postBudgetBase(req, res as Response, next);
           throw new Error("postBudgetBase should reject");
         } catch (err) {
-          expect(err).to.deep.equal(serverError);
+          expect(err).to.deep.equal(mockInternalServerError);
         }
       });
       it("should not send a response", async () => {
@@ -280,19 +281,15 @@ describe("Budget controller", () => {
         });
       });
       describe("if budget is not patched successfully...", () => {
-        const serverError = new Errors.ServerError(
-          500,
-          "Internal server error"
-        );
         beforeEach(() => {
-          sinon.stub(Budget, "update").rejects(serverError);
+          sinon.stub(Budget, "update").rejects(mockInternalServerError);
         });
         it("should pass along the given error", async () => {
           try {
             await patchBudgetBase(req, res as Response, next);
             throw new Error("patchBudgetBase should reject");
           } catch (err) {
-            expect(err).to.deep.equal(serverError);
+            expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
@@ -364,19 +361,15 @@ describe("Budget controller", () => {
         });
       });
       describe("if budget is not deleted successfully...", () => {
-        const serverError = new Errors.ServerError(
-          500,
-          "Internal server error"
-        );
         beforeEach(() => {
-          sinon.stub(Budget, "removeById").rejects(serverError);
+          sinon.stub(Budget, "removeById").rejects(mockInternalServerError);
         });
         it("should pass along the given error", async () => {
           try {
             await deleteBudgetBase(req, res as Response, next);
             throw new Error("deleteBudgetBase should reject");
           } catch (err) {
-            expect(err).to.deep.equal(serverError);
+            expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
