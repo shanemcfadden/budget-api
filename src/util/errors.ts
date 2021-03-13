@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, NextFunction } from "express";
+import { ErrorRequestHandler, NextFunction, RequestHandler } from "express";
 
 export class ServerError {
   statusCode: number;
@@ -8,6 +8,18 @@ export class ServerError {
     this.statusCode = statusCode;
     this.message = message;
   }
+}
+
+export function catchControllerErrors(
+  controller: RequestHandler
+): RequestHandler {
+  return (req, res, next) => {
+    try {
+      controller(req, res, next);
+    } catch (err) {
+      handleErrors(err, next);
+    }
+  };
 }
 
 export function handleErrors(error: ServerError | Error, next: NextFunction) {
