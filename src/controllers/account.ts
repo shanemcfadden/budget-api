@@ -16,7 +16,7 @@ export const AccountControllerBase: Controller = {
       name,
       description,
       startBalance,
-      startDate: new Date(startDate),
+      startDate: new Date(startDate), // TODO: make date timezone compatible between REST API and mysql server
       budgetId,
     });
 
@@ -29,7 +29,14 @@ export const AccountControllerBase: Controller = {
     res.send("PATCH /account");
   }) as AuthenticatedRequestHandler,
   deleteAccount: (async (req, res, next) => {
-    res.send("DELETE /account");
+    const accountId = +req.params.id;
+    const userHasPermission = await User.hasPermissionToEditAccount(
+      req.userId,
+      accountId
+    );
+    if (!userHasPermission) throw new ServerError(403, "Access denied");
+    await Account.removeById(accountId);
+    res.status(200).json({ message: "Account deleted successfully" });
   }) as AuthenticatedRequestHandler,
 };
 

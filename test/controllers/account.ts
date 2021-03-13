@@ -140,6 +140,89 @@ describe("AccountController", () => {
       });
     });
   });
-  //   describe("patchAccount()");
-  //   describe("deleteAccount()");
+  // describe("patchAccount()", () => {
+
+  // });
+  describe("deleteAccount()", () => {
+    beforeEach(() => {
+      req = ({
+        userId: fakeUser._id,
+        isAuth: true,
+        params: {
+          id,
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to remove given account...", () => {
+      let deleteAccountStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
+      });
+      describe("if the account creation is successful...", () => {
+        beforeEach(() => {
+          deleteAccountStub = Sinon.stub(Account, "removeById").resolves(true);
+        });
+        it("should delete the account", async () => {
+          await deleteAccount(req, res as Response, next);
+          expect(deleteAccountStub.calledOnce).to.be.true;
+          expect(deleteAccountStub.calledWith(id)).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await deleteAccount(req, res as Response, next);
+          expect(res.statusCode).to.exist;
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should have a success message in the response body", async () => {
+          await deleteAccount(req, res as Response, next);
+          expect(res.body?.message).to.equal("Account deleted successfully");
+        });
+      });
+      describe("if the account deletion results in an error", () => {
+        beforeEach(() => {
+          deleteAccountStub = Sinon.stub(Account, "removeById").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should throw said error", async () => {
+          try {
+            await deleteAccount(req, res as Response, next);
+            throw new Error("deleteAccount should throw here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await deleteAccount(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to remove a given account...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditAccount").resolves(false);
+      });
+      it("should throw a 403 error", async () => {
+        try {
+          await deleteAccount(req, res as Response, next);
+          throw new Error("deleteAccount should throw here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await deleteAccount(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
+      });
+    });
+  });
 });
