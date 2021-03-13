@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Response, NextFunction } from "express";
-import Sinon from "sinon";
+import Sinon, { SinonSpy } from "sinon";
 import mustBeAuthenticated from "../../src/middleware/mustBeAuthenticated";
 import { ExtendedRequest } from "../../src/types/express";
 import { ServerError } from "../../src/util/errors";
@@ -8,8 +8,14 @@ import { ServerError } from "../../src/util/errors";
 describe("mustBeAuthenticated()", () => {
   let req: ExtendedRequest;
   const res = {} as Response;
-  const next = Sinon.spy();
+  let next: SinonSpy;
   const fakeUserId = "1234fvuiwqe";
+  beforeEach(() => {
+    next = Sinon.spy();
+  });
+  afterEach(() => {
+    Sinon.restore();
+  });
 
   describe("if req.isAuth is undefined...", () => {
     beforeEach(() => {
@@ -28,8 +34,9 @@ describe("mustBeAuthenticated()", () => {
     it("should not call next()", () => {
       try {
         mustBeAuthenticated(req, res, next as NextFunction);
+      } catch {
       } finally {
-        expect(next.calledOnce).to.be.true;
+        expect(next.called).to.be.false;
       }
     });
   });
@@ -50,8 +57,9 @@ describe("mustBeAuthenticated()", () => {
     it("should not call next()", () => {
       try {
         mustBeAuthenticated(req, res, next as NextFunction);
+      } catch {
       } finally {
-        expect(next.calledOnce).to.be.true;
+        expect(next.called).to.be.false;
       }
     });
   });
@@ -67,6 +75,7 @@ describe("mustBeAuthenticated()", () => {
     });
     it("should call next", () => {
       mustBeAuthenticated(req, res, next as NextFunction);
+      console.log(next.getCalls());
       expect(next.calledOnce).to.be.true;
     });
     it("should not alter isAuth", () => {
