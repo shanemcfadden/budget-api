@@ -1,12 +1,12 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
-import sinon, { SinonSpy } from "sinon";
+import sinon from "sinon";
 import {
-  deleteBudget,
-  getBudget,
-  getBudgets,
-  patchBudget,
-  postBudget,
+  deleteBudgetBase,
+  getBudgetBase,
+  getBudgetsBase,
+  patchBudgetBase,
+  postBudgetBase,
 } from "../../src/controllers/budget";
 import { AuthenticatedRequest } from "../../src/types/express";
 import { MockResponse } from "../types";
@@ -19,7 +19,7 @@ describe("Budget controller", () => {
   let req: AuthenticatedRequest;
   let res: MockResponse;
   const next = (() => {}) as NextFunction;
-  let errorHandlerSpy: SinonSpy;
+  const error403 = new Errors.ServerError(403, "Access denied");
 
   beforeEach(() => {
     res = {
@@ -32,48 +32,47 @@ describe("Budget controller", () => {
         return;
       },
     };
-    errorHandlerSpy = sinon.spy(Errors, "handleErrors");
   });
   afterEach(() => {
     sinon.restore();
   });
-  describe("getBudgets()", () => {
-    describe("if user is authenticated...", () => {
+  describe("getBudgetsBase()", () => {
+    beforeEach(() => {
+      req = {
+        isAuth: true,
+        userId: "asdriou2342",
+      } as AuthenticatedRequest;
+    });
+    describe("if Budget model resolves...", () => {
+      const fakeBudgetResults = [
+        { id: 2, title: "Vacation budget", description: "Cannot wait" },
+        { id: 5, title: "Household items" },
+      ];
       beforeEach(() => {
-        req = {
-          isAuth: true,
-          userId: "asdriou2342",
-        } as AuthenticatedRequest;
+        sinon.stub(Budget, "findAllByUserId").resolves(fakeBudgetResults);
       });
-      describe("if Budget model resolves...", () => {
-        const fakeBudgetResults = [
-          { id: 2, title: "Vacation budget", description: "Cannot wait" },
-          { id: 5, title: "Household items" },
-        ];
-        beforeEach(() => {
-          sinon.stub(Budget, "findAllByUserId").resolves(fakeBudgetResults);
-        });
-        it("should send a 200 response with the resolved results", async () => {
-          await getBudgets(req, res as Response, next);
-          expect(res.statusCode).to.equal(200);
-          expect(res.body).to.deep.equal(fakeBudgetResults);
-        });
+      it("should send a 200 response with the resolved results", async () => {
+        await getBudgetsBase(req, res as Response, next);
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.deep.equal(fakeBudgetResults);
       });
-      describe("if Budget model rejects...", () => {
-        const mockError = new Errors.ServerError(500, "This is a mock error");
-        beforeEach(() => {
-          sinon.stub(Budget, "findAllByUserId").rejects(mockError);
-        });
-        it("should throw the rejected error", async () => {
-          await getBudgets(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(mockError);
-        });
+    });
+    describe("if Budget model rejects...", () => {
+      const mockError = new Errors.ServerError(500, "This is a mock error");
+      beforeEach(() => {
+        sinon.stub(Budget, "findAllByUserId").rejects(mockError);
+      });
+      it("should throw the rejected error", async () => {
+        try {
+          await getBudgetsBase(req, res as Response, next);
+          throw new Error("getBudgetsBase should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(mockError);
+        }
       });
     });
   });
-  describe("getBudget()", () => {
+  describe("getBudgetBase()", () => {
     beforeEach(() => {
       req = ({
         isAuth: true,
@@ -94,12 +93,12 @@ describe("Budget controller", () => {
             .resolves([fakeUserMinusPassword]);
         });
         it("should send a 200 response", async () => {
-          await getBudget(req, res as Response, next);
+          await getBudgetBase(req, res as Response, next);
           expect(res.statusCode).to.exist;
           expect(res.statusCode).to.equal(200);
         });
         it("should return budget data in the response json", async () => {
-          await getBudget(req, res as Response, next);
+          await getBudgetBase(req, res as Response, next);
           expect(res.body).to.exist;
           expect(res.body).to.deep.equal(fakeCompleteBudgetData);
         });
@@ -116,16 +115,21 @@ describe("Budget controller", () => {
           ]);
         });
         it("should throw an error", async () => {
-          await getBudget(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error.statusCode).to.equal(403);
-          expect(error.message).to.equal("Access denied");
+          try {
+            await getBudgetBase(req, res as Response, next);
+            throw new Error("getBudgetBase should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
         });
         it("should not send a response", async () => {
-          await getBudget(req, res as Response, next);
-          expect(res.statusCode).to.be.undefined;
-          expect(res.body).to.be.undefined;
+          try {
+            await getBudgetBase(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
         });
       });
     });
@@ -139,19 +143,25 @@ describe("Budget controller", () => {
         sinon.stub(User, "findAllByBudgetId").resolves([fakeUserMinusPassword]);
       });
       it("should pass along error received by first rejected promise", async () => {
-        await getBudget(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error).to.deep.equal(budgetNotFoundError);
+        try {
+          await getBudgetBase(req, res as Response, next);
+          throw new Error("getBudgetBase should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(budgetNotFoundError);
+        }
       });
       it("should not send a response", async () => {
-        await getBudget(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
+        try {
+          await getBudgetBase(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
       });
     });
   });
-  describe("postBudget()", () => {
+  describe("postBudgetBase()", () => {
     beforeEach(() => {
       req = ({
         isAuth: true,
@@ -173,16 +183,16 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "addUser").resolves(true);
         });
         it("should respond with a status code of 200", async () => {
-          await postBudget(req, res as Response, next);
+          await postBudgetBase(req, res as Response, next);
           expect(res.statusCode).to.exist;
           expect(res.statusCode).to.equal(200);
         });
         it("should respond with a success message in the body", async () => {
-          await postBudget(req, res as Response, next);
+          await postBudgetBase(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget created successfully");
         });
         it("should respond with the new budget id in the body", async () => {
-          await postBudget(req, res as Response, next);
+          await postBudgetBase(req, res as Response, next);
           expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
@@ -192,15 +202,21 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "addUser").rejects(serverError);
         });
         it("should pass along error received by first rejected promise", async () => {
-          await postBudget(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(serverError);
+          try {
+            await postBudgetBase(req, res as Response, next);
+            throw new Error("postBudgetBase should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(serverError);
+          }
         });
         it("should not send a response", async () => {
-          await postBudget(req, res as Response, next);
-          expect(res.statusCode).to.be.undefined;
-          expect(res.body).to.be.undefined;
+          try {
+            await postBudgetBase(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
         });
       });
     });
@@ -210,19 +226,25 @@ describe("Budget controller", () => {
         sinon.stub(Budget, "create").rejects(serverError);
       });
       it("should pass along error received by first rejected promise", async () => {
-        await postBudget(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error).to.deep.equal(serverError);
+        try {
+          await postBudgetBase(req, res as Response, next);
+          throw new Error("postBudgetBase should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(serverError);
+        }
       });
       it("should not send a response", async () => {
-        await postBudget(req, res as Response, next);
-        expect(res.statusCode).to.be.undefined;
-        expect(res.body).to.be.undefined;
+        try {
+          await postBudgetBase(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
       });
     });
   });
-  describe("patchBudget()", () => {
+  describe("patchBudgetBase()", () => {
     beforeEach(() => {
       req = ({
         userId: fakeUserMinusPassword._id,
@@ -245,15 +267,15 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "update").resolves(true);
         });
         it("should send a 200 response", async () => {
-          await patchBudget(req, res as Response, next);
+          await patchBudgetBase(req, res as Response, next);
           expect(res.statusCode).to.equal(200);
         });
         it("should send a success message", async () => {
-          await patchBudget(req, res as Response, next);
+          await patchBudgetBase(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget updated successfully");
         });
         it("should include budget id in the response json", async () => {
-          await patchBudget(req, res as Response, next);
+          await patchBudgetBase(req, res as Response, next);
           expect(res.body?.budgetId).to.equal(fakeCompleteBudgetData.id);
         });
       });
@@ -266,15 +288,21 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "update").rejects(serverError);
         });
         it("should pass along the given error", async () => {
-          await patchBudget(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(serverError);
+          try {
+            await patchBudgetBase(req, res as Response, next);
+            throw new Error("patchBudgetBase should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(serverError);
+          }
         });
         it("should not send a response", async () => {
-          await patchBudget(req, res as Response, next);
-          expect(res.body).to.be.undefined;
-          expect(res.statusCode).to.be.undefined;
+          try {
+            await patchBudgetBase(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.body).to.be.undefined;
+            expect(res.statusCode).to.be.undefined;
+          }
         });
       });
     });
@@ -290,21 +318,25 @@ describe("Budget controller", () => {
         ]);
       });
       it("should send a 403 error", async () => {
-        await patchBudget(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error).to.deep.equal(
-          new Errors.ServerError(403, "Access denied")
-        );
+        try {
+          await patchBudgetBase(req, res as Response, next);
+          throw new Error("patchBudgetBase should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
       });
       it("should not send a response", async () => {
-        await patchBudget(req, res as Response, next);
-        expect(res.body).to.be.undefined;
-        expect(res.statusCode).to.be.undefined;
+        try {
+          await patchBudgetBase(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.body).to.be.undefined;
+          expect(res.statusCode).to.be.undefined;
+        }
       });
     });
   });
-  describe("deleteBudget()", () => {
+  describe("deleteBudgetBase()", () => {
     beforeEach(() => {
       req = ({
         userId: fakeUserMinusPassword._id,
@@ -323,11 +355,11 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "removeById").resolves(true);
         });
         it("should send a 200 response", async () => {
-          await deleteBudget(req, res as Response, next);
+          await deleteBudgetBase(req, res as Response, next);
           expect(res.statusCode).to.equal(200);
         });
         it("should send a success message", async () => {
-          await deleteBudget(req, res as Response, next);
+          await deleteBudgetBase(req, res as Response, next);
           expect(res.body?.message).to.equal("Budget deleted successfully");
         });
       });
@@ -340,15 +372,21 @@ describe("Budget controller", () => {
           sinon.stub(Budget, "removeById").rejects(serverError);
         });
         it("should pass along the given error", async () => {
-          await deleteBudget(req, res as Response, next);
-          expect(errorHandlerSpy.calledOnce).to.be.true;
-          const error = errorHandlerSpy.getCall(0).args[0];
-          expect(error).to.deep.equal(serverError);
+          try {
+            await deleteBudgetBase(req, res as Response, next);
+            throw new Error("deleteBudgetBase should reject");
+          } catch (err) {
+            expect(err).to.deep.equal(serverError);
+          }
         });
         it("should not send a response", async () => {
-          await deleteBudget(req, res as Response, next);
-          expect(res.body).to.be.undefined;
-          expect(res.statusCode).to.be.undefined;
+          try {
+            await deleteBudgetBase(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.body).to.be.undefined;
+            expect(res.statusCode).to.be.undefined;
+          }
         });
       });
     });
@@ -364,17 +402,21 @@ describe("Budget controller", () => {
         ]);
       });
       it("should send a 403 error", async () => {
-        await deleteBudget(req, res as Response, next);
-        expect(errorHandlerSpy.calledOnce).to.be.true;
-        const error = errorHandlerSpy.getCall(0).args[0];
-        expect(error).to.deep.equal(
-          new Errors.ServerError(403, "Access denied")
-        );
+        try {
+          await deleteBudgetBase(req, res as Response, next);
+          throw new Error("deleteBudgetBase should reject");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
       });
       it("should not send a response", async () => {
-        await deleteBudget(req, res as Response, next);
-        expect(res.body).to.be.undefined;
-        expect(res.statusCode).to.be.undefined;
+        try {
+          await deleteBudgetBase(req, res as Response, next);
+        } catch {
+        } finally {
+          expect(res.body).to.be.undefined;
+          expect(res.statusCode).to.be.undefined;
+        }
       });
     });
   });
