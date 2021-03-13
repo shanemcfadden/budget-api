@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 import { Controller } from "../types/controllers";
