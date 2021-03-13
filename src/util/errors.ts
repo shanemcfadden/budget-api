@@ -1,6 +1,11 @@
-import { ErrorRequestHandler, NextFunction, RequestHandler } from "express";
+import { ErrorRequestHandler, NextFunction, Response } from "express";
 import { Controller } from "../types/controllers";
-import { AuthenticatedRequestHandler } from "../types/express";
+import {
+  AuthenticatedRequest,
+  AuthenticatedRequestHandler,
+  ExtendedRequest,
+  ExtendedRequestHandler,
+} from "../types/express";
 
 export class ServerError {
   statusCode: number;
@@ -20,10 +25,16 @@ export function handleControllerErrors(controller: Controller): Controller {
   return newController;
 }
 
-export function handleMiddlewareErrors<T extends AuthenticatedRequestHandler>(
-  middleware: T
-): T {
-  return (async (req, res, next) => {
+export function handleMiddlewareErrors<
+  T extends AuthenticatedRequestHandler | ExtendedRequestHandler
+>(middleware: T): T {
+  return (async (
+    req: T extends AuthenticatedRequestHandler
+      ? AuthenticatedRequest
+      : ExtendedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       await middleware(req, res, next);
     } catch (err) {
