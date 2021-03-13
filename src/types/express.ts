@@ -6,7 +6,11 @@ export interface ExtendedRequest extends Request {
 }
 
 export interface ExtendedRequestHandler {
-  (req: ExtendedRequest, res: Response, next: NextFunction): void;
+  (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction
+  ): void | Promise<void>;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -15,5 +19,9 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export interface AuthenticatedRequestHandler {
-  (req: AuthenticatedRequest, res: Response, next: NextFunction): void;
+  (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): void | Promise<void>;
 }
