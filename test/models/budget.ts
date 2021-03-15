@@ -14,7 +14,7 @@ import {
 } from "../fixtures";
 import { ServerError } from "../../src/util/errors";
 import Transaction from "../../src/models/transaction";
-import MacroCategory from "../../src/models/macro-category";
+import Category from "../../src/models/category";
 
 describe("Budget model", () => {
   const { id, title, description } = fakeBudgetData;
@@ -149,7 +149,7 @@ describe("Budget model", () => {
         .resolves(fakeBudgetAccountData);
       sinon.stub(Transaction, "findAllByBudgetId").resolves(fakeTransactions);
       sinon
-        .stub(MacroCategory, "findAllByBudgetIdWithMicroCategories")
+        .stub(Category, "findAllByBudgetIdWithSubcategories")
         .resolves(fakeCategoriesData);
     });
     it("should return complete budget details", async () => {
