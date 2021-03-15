@@ -6,52 +6,38 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-import {
-  NewMacroCategoryData,
-  MacroCategoryData,
-  CategoriesData,
-} from "../types/models";
+import { NewCategoryData, CategoryData, CategoriesData } from "../types/models";
 import { queryDb } from "../database/Database";
 
-const modelName = "macro-category";
+const modelName = "category";
 
-class MacroCategory {
-  static async create(
-    newTransactionData: NewMacroCategoryData
-  ): Promise<IdPacket> {
+class Category {
+  static async create(newTransactionData: NewCategoryData): Promise<IdPacket> {
     const { description, isIncome, budgetId } = newTransactionData;
     return await create([description, isIncome, budgetId], modelName);
   }
 
-  static async findById(transactionId: number): Promise<MacroCategoryData> {
-    return (await findById(
-      transactionId,
-      modelName
-    )) as Promise<MacroCategoryData>;
+  static async findById(transactionId: number): Promise<CategoryData> {
+    return (await findById(transactionId, modelName)) as Promise<CategoryData>;
   }
 
-  static async findAllByBudgetId(
-    budgetId: number
-  ): Promise<MacroCategoryData[]> {
-    return (await findAllByBudgetId(
-      budgetId,
-      modelName
-    )) as MacroCategoryData[];
+  static async findAllByBudgetId(budgetId: number): Promise<CategoryData[]> {
+    return (await findAllByBudgetId(budgetId, modelName)) as CategoryData[];
   }
 
-  static async findAllByBudgetIdWithMicroCategories(
+  static async findAllByBudgetIdWithSubcategories(
     budgetId: number
   ): Promise<CategoriesData> {
     const rawData = (await queryDb(
-      "macro-categories/findAllByBudgetIdWithMicroCategories.sql",
+      "categories/findAllByBudgetIdWithSubcategories.sql",
       [budgetId]
     )) as {
       id: number;
-      macroCategoryDescription: string;
+      categoryDescription: string;
       isIncome: number;
       budgetId: number;
-      microCategoryId: number;
-      microCategoryDescription: string;
+      subcategoryId: number;
+      subcategoryDescription: string;
     }[];
 
     const data = rawData.reduce(
@@ -61,28 +47,26 @@ class MacroCategory {
           {
             description: string;
             isIncome: boolean;
-            microCategories: Record<number, string>;
+            subcategories: Record<number, string>;
           }
         >,
         {
           id,
-          macroCategoryDescription,
+          categoryDescription,
           isIncome,
-          microCategoryId,
-          microCategoryDescription,
+          subcategoryId,
+          subcategoryDescription,
         }
       ) => {
         if (!output[id]) {
           output[id] = {
-            description: macroCategoryDescription,
+            description: categoryDescription,
             isIncome: !!isIncome,
-            microCategories: {},
+            subcategories: {},
           };
         }
-        if (microCategoryId != null) {
-          output[id].microCategories[
-            microCategoryId
-          ] = microCategoryDescription;
+        if (subcategoryId != null) {
+          output[id].subcategories[subcategoryId] = subcategoryDescription;
         }
         return output;
       },
@@ -91,7 +75,7 @@ class MacroCategory {
     return data;
   }
 
-  static async update(transactionData: MacroCategoryData): Promise<boolean> {
+  static async update(transactionData: CategoryData): Promise<boolean> {
     const { id, description, isIncome, budgetId } = transactionData;
     return await update(id, [description, isIncome, budgetId], modelName);
   }
@@ -101,4 +85,4 @@ class MacroCategory {
   }
 }
 
-export default MacroCategory;
+export default Category;
