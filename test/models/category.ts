@@ -11,14 +11,14 @@ import {
 } from "../fixtures";
 
 describe("Category model", () => {
-  const macroCategoryData = fakeCategories[0];
-  const { id, description, isIncome, budgetId } = macroCategoryData;
+  const categoryData = fakeCategories[0];
+  const { id, description, isIncome, budgetId } = categoryData;
   const newCategoryData = {
     description,
     isIncome,
     budgetId,
   };
-  const macroCategoryArr = [description, isIncome, budgetId];
+  const categoryArr = [description, isIncome, budgetId];
   const modelName = "category";
 
   afterEach(() => {
@@ -29,7 +29,7 @@ describe("Category model", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });
       const results = await Category.create(newCategoryData);
-      expect(createStub.calledOnceWith(macroCategoryArr, modelName)).to.be.true;
+      expect(createStub.calledOnceWith(categoryArr, modelName)).to.be.true;
       expect(results).to.deep.equal({ _id: id });
     });
   });
@@ -37,20 +37,20 @@ describe("Category model", () => {
     it("should call util findById() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findById")
-        .resolves(macroCategoryData as RowDataPacket);
+        .resolves(categoryData as RowDataPacket);
       const results = await Category.findById(id);
       expect(findStub.calledOnceWith(id, modelName)).to.be.true;
-      expect(results).to.deep.equal(macroCategoryData);
+      expect(results).to.deep.equal(categoryData);
     });
   });
   describe("findAllByBudgetId()", () => {
     it("should call util findAllByBudgetId() and return its value", async () => {
       const findStub = sinon
         .stub(Model, "findAllByBudgetId")
-        .resolves([macroCategoryData as RowDataPacket]);
+        .resolves([categoryData as RowDataPacket]);
       const results = await Category.findAllByBudgetId(budgetId);
       expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
-      expect(results).to.deep.equal([macroCategoryData]);
+      expect(results).to.deep.equal([categoryData]);
     });
   });
   describe("findAllByBudgetIdWithSubcategories()", () => {
@@ -79,9 +79,8 @@ describe("Category model", () => {
   describe("update()", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
-      const results = await Category.update(macroCategoryData);
-      expect(updateSub.calledOnceWith(id, macroCategoryArr, modelName)).to.be
-        .true;
+      const results = await Category.update(categoryData);
+      expect(updateSub.calledOnceWith(id, categoryArr, modelName)).to.be.true;
       expect(results).to.equal(true);
     });
   });
