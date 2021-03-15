@@ -2,8 +2,9 @@ import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
 import Subcategory from "../../src/models/subcategory";
+import Transaction from "../../src/models/transaction";
 import * as Model from "../../src/util/models";
-import { fakeSubcategories } from "../fixtures";
+import { fakeSubcategories, fakeTransactions } from "../fixtures";
 
 describe("Subcategory model", () => {
   const subCategoryData = fakeSubcategories[0];
@@ -46,6 +47,28 @@ describe("Subcategory model", () => {
       const results = await Subcategory.findAllByBudgetId(budgetId);
       expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
       expect(results).to.deep.equal([subCategoryData]);
+    });
+  });
+  describe("hasTransactions()", () => {
+    describe("if Transactions.findAllBySubcategory() returns an empty set...", () => {
+      beforeEach(() => {
+        sinon.stub(Transaction, "findAllBySubcategoryId").resolves([]);
+      });
+      it("should resolve false", async () => {
+        const result = await Subcategory.hasTransactions(id);
+        expect(result).to.be.false;
+      });
+    });
+    describe("if Transactions.findAllBySubcategory() returns a nonempty set...", () => {
+      beforeEach(() => {
+        sinon
+          .stub(Transaction, "findAllBySubcategoryId")
+          .resolves(fakeTransactions);
+      });
+      it("should resolve true", async () => {
+        const result = await Subcategory.hasTransactions(id);
+        expect(result).to.be.true;
+      });
     });
   });
   describe("update()", () => {

@@ -7,6 +7,7 @@ import {
   IdPacket,
 } from "../util/models";
 import { SubcategoryData, NewSubcategoryData } from "../types/models";
+import Transaction from "./transaction";
 
 const modelName = "subcategory";
 
@@ -20,6 +21,11 @@ class Subcategory {
 
   static async findById(transactionId: number): Promise<SubcategoryData> {
     return (await findById(transactionId, modelName)) as SubcategoryData;
+  }
+
+  static async hasTransactions(id: number): Promise<boolean> {
+    const transactions = await Transaction.findAllBySubcategoryId(id);
+    return !!transactions.length;
   }
 
   static async findAllByBudgetId(budgetId: number): Promise<SubcategoryData[]> {
