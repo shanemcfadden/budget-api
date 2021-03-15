@@ -13,16 +13,22 @@ describe("Transaction model", () => {
     description,
     date,
     accountId,
-    categoryId,
+    subcategoryId,
   } = transactionData;
   const newTransactionData = {
     amount,
     description,
     date,
     accountId,
-    categoryId,
+    subcategoryId,
   };
-  const transactionDataArr = [amount, description, date, accountId, categoryId];
+  const transactionDataArr = [
+    amount,
+    description,
+    date,
+    accountId,
+    subcategoryId,
+  ];
   const modelName = "transaction";
 
   afterEach(() => {

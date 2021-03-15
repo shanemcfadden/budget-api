@@ -167,7 +167,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Coffee",
     date: new Date("2021-01-15"),
     accountId: fakeAccounts[0].id,
-    categoryId: fakeSubcategories[1].id,
+    subcategoryId: fakeSubcategories[1].id,
   },
   {
     id: 2,
@@ -175,7 +175,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Paycheck",
     date: new Date("2021-01-14"),
     accountId: fakeAccounts[0].id,
-    categoryId: fakeSubcategories[0].id,
+    subcategoryId: fakeSubcategories[0].id,
   },
   {
     id: 2,
@@ -183,7 +183,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Sandwich",
     date: new Date("2021-01-13"),
     accountId: fakeAccounts[1].id,
-    categoryId: fakeSubcategories[1].id,
+    subcategoryId: fakeSubcategories[1].id,
   },
   {
     id: 2,
@@ -191,7 +191,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Gift from sofa cushions",
     date: new Date("2021-01-12"),
     accountId: fakeAccounts[1].id,
-    categoryId: fakeSubcategories[0].id,
+    subcategoryId: fakeSubcategories[0].id,
   },
 ];
 

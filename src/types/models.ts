@@ -64,7 +64,7 @@ export interface NewTransactionData {
   description?: string;
   date: Date;
   accountId: number;
-  categoryId: number;
+  subcategoryId: number;
 }
 
 export interface TransactionData extends NewTransactionData {
