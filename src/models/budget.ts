@@ -15,7 +15,7 @@ import {
 } from "../types/models";
 import { queryDb } from "../database/Database";
 import { ServerError } from "../util/errors";
-import MacroCategory from "./macro-category";
+import MacroCategory from "./category";
 import Transaction from "./transaction";
 
 const modelName = "budget";
@@ -39,7 +39,7 @@ class Budget {
     ] = await Promise.all([
       Budget.findByIdWithAccountData(budgetId),
       Transaction.findAllByBudgetId(budgetId),
-      MacroCategory.findAllByBudgetIdWithMicroCategories(budgetId),
+      MacroCategory.findAllByBudgetIdWithSubcategories(budgetId),
     ]);
     return {
       ...budgetAccountData,
