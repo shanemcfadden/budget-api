@@ -7,7 +7,11 @@ import {
   findAllByBudgetId,
   IdPacket,
 } from "../util/models";
-import { NewAccountData, CompleteAccountData } from "../types/models";
+import {
+  NewAccountData,
+  CompleteAccountData,
+  UpdateAccountData,
+} from "../types/models";
 
 const modelName = "account";
 
@@ -43,18 +47,11 @@ class Account {
     return (await findAllByUserId(userId, modelName)) as CompleteAccountData[];
   }
 
-  static async update(accountData: CompleteAccountData): Promise<boolean> {
-    const {
-      id,
-      name,
-      description,
-      startDate,
-      startBalance,
-      budgetId,
-    } = accountData;
+  static async update(accountData: UpdateAccountData): Promise<boolean> {
+    const { id, name, description, startDate, startBalance } = accountData;
     return await update(
       id,
-      [name, description, startDate, startBalance, budgetId],
+      [name, description, startDate, startBalance],
       modelName
     );
   }
