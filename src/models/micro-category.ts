@@ -6,34 +6,29 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-import { MicroCategoryData, NewMicroCategoryData } from "../types/models";
+import { SubcategoryData, NewSubcategoryData } from "../types/models";
 
-const modelName = "micro-category";
+const modelName = "subcategory";
 
-class MicroCategory {
+class Subcategory {
   static async create(
-    newTransactionData: NewMicroCategoryData
+    newTransactionData: NewSubcategoryData
   ): Promise<IdPacket> {
-    const { description, macroCategoryId } = newTransactionData;
-    return await create([description, macroCategoryId], modelName);
+    const { description, categoryId } = newTransactionData;
+    return await create([description, categoryId], modelName);
   }
 
-  static async findById(transactionId: number): Promise<MicroCategoryData> {
-    return (await findById(transactionId, modelName)) as MicroCategoryData;
+  static async findById(transactionId: number): Promise<SubcategoryData> {
+    return (await findById(transactionId, modelName)) as SubcategoryData;
   }
 
-  static async findAllByBudgetId(
-    budgetId: number
-  ): Promise<MicroCategoryData[]> {
-    return (await findAllByBudgetId(
-      budgetId,
-      modelName
-    )) as MicroCategoryData[];
+  static async findAllByBudgetId(budgetId: number): Promise<SubcategoryData[]> {
+    return (await findAllByBudgetId(budgetId, modelName)) as SubcategoryData[];
   }
 
-  static async update(transactionData: MicroCategoryData): Promise<boolean> {
-    const { id, description, macroCategoryId } = transactionData;
-    return await update(id, [description, macroCategoryId], modelName);
+  static async update(transactionData: SubcategoryData): Promise<boolean> {
+    const { id, description, categoryId } = transactionData;
+    return await update(id, [description, categoryId], modelName);
   }
 
   static async removeById(id: number): Promise<boolean> {
@@ -41,4 +36,4 @@ class MicroCategory {
   }
 }
 
-export default MicroCategory;
+export default Subcategory;
