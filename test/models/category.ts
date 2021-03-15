@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { OkPacket, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import Category from "../../src/models/category";
 import * as Model from "../../src/util/models";
@@ -53,7 +53,7 @@ describe("Category model", () => {
       beforeEach(() => {
         queryDbStub = sinon
           .stub(Database, "queryDb")
-          .resolves(([{ id }] as unknown) as OkPacket[]);
+          .resolves([{ id }] as RowDataPacket[]);
       });
       it("should query the database", async () => {
         await Category.checkUserPermissions(id, fakeUserId);
