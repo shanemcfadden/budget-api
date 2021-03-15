@@ -1,6 +1,6 @@
 DROP TABLE transactions;
-DROP TABLE transaction_micro_categories;
-DROP TABLE transaction_macro_categories;
+DROP TABLE transaction_subcategories;
+DROP TABLE transaction_categories;
 DROP TABLE accounts;
 DROP TABLE budget_users;
 DROP TABLE users;
@@ -75,7 +75,7 @@ INSERT INTO accounts (budget_id, name, description, start_date, start_balance)
         (2, 'Savings', 'The Federal Reserve', '2013-1-20', '100000')
 ;
 
-CREATE TABLE transaction_macro_categories (
+CREATE TABLE transaction_categories (
     id INT AUTO_INCREMENT,
     description VARCHAR(100) NOT NULL,
     is_income BOOLEAN NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE transaction_macro_categories (
 )
 ;
 
-INSERT INTO transaction_macro_categories (description, is_income, budget_id)
+INSERT INTO transaction_categories (description, is_income, budget_id)
     VALUES
         ('Work', 1, 1),
         ('Miscellaneous', 1, 1),
@@ -95,16 +95,16 @@ INSERT INTO transaction_macro_categories (description, is_income, budget_id)
         ('Freelance Work', 1, 2)
 ;
 
-CREATE TABLE transaction_micro_categories (
+CREATE TABLE transaction_subcategories (
     id INT AUTO_INCREMENT,
     description VARCHAR(100) NOT NULL,
-    macro_category_id INT NOT NULL,
-    FOREIGN Key (macro_category_id) REFERENCES transaction_macro_categories(id) ON DELETE CASCADE,
+    category_id INT NOT NULL,
+    FOREIGN Key (category_id) REFERENCES transaction_categories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 )
 ;
 
-INSERT INTO transaction_micro_categories (description, macro_category_id)
+INSERT INTO transaction_subcategories (description, category_id)
     VALUES
         ('Full Time Job', 1),
         ('Other', 2),
@@ -120,14 +120,14 @@ CREATE TABLE transactions(
     description VARCHAR(100),
     date DATE NOT NULL,
     account_id INT NOT NULL,
-    category_id INT NOT NULL,
+    subcategory_id INT NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES transaction_micro_categories(id) ON DELETE CASCADE,
+    FOREIGN KEY (subcategory_id) REFERENCES transaction_subcategories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 )
 ;
 
-INSERT INTO transactions (amount, description, date, account_id, category_id) 
+INSERT INTO transactions (amount, description, date, account_id, subcategory_id) 
     VALUES
         (300.50, 'Christmas bonus', '2020-12-25', 1, 1),
         (40, 'Found in coat pocket', '2021-01-02', 1, 2),
