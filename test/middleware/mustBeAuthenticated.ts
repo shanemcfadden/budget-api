@@ -75,7 +75,6 @@ describe("mustBeAuthenticated()", () => {
     });
     it("should call next", () => {
       mustBeAuthenticated(req, res, next as NextFunction);
-      console.log(next.getCalls());
       expect(next.calledOnce).to.be.true;
     });
     it("should not alter isAuth", () => {

@@ -8,6 +8,7 @@ import {
   update,
 } from "../util/models";
 import { UserDataMinusPassword, NewUserData, UserData } from "../types/models";
+import Account from "./account";
 
 const modelName = "user";
 
@@ -56,6 +57,25 @@ class User {
 
   static async removeById(id: string): Promise<boolean> {
     return await removeById(id, modelName);
+  }
+
+  static async hasPermissionToEditAccount(
+    userId: string,
+    accountId: number
+  ): Promise<boolean> {
+    const accessibleAccounts = await Account.findAllByUserId(userId);
+    return !!accessibleAccounts.filter(
+      (accountData) => accountData.id === accountId
+    ).length;
+  }
+
+  static async hasPermissionToEditBudget(
+    userId: string,
+    budgetId: number
+  ): Promise<boolean> {
+    const authorizedUsers = await User.findAllByBudgetId(budgetId);
+    return !!authorizedUsers.filter((userData) => userData._id === userId)
+      .length;
   }
 }
 

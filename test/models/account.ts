@@ -25,7 +25,8 @@ describe("Account model", () => {
     startBalance,
     budgetId,
   } = accountData;
-  const accountDataArr = [name, description, startDate, startBalance, budgetId];
+  const updateAccountArr = [name, description, startDate, startBalance];
+  const accountDataArr = [...updateAccountArr, budgetId];
   const modelName = "account";
 
   afterEach(() => {
@@ -76,7 +77,7 @@ describe("Account model", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
       const results = await Account.update(accountData);
-      expect(updateSub.calledOnceWith(id, accountDataArr, modelName)).to.be
+      expect(updateSub.calledOnceWith(id, updateAccountArr, modelName)).to.be
         .true;
       expect(results).to.equal(true);
     });
