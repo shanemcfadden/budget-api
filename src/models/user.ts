@@ -9,6 +9,8 @@ import {
 } from "../util/models";
 import { UserDataMinusPassword, NewUserData, UserData } from "../types/models";
 import Account from "./account";
+import Category from "./category";
+import Subcategory from "./subcategory";
 
 const modelName = "user";
 
@@ -76,6 +78,20 @@ class User {
     const authorizedUsers = await User.findAllByBudgetId(budgetId);
     return !!authorizedUsers.filter((userData) => userData._id === userId)
       .length;
+  }
+
+  static async hasPermissionToEditCategory(
+    userId: string,
+    categoryId: number
+  ): Promise<boolean> {
+    return await Category.checkUserPermissions(categoryId, userId);
+  }
+
+  static async hasPermissionToEditSubcategory(
+    userId: string,
+    subcategoryId: number
+  ): Promise<boolean> {
+    return await Subcategory.checkUserPermissions(subcategoryId, userId);
   }
 }
 
