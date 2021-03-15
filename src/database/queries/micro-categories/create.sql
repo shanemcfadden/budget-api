@@ -1,4 +1,4 @@
-INSERT INTO transaction_subcategories (description, macro_category_id) 
+INSERT INTO transaction_subcategories (description, category_id) 
     VALUES
         (? , ? )
 ;
