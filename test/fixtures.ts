@@ -5,8 +5,8 @@ import {
   CategoriesData,
   CompleteAccountData,
   CompleteBudgetData,
-  MacroCategoryData,
-  MicroCategoryData,
+  CategoryData,
+  SubcategoryData,
   TransactionData,
   UserData,
   UserDataMinusPassword,
@@ -96,7 +96,7 @@ export const fakeBudgetAccountData: BudgetAccountData = {
   },
 };
 
-export const fakeMacroCategories: MacroCategoryData[] = [
+export const fakeCategories: CategoryData[] = [
   {
     id: 45,
     description: "Work",
@@ -111,51 +111,51 @@ export const fakeMacroCategories: MacroCategoryData[] = [
   },
 ];
 
-export const fakeMicroCategories: MicroCategoryData[] = [
+export const fakeSubcategories: SubcategoryData[] = [
   {
     id: 300,
     description: "Bonuses",
-    macroCategoryId: fakeMacroCategories[0].id,
+    categoryId: fakeCategories[0].id,
   },
   {
     id: 345,
     description: "Food",
-    macroCategoryId: fakeMacroCategories[1].id,
+    categoryId: fakeCategories[1].id,
   },
 ];
 
-export const fakeMacroMicroCategoryRows: RowDataPacket[] = [
+export const fakeSubcategoryRows: RowDataPacket[] = [
   {
-    id: fakeMacroCategories[0].id,
-    macroCategoryDescription: fakeMacroCategories[0].description,
-    isIncome: fakeMacroCategories[0].isIncome,
-    budgetId: fakeMacroCategories[0].budgetId,
-    microCategoryId: fakeMicroCategories[0].id,
-    microCategoryDescription: fakeMicroCategories[0].description,
+    id: fakeCategories[0].id,
+    categoryDescription: fakeCategories[0].description,
+    isIncome: fakeCategories[0].isIncome,
+    budgetId: fakeCategories[0].budgetId,
+    subcategoryId: fakeSubcategories[0].id,
+    subcategoryDescription: fakeSubcategories[0].description,
   } as RowDataPacket,
   {
-    id: fakeMacroCategories[1].id,
-    macroCategoryDescription: fakeMacroCategories[1].description,
-    isIncome: fakeMacroCategories[1].isIncome,
-    budgetId: fakeMacroCategories[1].budgetId,
-    microCategoryId: fakeMicroCategories[1].id,
-    microCategoryDescription: fakeMicroCategories[1].description,
+    id: fakeCategories[1].id,
+    categoryDescription: fakeCategories[1].description,
+    isIncome: fakeCategories[1].isIncome,
+    budgetId: fakeCategories[1].budgetId,
+    subcategoryId: fakeSubcategories[1].id,
+    subcategoryDescription: fakeSubcategories[1].description,
   } as RowDataPacket,
 ];
 
 export const fakeCategoriesData: CategoriesData = {
-  [fakeMacroCategories[0].id]: {
-    description: fakeMacroCategories[0].description,
-    isIncome: fakeMacroCategories[0].isIncome,
-    microCategories: {
-      [fakeMicroCategories[0].id]: fakeMicroCategories[0].description,
+  [fakeCategories[0].id]: {
+    description: fakeCategories[0].description,
+    isIncome: fakeCategories[0].isIncome,
+    subcategories: {
+      [fakeSubcategories[0].id]: fakeSubcategories[0].description,
     },
   },
-  [fakeMacroCategories[1].id]: {
-    description: fakeMacroCategories[1].description,
-    isIncome: fakeMacroCategories[1].isIncome,
-    microCategories: {
-      [fakeMicroCategories[1].id]: fakeMicroCategories[1].description,
+  [fakeCategories[1].id]: {
+    description: fakeCategories[1].description,
+    isIncome: fakeCategories[1].isIncome,
+    subcategories: {
+      [fakeSubcategories[1].id]: fakeSubcategories[1].description,
     },
   },
 };
@@ -167,7 +167,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Coffee",
     date: new Date("2021-01-15"),
     accountId: fakeAccounts[0].id,
-    categoryId: fakeMicroCategories[1].id,
+    categoryId: fakeSubcategories[1].id,
   },
   {
     id: 2,
@@ -175,7 +175,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Paycheck",
     date: new Date("2021-01-14"),
     accountId: fakeAccounts[0].id,
-    categoryId: fakeMicroCategories[0].id,
+    categoryId: fakeSubcategories[0].id,
   },
   {
     id: 2,
@@ -183,7 +183,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Sandwich",
     date: new Date("2021-01-13"),
     accountId: fakeAccounts[1].id,
-    categoryId: fakeMicroCategories[1].id,
+    categoryId: fakeSubcategories[1].id,
   },
   {
     id: 2,
@@ -191,7 +191,7 @@ export const fakeTransactions: TransactionData[] = [
     description: "Gift from sofa cushions",
     date: new Date("2021-01-12"),
     accountId: fakeAccounts[1].id,
-    categoryId: fakeMicroCategories[0].id,
+    categoryId: fakeSubcategories[0].id,
   },
 ];
 
