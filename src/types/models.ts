@@ -75,27 +75,27 @@ export interface CategoriesData {
   [index: number]: {
     description: string;
     isIncome: boolean;
-    microCategories: Record<number, string>;
+    subcategories: Record<number, string>;
   };
 }
 
-export interface MacroCategoryDataWithoutBudgetId {
+export interface CategoryDataWithoutBudgetId {
   description: string;
   isIncome: boolean;
 }
-export interface NewMacroCategoryData extends MacroCategoryDataWithoutBudgetId {
+export interface NewCategoryData extends CategoryDataWithoutBudgetId {
   budgetId: number;
 }
 
-export interface MacroCategoryData extends NewMacroCategoryData {
+export interface CategoryData extends NewCategoryData {
   id: number;
 }
 
-export interface NewMicroCategoryData {
+export interface NewSubcategoryData {
   description: string;
-  macroCategoryId: number;
+  categoryId: number;
 }
 
-export interface MicroCategoryData extends NewMicroCategoryData {
+export interface SubcategoryData extends NewSubcategoryData {
   id: number;
 }
