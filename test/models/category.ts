@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { RowDataPacket } from "mysql2";
+import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import Category from "../../src/models/category";
 import * as Model from "../../src/util/models";
@@ -27,6 +27,50 @@ describe("Category model", () => {
     sinon.restore();
   });
 
+  describe("checkUserPermissions()", () => {
+    const fakeUserId = "asdfqwerio23";
+    let queryDbStub: SinonStub;
+    describe("if database query returns an empty set...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon.stub(Database, "queryDb").resolves([]);
+      });
+      it("should query the database", async () => {
+        await Category.checkUserPermissions(id, fakeUserId);
+        expect(queryDbStub.calledOnce).to.be.true;
+        expect(
+          queryDbStub.calledOnceWith("categories/checkUserPermissions.sql", [
+            id,
+            fakeUserId,
+          ])
+        ).to.be.true;
+      });
+      it("should return false", async () => {
+        const result = await Category.checkUserPermissions(id, fakeUserId);
+        expect(result).to.be.false;
+      });
+    });
+    describe("if database query returns a nonempty set...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves(([{ id }] as unknown) as OkPacket[]);
+      });
+      it("should query the database", async () => {
+        await Category.checkUserPermissions(id, fakeUserId);
+        expect(queryDbStub.calledOnce).to.be.true;
+        expect(
+          queryDbStub.calledOnceWith("categories/checkUserPermissions.sql", [
+            id,
+            fakeUserId,
+          ])
+        ).to.be.true;
+      });
+      it("should return false", async () => {
+        const result = await Category.checkUserPermissions(id, fakeUserId);
+        expect(result).to.be.true;
+      });
+    });
+  });
   describe("create()", () => {
     it("should call util create() and return its value", async () => {
       const createStub = sinon.stub(Model, "create").resolves({ _id: id });

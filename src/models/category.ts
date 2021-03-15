@@ -9,10 +9,22 @@ import {
 import { NewCategoryData, CategoryData, CategoriesData } from "../types/models";
 import Transaction from "./transaction";
 import { queryDb } from "../database/Database";
+import { RowDataPacket } from "mysql2";
 
 const modelName = "category";
 
 class Category {
+  static async checkUserPermissions(
+    categoryId: number,
+    userId: string
+  ): Promise<boolean> {
+    const matchingPermissions = (await queryDb(
+      "categories/checkUserPermissions.sql",
+      [categoryId, userId]
+    )) as RowDataPacket[];
+    return !!matchingPermissions.length;
+  }
+
   static async create(newTransactionData: NewCategoryData): Promise<IdPacket> {
     const { description, isIncome, budgetId } = newTransactionData;
     return await create([description, isIncome, budgetId], modelName);
