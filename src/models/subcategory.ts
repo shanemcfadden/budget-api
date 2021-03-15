@@ -8,10 +8,23 @@ import {
 } from "../util/models";
 import { SubcategoryData, NewSubcategoryData } from "../types/models";
 import Transaction from "./transaction";
+import { queryDb } from "../database/Database";
+import { RowDataPacket } from "mysql2";
 
 const modelName = "subcategory";
 
 class Subcategory {
+  static async checkUserPermissions(
+    subcategoryId: number,
+    userId: string
+  ): Promise<boolean> {
+    const matchingPermissions = (await queryDb(
+      "subcategories/checkUserPermissions.sql",
+      [subcategoryId, userId]
+    )) as RowDataPacket[];
+    return !!matchingPermissions.length;
+  }
+
   static async create(
     newTransactionData: NewSubcategoryData
   ): Promise<IdPacket> {
