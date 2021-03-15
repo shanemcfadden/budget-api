@@ -140,9 +140,80 @@ describe("AccountController", () => {
       });
     });
   });
-  // describe("patchAccount()", () => {
-
-  // });
+  describe("patchAccount()", () => {
+    beforeEach(() => {
+      req = ({
+        userId: fakeUser._id,
+        isAuth: true,
+        body: {
+          name,
+          description,
+          startBalance,
+          startDate: startDate.toString(),
+        },
+        params: {
+          id,
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to update said account", () => {
+      let updateAccountStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
+      });
+      describe("if the account update is successful...", () => {
+        beforeEach(() => {
+          updateAccountStub = Sinon.stub(Account, "update").resolves(true);
+        });
+        it("should update the account", async () => {
+          await patchAccount(req, res as Response, next);
+          expect(updateAccountStub.calledOnce).to.be.true;
+          expect(
+            updateAccountStub.calledWith({
+              id,
+              name,
+              description,
+              startDate,
+              startBalance,
+            })
+          ).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await patchAccount(req, res as Response, next);
+          expect(res.statusCode).to.exist;
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should have a success message in the response body", async () => {
+          await patchAccount(req, res as Response, next);
+          expect(res.body?.message).to.equal("Account updated successfully");
+        });
+      });
+      describe("if the account creation results in an error", () => {
+        beforeEach(() => {
+          updateAccountStub = Sinon.stub(Account, "update").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should throw said error", async () => {
+          try {
+            await patchAccount(req, res as Response, next);
+            throw new Error("patchAccount should throw here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await patchAccount(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+  });
   describe("deleteAccount()", () => {
     beforeEach(() => {
       req = ({

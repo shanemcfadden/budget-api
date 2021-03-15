@@ -26,7 +26,23 @@ export const AccountControllerBase: Controller = {
     });
   }) as AuthenticatedRequestHandler,
   patchAccount: (async (req, res, next) => {
-    res.send("PATCH /account");
+    const accountId = +req.params.id;
+    const { name, description, startBalance, startDate } = req.body;
+    const userHasPermission = await User.hasPermissionToEditAccount(
+      req.userId,
+      accountId
+    );
+    if (!userHasPermission) throw new ServerError(403, "Access denied");
+    await Account.update({
+      id: accountId,
+      name,
+      description,
+      startBalance,
+      startDate: new Date(startDate),
+    });
+    res.status(200).json({
+      message: "Account updated successfully",
+    });
   }) as AuthenticatedRequestHandler,
   deleteAccount: (async (req, res, next) => {
     const accountId = +req.params.id;
