@@ -19,7 +19,7 @@ describe("Category model", () => {
     budgetId,
   };
   const macroCategoryArr = [description, isIncome, budgetId];
-  const modelName = "macro-category";
+  const modelName = "category";
 
   afterEach(() => {
     sinon.restore();
@@ -65,7 +65,7 @@ describe("Category model", () => {
       expect(queryDbStub.calledOnce).to.be.true;
       expect(
         queryDbStub.calledOnceWith(
-          "macro-categories/findAllByBudgetIdWithSubcategories.sql"
+          "categories/findAllByBudgetIdWithSubcategories.sql"
         )
       ).to.be.true;
     });
