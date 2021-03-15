@@ -3,11 +3,13 @@ import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
 import Category from "../../src/models/category";
 import * as Model from "../../src/util/models";
+import Transaction from "../../src/models/transaction";
 import * as Database from "../../src/database/Database";
 import {
   fakeCategoriesData,
   fakeCategories,
   fakeSubcategoryRows,
+  fakeTransactions,
 } from "../fixtures";
 
 describe("Category model", () => {
@@ -74,6 +76,28 @@ describe("Category model", () => {
         budgetId
       );
       expect(results).to.deep.equal(fakeCategoriesData);
+    });
+  });
+  describe("hasTransactions()", () => {
+    describe("if Transactions.findAllByCategory() returns an empty set...", () => {
+      beforeEach(() => {
+        sinon.stub(Transaction, "findAllByCategoryId").resolves([]);
+      });
+      it("should resolve false", async () => {
+        const result = await Category.hasTransactions(id);
+        expect(result).to.be.false;
+      });
+    });
+    describe("if Transactions.findAllByCategory() returns a nonempty set...", () => {
+      beforeEach(() => {
+        sinon
+          .stub(Transaction, "findAllByCategoryId")
+          .resolves(fakeTransactions);
+      });
+      it("should resolve true", async () => {
+        const result = await Category.hasTransactions(id);
+        expect(result).to.be.true;
+      });
     });
   });
   describe("update()", () => {

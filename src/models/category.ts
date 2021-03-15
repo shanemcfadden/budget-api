@@ -7,6 +7,7 @@ import {
   IdPacket,
 } from "../util/models";
 import { NewCategoryData, CategoryData, CategoriesData } from "../types/models";
+import Transaction from "./transaction";
 import { queryDb } from "../database/Database";
 
 const modelName = "category";
@@ -73,6 +74,11 @@ class Category {
       {}
     );
     return data;
+  }
+
+  static async hasTransactions(id: number): Promise<boolean> {
+    const transactions = await Transaction.findAllByCategoryId(id);
+    return !!transactions.length;
   }
 
   static async update(transactionData: CategoryData): Promise<boolean> {
