@@ -1,1 +1,1 @@
-DELETE FROM transaction_micro_categories WHERE id = ? ;
+DELETE FROM transaction_subcategories WHERE id = ? ;

@@ -1,8 +1,8 @@
 SELECT 
-    transaction_micro_categories.id,
-    transaction_micro_categories.description, 
-    macro_category_id AS macroCategoryId
-FROM transaction_micro_categories
-    JOIN transaction_macro_categories ON transaction_macro_categories.id = macro_category_id
-    WHERE transaction_macro_categories.budget_id = ?
+    tsc.id,
+    tsc.description, 
+    category_id AS categoryId
+FROM transaction_subcategories as tsc
+    JOIN transaction_categories as tc ON tc.id = category_id
+    WHERE tc.budget_id = ?
 ;

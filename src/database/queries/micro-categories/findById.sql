@@ -1,7 +1,7 @@
 SELECT 
     id,
     description, 
-    macro_category_id AS macroCategoryId
-FROM transaction_micro_categories
+    category_id AS categoryId
+FROM transaction_subcategories
     WHERE id = ?
 ;
