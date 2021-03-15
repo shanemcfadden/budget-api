@@ -77,7 +77,7 @@ describe("Transaction model", () => {
       await Transaction.findAllByCategoryId(categoryId);
       expect(queryDbStub.calledOnce).to.be.true;
       expect(
-        queryDbStub.calledOnceWith("transactions/findAllByCategoryId", [
+        queryDbStub.calledOnceWith("transactions/findAllByCategoryId.sql", [
           categoryId,
         ])
       ).to.be.true;
@@ -99,7 +99,7 @@ describe("Transaction model", () => {
       await Transaction.findAllBySubcategoryId(subcategoryId);
       expect(queryDbStub.calledOnce).to.be.true;
       expect(
-        queryDbStub.calledOnceWith("transactions/findAllBySubcategoryId", [
+        queryDbStub.calledOnceWith("transactions/findAllBySubcategoryId.sql", [
           subcategoryId,
         ])
       ).to.be.true;
