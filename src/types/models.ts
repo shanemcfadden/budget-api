@@ -43,6 +43,10 @@ export interface NewAccountData extends AccountDataBase {
   budgetId: number;
 }
 
+export interface UpdateAccountData extends AccountDataBase {
+  id: number;
+}
+
 export interface AccountDataWithoutBudgetId extends AccountDataBase {
   currentBalance: number;
 }
