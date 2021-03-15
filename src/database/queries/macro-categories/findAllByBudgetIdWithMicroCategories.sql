@@ -1,11 +1,11 @@
 SELECT  
-    transaction_macro_categories.id AS id,
-    transaction_macro_categories.description AS macroCategoryDescription,
+    tc.id AS id,
+    tc.description AS categoryDescription,
     is_income AS isIncome,
     budget_id AS budgetId,
-    transaction_micro_categories.id AS microCategoryId,
-    transaction_micro_categories.description AS microCategoryDescription
-FROM transaction_macro_categories 
-    LEFT JOIN transaction_micro_categories ON transaction_micro_categories.macro_category_id = transaction_macro_categories.id 
+    tsc.id AS subcategoryId,
+    tsc.description AS subcategoryDescription
+FROM transaction_categories AS tc
+    LEFT JOIN transaction_subcategories  AS tsc ON tsc.category_id = tc.id 
     WHERE budget_id = ?
 ;
