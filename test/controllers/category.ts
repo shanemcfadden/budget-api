@@ -129,6 +129,178 @@ describe("CategoryController", () => {
       });
     });
   });
-  // describe('patchCategory()')
-  // describe('deleteCategory()')
+  describe("patchCategory()", () => {
+    beforeEach(() => {
+      req = ({
+        isAuth: true,
+        userId: fakeUser._id,
+        body: {
+          description,
+          isIncome,
+        },
+        params: {
+          id: id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to update the category...", () => {
+      let categoryUpdateStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
+      });
+      describe("if the category update is successful...", () => {
+        beforeEach(() => {
+          categoryUpdateStub = Sinon.stub(Category, "update").resolves(true);
+        });
+        it("should update the category", async () => {
+          await patchCategory(req, res as Response, next);
+          expect(categoryUpdateStub.calledOnce).to.be.true;
+          expect(
+            categoryUpdateStub.calledOnceWith({ id, description, isIncome })
+          ).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await patchCategory(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should send a success message in the response body", async () => {
+          await patchCategory(req, res as Response, next);
+          expect(res.body?.message).to.equal("Category updated successfully");
+        });
+      });
+      describe("if the category update is unsuccessful...", () => {
+        beforeEach(() => {
+          categoryUpdateStub = Sinon.stub(Category, "update").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should throw the error thrown by the update function", async () => {
+          try {
+            await patchCategory(req, res as Response, next);
+            throw new Error("patchCategory should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await patchCategory(req, res as Response, next);
+            throw new Error("patchCategory should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to update the given category...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+      });
+      it("should throw a 403 error", async () => {
+        try {
+          await patchCategory(req, res as Response, next);
+          throw new Error("patchCategory should reject here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await patchCategory(req, res as Response, next);
+          throw new Error("patchCategory should reject here");
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
+      });
+    });
+  });
+  describe("deleteCategory()", () => {
+    beforeEach(() => {
+      req = ({
+        isAuth: true,
+        userId: fakeUser._id,
+        params: {
+          id: id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to delete the category...", () => {
+      let categoryRemoveByIdStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
+      });
+      describe("if the category delete is successful...", () => {
+        beforeEach(() => {
+          categoryRemoveByIdStub = Sinon.stub(Category, "removeById").resolves(
+            true
+          );
+        });
+        it("should delete the category", async () => {
+          await deleteCategory(req, res as Response, next);
+          expect(categoryRemoveByIdStub.calledOnce).to.be.true;
+          expect(categoryRemoveByIdStub.calledOnceWith(id)).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await deleteCategory(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should send a success message in the response body", async () => {
+          await deleteCategory(req, res as Response, next);
+          expect(res.body?.message).to.equal("Category deleted successfully");
+        });
+      });
+      describe("if the category delete is unsuccessful...", () => {
+        beforeEach(() => {
+          categoryRemoveByIdStub = Sinon.stub(Category, "removeById").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should throw the error thrown by the delete function", async () => {
+          try {
+            await deleteCategory(req, res as Response, next);
+            throw new Error("patchCategory should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await deleteCategory(req, res as Response, next);
+            throw new Error("patchCategory should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to delete the given category...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+      });
+      it("should throw a 403 error", async () => {
+        try {
+          await deleteCategory(req, res as Response, next);
+          throw new Error("patchCategory should reject here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await deleteCategory(req, res as Response, next);
+          throw new Error("patchCategory should reject here");
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
+      });
+    });
+  });
 });
