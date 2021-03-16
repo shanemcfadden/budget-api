@@ -233,6 +233,7 @@ describe("CategoryController", () => {
       beforeEach(() => {
         Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
       });
+      // TODO: Make sure category has no subcategory with transactions before deleting
       describe("if the category delete is successful...", () => {
         beforeEach(() => {
           categoryRemoveByIdStub = Sinon.stub(Category, "removeById").resolves(

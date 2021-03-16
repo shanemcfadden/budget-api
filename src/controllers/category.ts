@@ -34,6 +34,7 @@ export const CategoryControllerBase: Controller = {
     const userId = req.userId;
     const id = +req.params.id;
     const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
+    // TODO: Make sure category has no subcategory with transactions before deleting
     if (!permissionToEdit) throw new ServerError(403, "Access denied");
     await Category.removeById(id);
     res.status(200).json({
