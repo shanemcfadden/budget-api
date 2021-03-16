@@ -5,13 +5,10 @@ const router = Router();
 
 router.post("/", SubcategoryController.postSubcategory as RequestHandler);
 
-router.patch(
-  "/:subcategoryId",
-  SubcategoryController.patchSubcategory as RequestHandler
-);
+router.patch("/:id", SubcategoryController.patchSubcategory as RequestHandler);
 
 router.delete(
-  "/:subcategoryId",
+  "/:id",
   SubcategoryController.deleteSubcategory as RequestHandler
 );
 
