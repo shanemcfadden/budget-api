@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from "express";
 import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "../middleware/validator";
-import SubcategoryRoutes from "./subcategory";
 import CategoryController from "../controllers/category";
 
 const router = Router();
@@ -38,7 +37,5 @@ router.patch(
 );
 
 router.delete("/:id", CategoryController.deleteCategory as RequestHandler);
-
-router.use("/:categoryId", SubcategoryRoutes);
 
 export default router;

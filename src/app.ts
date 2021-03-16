@@ -5,6 +5,7 @@ import AccountRoutes from "./routes/account";
 import AuthRoutes from "./routes/auth";
 import BudgetRoutes from "./routes/budget";
 import CategoryRoutes from "./routes/category";
+import SubcategoryRoutes from "./routes/subcategory";
 import authenticateBearer from "./middleware/authenticateBearer";
 import { errorRequestHandler } from "./util/errors";
 import mustBeAuthenticated from "./middleware/mustBeAuthenticated";
@@ -20,6 +21,7 @@ app.use("/auth", AuthRoutes);
 app.use("/budget", mustBeAuthenticated, BudgetRoutes);
 app.use("/account", mustBeAuthenticated, AccountRoutes);
 app.use("/category", mustBeAuthenticated, CategoryRoutes);
+app.use("/subcategory", mustBeAuthenticated, SubcategoryRoutes);
 
 app.use((req, res) => {
   res.send("route not found");
