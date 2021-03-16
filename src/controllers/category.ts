@@ -14,18 +14,31 @@ export const CategoryControllerBase: Controller = {
     );
     if (!permissionToEdit) throw new ServerError(403, "Access denied");
     const idPacket = await Category.create({ description, isIncome, budgetId });
-    res
-      .status(200)
-      .json({
-        message: "Category created successfully",
-        categoryId: idPacket._id,
-      });
+    res.status(200).json({
+      message: "Category created successfully",
+      categoryId: idPacket._id,
+    });
   }) as AuthenticatedRequestHandler,
   patchCategory: (async (req, res, next) => {
-    res.send("PATCH category");
+    const userId = req.userId;
+    const id = +req.params.id;
+    const { description, isIncome } = req.body;
+    const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
+    if (!permissionToEdit) throw new ServerError(403, "Access denied");
+    await Category.update({ description, isIncome, id });
+    res.status(200).json({
+      message: "Category updated successfully",
+    });
   }) as AuthenticatedRequestHandler,
   deleteCategory: (async (req, res, next) => {
-    res.send("DELETE category");
+    const userId = req.userId;
+    const id = +req.params.id;
+    const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
+    if (!permissionToEdit) throw new ServerError(403, "Access denied");
+    await Category.removeById(id);
+    res.status(200).json({
+      message: "Category deleted successfully",
+    });
   }) as AuthenticatedRequestHandler,
 };
 
