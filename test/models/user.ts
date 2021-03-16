@@ -7,6 +7,8 @@ import * as Database from "../../src/database/Database";
 import * as Model from "../../src/util/models";
 import { fakeAccounts, fakeUser } from "../fixtures";
 import Account from "../../src/models/account";
+import Category from "../../src/models/category";
+import Subcategory from "../../src/models/subcategory";
 
 chai.use(chaiuuid);
 const expect = chai.expect;
@@ -178,6 +180,60 @@ describe("User model", () => {
       });
       it("should return true", async () => {
         const result = await User.hasPermissionToEditBudget(_id, fakeBudgetId);
+        expect(result).to.be.true;
+      });
+    });
+  });
+  describe("hasPermissionToEditCategory()", () => {
+    const fakeCategoryId = 12382;
+    describe("if Category.checkUserPermissions() returns false...", () => {
+      beforeEach(() => {
+        sinon.stub(Category, "checkUserPermissions").resolves(false);
+      });
+      it("should resolve false", async () => {
+        const result = await User.hasPermissionToEditCategory(
+          _id,
+          fakeCategoryId
+        );
+        expect(result).to.be.false;
+      });
+    });
+    describe("if Category.checkUserPermissions() returns true...", () => {
+      beforeEach(() => {
+        sinon.stub(Category, "checkUserPermissions").resolves(true);
+      });
+      it("should resolve true", async () => {
+        const result = await User.hasPermissionToEditCategory(
+          _id,
+          fakeCategoryId
+        );
+        expect(result).to.be.true;
+      });
+    });
+  });
+  describe("hasPermissionToEditSubcategory()", () => {
+    const fakeSubcategoryId = 12382;
+    describe("if Subcategory.checkUserPermissions() returns false...", () => {
+      beforeEach(() => {
+        sinon.stub(Subcategory, "checkUserPermissions").resolves(false);
+      });
+      it("should resolve false", async () => {
+        const result = await User.hasPermissionToEditSubcategory(
+          _id,
+          fakeSubcategoryId
+        );
+        expect(result).to.be.false;
+      });
+    });
+    describe("if Subcategory.checkUserPermissions() returns true...", () => {
+      beforeEach(() => {
+        sinon.stub(Subcategory, "checkUserPermissions").resolves(true);
+      });
+      it("should resolve true", async () => {
+        const result = await User.hasPermissionToEditSubcategory(
+          _id,
+          fakeSubcategoryId
+        );
         expect(result).to.be.true;
       });
     });

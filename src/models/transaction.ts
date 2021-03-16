@@ -7,6 +7,7 @@ import {
   IdPacket,
 } from "../util/models";
 import { NewTransactionData, TransactionData } from "../types/models";
+import { queryDb } from "../database/Database";
 
 const modelName = "transaction";
 
@@ -19,10 +20,10 @@ class Transaction {
       description,
       date,
       accountId,
-      categoryId,
+      subcategoryId,
     } = newTransactionData;
     return await create(
-      [amount, description, date, accountId, categoryId],
+      [amount, description, date, accountId, subcategoryId],
       modelName
     );
   }
@@ -35,6 +36,22 @@ class Transaction {
     return (await findAllByBudgetId(budgetId, modelName)) as TransactionData[];
   }
 
+  static async findAllByCategoryId(
+    categoryId: number
+  ): Promise<TransactionData[]> {
+    return (await queryDb("transactions/findAllByCategoryId.sql", [
+      categoryId,
+    ])) as TransactionData[];
+  }
+
+  static async findAllBySubcategoryId(
+    subcategoryId: number
+  ): Promise<TransactionData[]> {
+    return (await queryDb("transactions/findAllBySubcategoryId.sql", [
+      subcategoryId,
+    ])) as TransactionData[];
+  }
+
   static async update(transactionData: TransactionData): Promise<boolean> {
     const {
       id,
@@ -42,11 +59,11 @@ class Transaction {
       description,
       date,
       accountId,
-      categoryId,
+      subcategoryId,
     } = transactionData;
     return await update(
       id,
-      [amount, description, date, accountId, categoryId],
+      [amount, description, date, accountId, subcategoryId],
       modelName
     );
   }

@@ -68,8 +68,8 @@ export async function removeById(id: RowId, model: string) {
 
 export function pluralModel(modelName: string): string {
   const oddPlurals: Record<string, string> = {
-    "macro-category": "macro-categories",
-    "micro-category": "micro-categories",
+    category: "categories",
+    subcategory: "subcategories",
   };
   return oddPlurals[modelName] || modelName + "s";
 }

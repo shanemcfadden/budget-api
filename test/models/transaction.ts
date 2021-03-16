@@ -1,8 +1,9 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
-import sinon from "sinon";
+import sinon, { SinonStub } from "sinon";
 import Transaction from "../../src/models/transaction";
 import * as Model from "../../src/util/models";
+import * as Database from "../../src/database/Database";
 import { fakeTransactions } from "../fixtures";
 
 describe("Transaction model", () => {
@@ -13,16 +14,22 @@ describe("Transaction model", () => {
     description,
     date,
     accountId,
-    categoryId,
+    subcategoryId,
   } = transactionData;
   const newTransactionData = {
     amount,
     description,
     date,
     accountId,
-    categoryId,
+    subcategoryId,
   };
-  const transactionDataArr = [amount, description, date, accountId, categoryId];
+  const transactionDataArr = [
+    amount,
+    description,
+    date,
+    accountId,
+    subcategoryId,
+  ];
   const modelName = "transaction";
 
   afterEach(() => {
@@ -56,6 +63,50 @@ describe("Transaction model", () => {
       const results = await Transaction.findAllByBudgetId(budgetId);
       expect(findStub.calledOnceWith(budgetId, modelName)).to.be.true;
       expect(results).to.deep.equal([transactionData]);
+    });
+  });
+  describe("findAllByCategoryId()", () => {
+    const categoryId = 333;
+    let queryDbStub: SinonStub;
+    beforeEach(() => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves(fakeTransactions as RowDataPacket[]);
+    });
+    it("should query the database", async () => {
+      await Transaction.findAllByCategoryId(categoryId);
+      expect(queryDbStub.calledOnce).to.be.true;
+      expect(
+        queryDbStub.calledOnceWith("transactions/findAllByCategoryId.sql", [
+          categoryId,
+        ])
+      ).to.be.true;
+    });
+    it("should return values given by database", async () => {
+      const results = await Transaction.findAllByCategoryId(categoryId);
+      expect(results).to.deep.equal(fakeTransactions);
+    });
+  });
+  describe("findAllBySubcategoryId()", () => {
+    const subcategoryId = 222;
+    let queryDbStub: SinonStub;
+    beforeEach(() => {
+      queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves(fakeTransactions as RowDataPacket[]);
+    });
+    it("should query the database", async () => {
+      await Transaction.findAllBySubcategoryId(subcategoryId);
+      expect(queryDbStub.calledOnce).to.be.true;
+      expect(
+        queryDbStub.calledOnceWith("transactions/findAllBySubcategoryId.sql", [
+          subcategoryId,
+        ])
+      ).to.be.true;
+    });
+    it("should return values given by database", async () => {
+      const results = await Transaction.findAllBySubcategoryId(subcategoryId);
+      expect(results).to.deep.equal(fakeTransactions);
     });
   });
   describe("update()", () => {

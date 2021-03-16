@@ -4,7 +4,7 @@ SELECT
     transactions.description, 
     date, 
     account_id AS accountId, 
-    category_id AS categoryId 
+    subcategory_id AS subcategoryId 
 FROM transactions
     JOIN accounts ON transactions.account_id = accounts.id 
     WHERE accounts.budget_id = ?
