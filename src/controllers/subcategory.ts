@@ -41,16 +41,30 @@ export const SubcategoryControllerBase: Controller = {
     });
   }) as AuthenticatedRequestHandler,
   deleteSubcategory: (async (req, res, next) => {
-    // const userId = req.userId;
-    // const id = +req.params.id;
-    // const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
-    // // TODO: Make sure category has no subcategory with transactions before deleting
-    // if (!permissionToEdit) throw new ServerError(403, "Access denied");
-    // await Category.removeById(id);
-    // res.status(200).json({
-    //   message: "Category deleted successfully",
-    // });
-    res.send("DELETE /:categoryId/:subcategoryId");
+    const userId = req.userId;
+    const id = +req.params.id;
+    const [
+      hasPermissionToEditSubcategory,
+      subcategoryHasTransactions,
+    ] = await Promise.all([
+      User.hasPermissionToEditSubcategory(userId, id),
+      Subcategory.hasTransactions(id),
+    ]);
+
+    if (!hasPermissionToEditSubcategory)
+      throw new ServerError(403, "Access denied");
+
+    if (subcategoryHasTransactions) {
+      throw new ServerError(
+        403,
+        "Make sure none of the current transactions are in this subcategory before deleting it"
+      );
+    }
+
+    await Subcategory.removeById(id);
+    res.status(200).json({
+      message: "Subcategory removed successfully",
+    });
   }) as AuthenticatedRequestHandler,
 };
 
