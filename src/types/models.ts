@@ -83,6 +83,10 @@ export interface CategoryDataWithoutBudgetId {
   description: string;
   isIncome: boolean;
 }
+
+export interface UpdateCategoryData extends CategoryDataWithoutBudgetId {
+  id: number;
+}
 export interface NewCategoryData extends CategoryDataWithoutBudgetId {
   budgetId: number;
 }

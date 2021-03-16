@@ -20,7 +20,8 @@ describe("Category model", () => {
     isIncome,
     budgetId,
   };
-  const categoryArr = [description, isIncome, budgetId];
+  const updateCategoryArr = [description, isIncome];
+  const categoryArr = [...updateCategoryArr, budgetId];
   const modelName = "category";
 
   afterEach(() => {
@@ -148,7 +149,8 @@ describe("Category model", () => {
     it("should call util update() and return its value", async () => {
       const updateSub = sinon.stub(Model, "update").resolves(true);
       const results = await Category.update(categoryData);
-      expect(updateSub.calledOnceWith(id, categoryArr, modelName)).to.be.true;
+      expect(updateSub.calledOnceWith(id, updateCategoryArr, modelName)).to.be
+        .true;
       expect(results).to.equal(true);
     });
   });

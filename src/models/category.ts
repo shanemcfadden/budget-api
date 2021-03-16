@@ -6,7 +6,12 @@ import {
   update,
   IdPacket,
 } from "../util/models";
-import { NewCategoryData, CategoryData, CategoriesData } from "../types/models";
+import {
+  NewCategoryData,
+  CategoryData,
+  CategoriesData,
+  UpdateCategoryData,
+} from "../types/models";
 import Transaction from "./transaction";
 import { queryDb } from "../database/Database";
 import { RowDataPacket } from "mysql2";
@@ -93,9 +98,9 @@ class Category {
     return !!transactions.length;
   }
 
-  static async update(transactionData: CategoryData): Promise<boolean> {
-    const { id, description, isIncome, budgetId } = transactionData;
-    return await update(id, [description, isIncome, budgetId], modelName);
+  static async update(categoryData: UpdateCategoryData): Promise<boolean> {
+    const { id, description, isIncome } = categoryData;
+    return await update(id, [description, isIncome], modelName);
   }
 
   static async removeById(id: number): Promise<boolean> {
