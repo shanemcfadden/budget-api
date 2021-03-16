@@ -78,7 +78,7 @@ describe("SubcategoryController", () => {
         it("should send a success message in the response body", async () => {
           await postSubcategory(req, res as Response, next);
           expect(res.body?.message).to.equal(
-            "Subcategory successfully created"
+            "Subcategory created successfully"
           );
         });
         it("should send the subcategory id in the response body", async () => {
