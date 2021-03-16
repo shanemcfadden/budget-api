@@ -1,4 +1,4 @@
 UPDATE transaction_subcategories
-    description = ?, category_id = ?
+    SET description = ?, category_id = ?
     WHERE id = ?
 ;
