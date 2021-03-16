@@ -22,9 +22,9 @@ export const CategoryControllerBase: Controller = {
   patchCategory: (async (req, res, next) => {
     const userId = req.userId;
     const id = +req.params.id;
-    const { description, isIncome } = req.body;
     const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
     if (!permissionToEdit) throw new ServerError(403, "Access denied");
+    const { description, isIncome } = req.body;
     await Category.update({ description, isIncome, id });
     res.status(200).json({
       message: "Category updated successfully",
