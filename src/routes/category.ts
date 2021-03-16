@@ -17,6 +17,7 @@ router.post(
     "Specify whether or not this category is for income"
   ).isBoolean(),
   body("budgetId", "Specify a budget id").isInt(),
+  throwAllValidationErrorMessages,
   CategoryController.postCategory as RequestHandler
 );
 
@@ -31,6 +32,7 @@ router.patch(
     "isIncome",
     "Specify whether or not this category is for income"
   ).isBoolean(),
+  throwAllValidationErrorMessages,
   CategoryController.patchCategory as RequestHandler
 );
 
