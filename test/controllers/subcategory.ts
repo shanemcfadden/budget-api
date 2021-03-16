@@ -136,6 +136,158 @@ describe("SubcategoryController", () => {
       });
     });
   });
-  // describe('patchSubcategory()')
+  describe("patchSubcategory()", () => {
+    beforeEach(() => {
+      req = ({
+        userId: fakeUser._id,
+        isAuth: true,
+        body: {
+          description,
+          categoryId,
+        },
+        params: {
+          id: id.toString(),
+        },
+      } as unknown) as AuthenticatedRequest;
+    });
+    describe("if user is authorized to update given subcategory...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(true);
+      });
+      describe("if user is authorized to update given category...", () => {
+        let subcategoryUpdateStub: SinonStub;
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
+        });
+        describe("if update is successful...", () => {
+          beforeEach(() => {
+            subcategoryUpdateStub = Sinon.stub(Subcategory, "update").resolves(
+              true
+            );
+          });
+          it("should update the subcategory", async () => {
+            await patchSubcategory(req, res as Response, next);
+            expect(subcategoryUpdateStub.calledOnce).to.be.true;
+            expect(
+              subcategoryUpdateStub.calledOnceWith({
+                description,
+                categoryId,
+                id,
+              })
+            ).to.be.true;
+          });
+          it("should send a 200 response", async () => {
+            await patchSubcategory(req, res as Response, next);
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should send a success message in the response body", async () => {
+            await patchSubcategory(req, res as Response, next);
+            expect(res.body?.message).to.equal(
+              "Subcategory updated successfully"
+            );
+          });
+        });
+        describe("if the update is not successful...", () => {
+          beforeEach(() => {
+            subcategoryUpdateStub = Sinon.stub(Subcategory, "update").rejects(
+              mockInternalServerError
+            );
+          });
+          it("should pass along error rejected by the model", async () => {
+            try {
+              await patchSubcategory(req, res as Response, next);
+              throw new Error("patchSubcategory() should reject here");
+            } catch (err) {
+              expect(err).to.deep.equal(mockInternalServerError);
+            }
+          });
+          it("should not send a response", async () => {
+            try {
+              await patchSubcategory(req, res as Response, next);
+              throw new Error("patchSubcategory() should reject here");
+            } catch {
+            } finally {
+              expect(res.statusCode).to.be.undefined;
+              expect(res.body).to.be.undefined;
+            }
+          });
+        });
+      });
+      describe("if user is not authorized to update given category...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+        });
+        it("should pass along a 403 error", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to update given subcategory...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(false);
+      });
+      describe("if user is authorized to update given category...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
+        });
+        it("should pass along a 403 error", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+      describe("if user is not authorized to update given category...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+        });
+        it("should pass along a 403 error", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await patchSubcategory(req, res as Response, next);
+            throw new Error("patchSubcategory() should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+  });
   // describe('deleteSubcategory()')
 });
