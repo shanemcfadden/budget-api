@@ -23,16 +23,22 @@ export const SubcategoryControllerBase: Controller = {
     });
   }) as AuthenticatedRequestHandler,
   patchSubcategory: (async (req, res, next) => {
-    // const userId = req.userId;
-    // const id = +req.params.id;
-    // const permissionToEdit = await User.hasPermissionToEditCategory(userId, id);
-    // if (!permissionToEdit) throw new ServerError(403, "Access denied");
-    // const { description, isIncome } = req.body;
-    // await Category.update({ description, isIncome, id });
-    // res.status(200).json({
-    //   message: "Category updated successfully",
-    // });
-    res.send("PATCH /:categoryId/:subcategoryId");
+    const userId = req.userId;
+    const id = +req.params.id;
+    const { categoryId, description } = req.body;
+    const [
+      hasPermissionToEditNewCategory,
+      hasPermissionToEditSubcategory,
+    ] = await Promise.all([
+      User.hasPermissionToEditCategory(userId, categoryId),
+      User.hasPermissionToEditSubcategory(userId, id),
+    ]);
+    if (!hasPermissionToEditNewCategory || !hasPermissionToEditSubcategory)
+      throw new ServerError(403, "Access denied");
+    await Subcategory.update({ description, categoryId, id });
+    res.status(200).json({
+      message: "Subcategory updated successfully",
+    });
   }) as AuthenticatedRequestHandler,
   deleteSubcategory: (async (req, res, next) => {
     // const userId = req.userId;
