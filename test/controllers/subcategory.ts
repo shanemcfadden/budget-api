@@ -51,76 +51,53 @@ describe("SubcategoryController", () => {
           categoryId,
         },
       } as AuthenticatedRequest;
-      describe("if user is authorized to edit given category...", () => {
-        let subcategoryCreateStub: SinonStub;
+    });
+    describe("if user is authorized to edit given category...", () => {
+      let subcategoryCreateStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
+      });
+      describe("if subcategory creation is successful...", () => {
         beforeEach(() => {
-          Sinon.stub(User, "hasPermissionToEditCategory").resolves(true);
-        });
-        describe("if subcategory creation is successful...", () => {
-          beforeEach(() => {
-            subcategoryCreateStub = Sinon.stub(Subcategory, "create").resolves({
-              _id: id,
-            });
+          subcategoryCreateStub = Sinon.stub(Subcategory, "create").resolves({
+            _id: id,
           });
+        });
 
-          it("should create the subcategory", async () => {
-            await postSubcategory(req, res as Response, next);
-            expect(subcategoryCreateStub.calledOnce).to.be.true;
-            expect(
-              subcategoryCreateStub.calledOnceWith({ description, categoryId })
-            ).to.be.true;
-          });
-          it("should send a 200 response", async () => {
-            await postSubcategory(req, res as Response, next);
-            expect(res.statusCode).to.equal(200);
-          });
-          it("should send a success message in the response body", async () => {
-            await postSubcategory(req, res as Response, next);
-            expect(res.body?.message).to.equal(
-              "Subcategory successfully created"
-            );
-          });
-          it("should send the subcategory id in the response body", async () => {
-            await postSubcategory(req, res as Response, next);
-            expect(res.body?.subcategoryId).to.equal(id);
-          });
+        it("should create the subcategory", async () => {
+          await postSubcategory(req, res as Response, next);
+          expect(subcategoryCreateStub.calledOnce).to.be.true;
+          expect(
+            subcategoryCreateStub.calledOnceWith({ description, categoryId })
+          ).to.be.true;
         });
-        describe("if the subcategory creation is not successful", () => {
-          beforeEach(() => {
-            subcategoryCreateStub = Sinon.stub(Subcategory, "create").rejects(
-              mockInternalServerError
-            );
-          });
-          it("should pass along the error rejected by the model function", async () => {
-            try {
-              await postSubcategory(req, res as Response, next);
-              throw new Error("postSubcategory() should throw here");
-            } catch (err) {
-              expect(err).to.deep.equal(mockInternalServerError);
-            }
-          });
-          it("should not send a response", async () => {
-            try {
-              await postSubcategory(req, res as Response, next);
-              throw new Error("postSubcategory() should throw here");
-            } catch {
-            } finally {
-              expect(res.statusCode).to.be.undefined;
-              expect(res.body).to.be.undefined;
-            }
-          });
+        it("should send a 200 response", async () => {
+          await postSubcategory(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should send a success message in the response body", async () => {
+          await postSubcategory(req, res as Response, next);
+          expect(res.body?.message).to.equal(
+            "Subcategory successfully created"
+          );
+        });
+        it("should send the subcategory id in the response body", async () => {
+          await postSubcategory(req, res as Response, next);
+          expect(res.body?.subcategoryId).to.equal(id);
         });
       });
-      describe("if user is not authorized to edit given category...", () => {
+      describe("if the subcategory creation is not successful", () => {
         beforeEach(() => {
-          Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+          subcategoryCreateStub = Sinon.stub(Subcategory, "create").rejects(
+            mockInternalServerError
+          );
         });
-        it("should throw a 403 error", async () => {
+        it("should pass along the error rejected by the model function", async () => {
           try {
             await postSubcategory(req, res as Response, next);
             throw new Error("postSubcategory() should throw here");
           } catch (err) {
-            expect(err).to.deep.equal(error403);
+            expect(err).to.deep.equal(mockInternalServerError);
           }
         });
         it("should not send a response", async () => {
@@ -133,6 +110,29 @@ describe("SubcategoryController", () => {
             expect(res.body).to.be.undefined;
           }
         });
+      });
+    });
+    describe("if user is not authorized to edit given category...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditCategory").resolves(false);
+      });
+      it("should throw a 403 error", async () => {
+        try {
+          await postSubcategory(req, res as Response, next);
+          throw new Error("postSubcategory() should throw here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await postSubcategory(req, res as Response, next);
+          throw new Error("postSubcategory() should throw here");
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
       });
     });
   });
