@@ -7,9 +7,6 @@ const router = Router();
 
 router.post(
   "/",
-  body("description", "Transaction description is required").isLength({
-    min: 1,
-  }),
   body(
     "description",
     "Transaction description must not exceed 100 characters"
@@ -27,9 +24,6 @@ router.post(
 
 router.patch(
   "/:id",
-  body("description", "Transaction description is required").isLength({
-    min: 1,
-  }),
   body(
     "description",
     "Transaction description must not exceed 100 characters"
