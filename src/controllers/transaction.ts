@@ -49,7 +49,53 @@ export const TransactionControllerBase: Controller = {
     });
   }) as AuthenticatedRequestHandler,
   patchTransaction: (async (req, res, next) => {
-    res.send("PATCH transaction");
+    const id = +req.params.id;
+    const { userId } = req;
+    const { description, amount, date, subcategoryId, accountId } = req.body;
+
+    const [
+      hasTransactionPermissions,
+      hasSubcategoryPermissions,
+      hasAccountPermissions,
+    ] = await Promise.all([
+      User.hasPermissionToEditTransaction(userId, id),
+      User.hasPermissionToEditSubcategory(userId, subcategoryId),
+      User.hasPermissionToEditAccount(userId, accountId),
+    ]);
+
+    if (
+      !hasTransactionPermissions ||
+      !hasAccountPermissions ||
+      !hasSubcategoryPermissions
+    )
+      throw new ServerError(403, "Access denied");
+
+    await Transaction.update({
+      id,
+      description,
+      amount,
+      date,
+      subcategoryId,
+      accountId,
+    });
+
+    let currentBalance: number;
+    try {
+      currentBalance = await Account.getCurrentBalance(accountId);
+    } catch (err) {
+      res.status(200).json({
+        message: "Transaction updated successfully",
+        error: {
+          message:
+            "Internal server error: unable to retrieve current account balance",
+        },
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "Transaction updated successfully",
+      currentBalance,
+    });
   }) as AuthenticatedRequestHandler,
   deleteTransaction: (async (req, res, next) => {
     res.send("DELETE transaction");
