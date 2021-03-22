@@ -12,6 +12,7 @@ import { MockResponse } from "../types";
 import User from "../../src/models/user";
 import Transaction from "../../src/models/transaction";
 import { expect } from "chai";
+import Account from "../../src/models/account";
 
 const {
   postTransaction,
@@ -61,6 +62,188 @@ describe("TransactionController", () => {
           accountId,
         },
       } as AuthenticatedRequest;
+    });
+    describe("if user has permission to update given account...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(true);
+      });
+      describe("if user has permission to update given subcategory...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
+        });
+        describe("if transaction creation was successful...", () => {
+          let createTransactionStub: SinonStub;
+          beforeEach(() => {
+            createTransactionStub = Sinon.stub(Transaction, "create").resolves({
+              _id: id,
+            });
+          });
+          describe("if retrieving new current balance for the given account is successful...", () => {
+            const mockCurrentBalance = 3000;
+            beforeEach(() => {
+              Sinon.stub(Account, "getCurrentBalance").resolves(
+                mockCurrentBalance
+              );
+            });
+            it("should create the transaction", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(createTransactionStub.calledOnce).to.be.true;
+              expect(
+                createTransactionStub.calledOnceWith({
+                  amount,
+                  description,
+                  date,
+                  accountId,
+                  subcategoryId,
+                })
+              ).to.be.true;
+            });
+            it("should send a 200 response", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(res.statusCode).to.equal(200);
+            });
+            it("should send a success message in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(req.body?.message).to.equal(
+                "Transaction created successfully"
+              );
+            });
+            it("should send the transaction id in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(req.body?.transactionId).to.equal(id);
+            });
+          });
+          describe("if retrieving the new current balance for the given account is not successful...", () => {
+            beforeEach(() => {
+              Sinon.stub(Account, "getCurrentBalance").rejects(
+                mockInternalServerError
+              );
+            });
+            it("should create the transaction", async () => {
+              expect(createTransactionStub.calledOnce).to.be.true;
+              expect(
+                createTransactionStub.calledOnceWith({
+                  amount,
+                  description,
+                  date,
+                  accountId,
+                  subcategoryId,
+                })
+              ).to.be.true;
+            });
+            it("should send a 200 response", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(res.statusCode).to.equal(200);
+            });
+
+            it("should send a partial success message in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(req.body?.message).to.equal(
+                "Transaction created successfully."
+              );
+            });
+            it("should send a server error message in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(req.body?.error.message).to.equal(
+                "Internal server error: unable to retrieve current account balance"
+              );
+            });
+          });
+        });
+        describe("if transaction creation was not successful...", () => {
+          beforeEach(() => {
+            Sinon.stub(Transaction, "create").rejects(mockInternalServerError);
+          });
+          it("should pass along the error rejected by the model function", async () => {
+            try {
+              await postTransaction(req, res as Response, next);
+              throw new Error("postTransaction should reject here");
+            } catch (err) {
+              expect(err).to.deep.equal(mockInternalServerError);
+            }
+          });
+          it("should not send a response", async () => {
+            try {
+              await postTransaction(req, res as Response, next);
+            } catch {
+            } finally {
+              expect(res.statusCode).to.be.undefined;
+              expect(res.body).to.be.undefined;
+            }
+          });
+        });
+      });
+      describe("if user does not have permission to update given subcategory...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(false);
+        });
+        it("should throw a 403 error", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+            throw new Error("postTransaction should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user does not have permission to update given account...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditAccount").resolves(false);
+      });
+      describe("if user has permission to update given subcategory...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(true);
+        });
+        it("should throw a 403 error", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+            throw new Error("postTransaction should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+      describe("if user does not have permission to update given subcategory...", () => {
+        beforeEach(() => {
+          Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(false);
+        });
+        it("should throw a 403 error", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+            throw new Error("postTransaction should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(error403);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await postTransaction(req, res as Response, next);
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
     });
   });
   describe("patchTransaction()", () => {
