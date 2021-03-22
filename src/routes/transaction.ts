@@ -7,29 +7,41 @@ const router = Router();
 
 router.post(
   "/",
-  //   body("description", "Transaction description is required").isLength({
-  //     min: 1,
-  //   }),
-  //   body(
-  //     "description",
-  //     "Transaction description must not exceed 100 characters"
-  //   ).isLength({ max: 100 }),
-  //   body("categoryId", "Specify a category id").isInt(),
-  //   throwAllValidationErrorMessages,
+  body("description", "Transaction description is required").isLength({
+    min: 1,
+  }),
+  body(
+    "description",
+    "Transaction description must not exceed 100 characters"
+  ).isLength({ max: 100 }),
+  body("amount", "Transaction amount is required").isFloat({
+    min: -99999999.99,
+    max: 9999999.99,
+  }),
+  body("accountId", "Specify an account id").isInt(),
+  body("categoryId", "Specify a category id").isInt(),
+  body("date", "Transaction date is required").isDate(),
+  throwAllValidationErrorMessages,
   TransactionController.postTransaction as RequestHandler
 );
 
 router.patch(
   "/:id",
-  //   body("description", "Transaction description is required").isLength({
-  //     min: 1,
-  //   }),
-  //   body(
-  //     "description",
-  //     "Transaction description must not exceed 100 characters"
-  //   ).isLength({ max: 100 }),
-  //   body("categoryId", "Specify a category id").isInt(),
-  //   throwAllValidationErrorMessages,
+  body("description", "Transaction description is required").isLength({
+    min: 1,
+  }),
+  body(
+    "description",
+    "Transaction description must not exceed 100 characters"
+  ).isLength({ max: 100 }),
+  body("amount", "Transaction amount is required").isFloat({
+    min: -99999999.99,
+    max: 9999999.99,
+  }),
+  body("accountId", "Specify an account id").isInt(),
+  body("categoryId", "Specify a category id").isInt(),
+  body("date", "Transaction date is required").isDate(),
+  throwAllValidationErrorMessages,
   TransactionController.patchTransaction as RequestHandler
 );
 
