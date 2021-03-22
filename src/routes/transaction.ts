@@ -19,7 +19,7 @@ router.post(
     max: 9999999.99,
   }),
   body("accountId", "Specify an account id").isInt(),
-  body("categoryId", "Specify a category id").isInt(),
+  body("subcategoryId", "Specify a subcategory id").isInt(),
   body("date", "Transaction date is required").isDate(),
   throwAllValidationErrorMessages,
   TransactionController.postTransaction as RequestHandler
@@ -39,7 +39,7 @@ router.patch(
     max: 9999999.99,
   }),
   body("accountId", "Specify an account id").isInt(),
-  body("categoryId", "Specify a category id").isInt(),
+  body("subcategoryId", "Specify a subcategory id").isInt(),
   body("date", "Transaction date is required").isDate(),
   throwAllValidationErrorMessages,
   TransactionController.patchTransaction as RequestHandler
