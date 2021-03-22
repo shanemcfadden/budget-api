@@ -9,6 +9,7 @@ import SubcategoryRoutes from "routes/subcategory";
 import authenticateBearer from "middleware/authenticateBearer";
 import { errorRequestHandler } from "util/errors";
 import mustBeAuthenticated from "middleware/mustBeAuthenticated";
+import TransactionRoutes from "routes/transaction";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/auth", AuthRoutes);
 app.use("/budget", mustBeAuthenticated, BudgetRoutes);
 app.use("/account", mustBeAuthenticated, AccountRoutes);
 app.use("/category", mustBeAuthenticated, CategoryRoutes);
+app.use("/transaction", mustBeAuthenticated, TransactionRoutes);
 app.use("/subcategory", mustBeAuthenticated, SubcategoryRoutes);
 
 app.use((req, res) => {
