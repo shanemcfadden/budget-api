@@ -259,6 +259,9 @@ describe("TransactionController", () => {
       } as unknown) as AuthenticatedRequest;
     });
     describe("if user has permission to update the given transaction...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditTransaction").resolves(true);
+      });
       describe("if user has permission to update given account...", () => {
         beforeEach(() => {
           Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
@@ -304,10 +307,6 @@ describe("TransactionController", () => {
                 expect(res.body?.message).to.equal(
                   "Transaction updated successfully"
                 );
-              });
-              it("should send the transaction id in the response body", async () => {
-                await patchTransaction(req, res as Response, next);
-                expect(res.body?.transactionId).to.equal(id);
               });
             });
             describe("if retrieving the new current balance for the given account is not successful...", () => {
@@ -448,6 +447,9 @@ describe("TransactionController", () => {
       });
     });
     describe("if user does not have permission to edit given transaction...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditTransaction").resolves(false);
+      });
       describe("if user has permission to update given account...", () => {
         beforeEach(() => {
           Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
