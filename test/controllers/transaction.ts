@@ -65,14 +65,14 @@ describe("TransactionController", () => {
     });
     describe("if user has permission to update given account...", () => {
       beforeEach(() => {
-        Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(true);
+        Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
       });
       describe("if user has permission to update given subcategory...", () => {
+        let createTransactionStub: SinonStub;
         beforeEach(() => {
-          Sinon.stub(User, "hasPermissionToEditAccount").resolves(true);
+          Sinon.stub(User, "hasPermissionToEditSubcategory").resolves(true);
         });
         describe("if transaction creation was successful...", () => {
-          let createTransactionStub: SinonStub;
           beforeEach(() => {
             createTransactionStub = Sinon.stub(Transaction, "create").resolves({
               _id: id,
@@ -104,13 +104,13 @@ describe("TransactionController", () => {
             });
             it("should send a success message in the response body", async () => {
               await postTransaction(req, res as Response, next);
-              expect(req.body?.message).to.equal(
+              expect(res.body?.message).to.equal(
                 "Transaction created successfully"
               );
             });
             it("should send the transaction id in the response body", async () => {
               await postTransaction(req, res as Response, next);
-              expect(req.body?.transactionId).to.equal(id);
+              expect(res.body?.transactionId).to.equal(id);
             });
           });
           describe("if retrieving the new current balance for the given account is not successful...", () => {
@@ -120,6 +120,7 @@ describe("TransactionController", () => {
               );
             });
             it("should create the transaction", async () => {
+              await postTransaction(req, res as Response, next);
               expect(createTransactionStub.calledOnce).to.be.true;
               expect(
                 createTransactionStub.calledOnceWith({
@@ -138,13 +139,13 @@ describe("TransactionController", () => {
 
             it("should send a partial success message in the response body", async () => {
               await postTransaction(req, res as Response, next);
-              expect(req.body?.message).to.equal(
-                "Transaction created successfully."
+              expect(res.body?.message).to.equal(
+                "Transaction created successfully"
               );
             });
             it("should send a server error message in the response body", async () => {
               await postTransaction(req, res as Response, next);
-              expect(req.body?.error.message).to.equal(
+              expect(res.body?.error.message).to.equal(
                 "Internal server error: unable to retrieve current account balance"
               );
             });
