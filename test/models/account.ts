@@ -85,7 +85,7 @@ describe("Account model", () => {
       expect(
         queryDbStub.calledOnceWith("accounts/getCurrentDatabase.sql", [id])
       ).to.be.true;
-      expect(result).to.equal(id);
+      expect(result).to.equal(currentBalance);
     });
   });
   describe("update()", () => {
