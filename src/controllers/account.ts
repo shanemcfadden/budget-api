@@ -1,8 +1,8 @@
-import Account from "../models/account";
-import User from "../models/user";
-import { Controller } from "../types/controllers";
-import { AuthenticatedRequestHandler } from "../types/express";
-import { handleControllerErrors, ServerError } from "../util/errors";
+import Account from "models/account";
+import User from "models/user";
+import { Controller } from "types/controllers";
+import { AuthenticatedRequestHandler } from "types/express";
+import { handleControllerErrors, ServerError } from "util/errors";
 
 export const AccountControllerBase: Controller = {
   postAccount: (async (req, res, next) => {
