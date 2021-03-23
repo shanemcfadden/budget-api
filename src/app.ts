@@ -1,14 +1,14 @@
-import "./util/env";
+import "util/env";
 import express from "express";
-import { db } from "./database/Database";
-import AccountRoutes from "./routes/account";
-import AuthRoutes from "./routes/auth";
-import BudgetRoutes from "./routes/budget";
-import CategoryRoutes from "./routes/category";
-import SubcategoryRoutes from "./routes/subcategory";
-import authenticateBearer from "./middleware/authenticateBearer";
-import { errorRequestHandler } from "./util/errors";
-import mustBeAuthenticated from "./middleware/mustBeAuthenticated";
+import { db } from "database/Database";
+import AccountRoutes from "routes/account";
+import AuthRoutes from "routes/auth";
+import BudgetRoutes from "routes/budget";
+import CategoryRoutes from "routes/category";
+import SubcategoryRoutes from "routes/subcategory";
+import authenticateBearer from "middleware/authenticateBearer";
+import { errorRequestHandler } from "util/errors";
+import mustBeAuthenticated from "middleware/mustBeAuthenticated";
 
 const app = express();
 
