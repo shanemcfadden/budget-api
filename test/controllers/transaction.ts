@@ -112,6 +112,10 @@ describe("TransactionController", () => {
               await postTransaction(req, res as Response, next);
               expect(res.body?.transactionId).to.equal(id);
             });
+            it("should send current balance in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(res.body?.currentBalance).to.equal(mockCurrentBalance);
+            });
           });
           describe("if retrieving the new current balance for the given account is not successful...", () => {
             beforeEach(() => {
@@ -148,6 +152,10 @@ describe("TransactionController", () => {
               expect(res.body?.error.message).to.equal(
                 "Internal server error: unable to retrieve current account balance"
               );
+            });
+            it("should send the transaction id in the response body", async () => {
+              await postTransaction(req, res as Response, next);
+              expect(res.body?.transactionId).to.equal(id);
             });
           });
         });
@@ -307,6 +315,10 @@ describe("TransactionController", () => {
                 expect(res.body?.message).to.equal(
                   "Transaction updated successfully"
                 );
+              });
+              it("should send current balance in the response body", async () => {
+                await patchTransaction(req, res as Response, next);
+                expect(res.body?.currentBalance).to.equal(mockCurrentBalance);
               });
             });
             describe("if retrieving the new current balance for the given account is not successful...", () => {
