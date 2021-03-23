@@ -39,9 +39,11 @@ export const TransactionControllerBase: Controller = {
           message:
             "Internal server error: unable to retrieve current account balance",
         },
+        transactionId: _id,
       });
       return;
     }
+
     res.status(200).json({
       message: "Transaction created successfully",
       currentBalance,
