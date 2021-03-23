@@ -1,6 +1,6 @@
 import { OkPacket, RowDataPacket } from "mysql2";
-import { getQueryPath, queryDb } from "../database/Database";
-import { capitalize } from "./strings";
+import { getQueryPath, queryDb } from "database/Database";
+import { capitalize } from "util/strings";
 
 type RowId = number | string;
 export interface IdPacket {
