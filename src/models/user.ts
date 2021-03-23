@@ -93,7 +93,6 @@ class User {
     userId: string,
     transactionId: number
   ): Promise<boolean> {
-    // TODO
     const results = (await queryDb("users/hasPermissionToEditTransaction.sql", [
       userId,
       transactionId,
