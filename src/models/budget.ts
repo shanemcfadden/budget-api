@@ -6,17 +6,17 @@ import {
   IdPacket,
   removeById,
   update,
-} from "../util/models";
+} from "util/models";
 import {
   NewBudgetData,
   BudgetData,
   CompleteBudgetData,
   BudgetAccountData,
-} from "../types/models";
-import { queryDb } from "../database/Database";
-import { ServerError } from "../util/errors";
-import Category from "./category";
-import Transaction from "./transaction";
+} from "types/models";
+import { queryDb } from "database/Database";
+import { ServerError } from "util/errors";
+import Category from "models/category";
+import Transaction from "models/transaction";
 
 const modelName = "budget";
 

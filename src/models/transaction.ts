@@ -5,9 +5,9 @@ import {
   removeById,
   update,
   IdPacket,
-} from "../util/models";
-import { NewTransactionData, TransactionData } from "../types/models";
-import { queryDb } from "../database/Database";
+} from "util/models";
+import { NewTransactionData, TransactionData } from "types/models";
+import { queryDb } from "database/Database";
 
 const modelName = "transaction";
 

@@ -6,12 +6,12 @@ import {
   findAllByUserId,
   findAllByBudgetId,
   IdPacket,
-} from "../util/models";
+} from "util/models";
 import {
   NewAccountData,
   CompleteAccountData,
   UpdateAccountData,
-} from "../types/models";
+} from "types/models";
 
 const modelName = "account";
 

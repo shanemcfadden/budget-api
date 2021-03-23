@@ -1,16 +1,11 @@
 import { v4 as uuid } from "uuid";
 import { RowDataPacket } from "mysql2";
-import { getQueryPath, queryDb } from "../database/Database";
-import {
-  findAllByBudgetId,
-  findById,
-  removeById,
-  update,
-} from "../util/models";
-import { UserDataMinusPassword, NewUserData, UserData } from "../types/models";
-import Account from "./account";
-import Category from "./category";
-import Subcategory from "./subcategory";
+import { getQueryPath, queryDb } from "database/Database";
+import { findAllByBudgetId, findById, removeById, update } from "util/models";
+import { UserDataMinusPassword, NewUserData, UserData } from "types/models";
+import Account from "models/account";
+import Category from "models/category";
+import Subcategory from "models/subcategory";
 
 const modelName = "user";
 
