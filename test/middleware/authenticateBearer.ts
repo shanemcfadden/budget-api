@@ -2,8 +2,8 @@ import { expect } from "chai";
 import { Response, NextFunction } from "express";
 import sinon, { SinonStub } from "sinon";
 import jwt from "jsonwebtoken";
-import authenticateBearer from "../../src/middleware/authenticateBearer";
-import { ExtendedRequest } from "../../src/types/express";
+import authenticateBearer from "middleware/authenticateBearer";
+import { ExtendedRequest } from "types/express";
 
 describe("authenticateBearer middleware", () => {
   let req: ExtendedRequest;

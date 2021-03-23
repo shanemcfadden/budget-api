@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import * as Database from "../../src/database/Database";
+import * as Database from "database/Database";
 import {
   create,
   findAllByBudgetId,
@@ -9,8 +9,8 @@ import {
   findById,
   update,
   removeById,
-} from "../../src/util/models";
-import { capitalize } from "../../src/util/strings";
+} from "util/models";
+import { capitalize } from "util/strings";
 
 describe("util/model.ts", () => {
   let queryDbStub: SinonStub;

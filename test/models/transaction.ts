@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import Transaction from "../../src/models/transaction";
-import * as Model from "../../src/util/models";
-import * as Database from "../../src/database/Database";
+import Transaction from "models/transaction";
+import * as Model from "util/models";
+import * as Database from "database/Database";
 import { fakeTransactions } from "../fixtures";
 
 describe("Transaction model", () => {

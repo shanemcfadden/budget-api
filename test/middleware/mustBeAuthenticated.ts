@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { Response, NextFunction } from "express";
 import Sinon, { SinonSpy } from "sinon";
-import mustBeAuthenticated from "../../src/middleware/mustBeAuthenticated";
-import { ExtendedRequest } from "../../src/types/express";
-import { ServerError } from "../../src/util/errors";
+import mustBeAuthenticated from "middleware/mustBeAuthenticated";
+import { ExtendedRequest } from "types/express";
+import { ServerError } from "util/errors";
 
 describe("mustBeAuthenticated()", () => {
   let req: ExtendedRequest;
