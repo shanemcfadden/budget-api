@@ -10,10 +10,10 @@
     "build": "tsc",
     "copy-files": "copyfiles -u 1 src/**/*.sql dist",
     "postbuild": "copy-files",
-    "start": "pm2 start dist/app.js -i max",
-    "dev": "ts-node src/app.ts",
+    "start": "pm2 start dist/app.js -i max --node-args=\"-r ./tsconfig-paths-bootstrap.js\"",
+    "dev": "ts-node -r ./tsconfig-paths-bootstrap.js src/app.ts",
     "predev:watch": "yarn run copy-files",
-    "dev:watch": "tsc -w & nodemon -w dist dist/app.js",
+    "dev:watch": "tsc -w & nodemon -r ./tsconfig-paths-bootstrap.js -w dist dist/app.js",
     "test": "mocha --recursive",
     "test:watch": "mocha --watch --recursive"
   },
@@ -37,6 +37,7 @@
     "mocha": "^8.3.0",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.2"
   },
   "dependencies": {
