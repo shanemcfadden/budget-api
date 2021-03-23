@@ -82,9 +82,8 @@ describe("Account model", () => {
         .resolves([{ currentBalance } as RowDataPacket]);
       const result = await Account.getCurrentBalance(id);
       expect(queryDbStub.calledOnce).to.be.true;
-      expect(
-        queryDbStub.calledOnceWith("accounts/getCurrentDatabase.sql", [id])
-      ).to.be.true;
+      expect(queryDbStub.calledOnceWith("accounts/getCurrentBalance.sql", [id]))
+        .to.be.true;
       expect(result).to.equal(currentBalance);
     });
   });
