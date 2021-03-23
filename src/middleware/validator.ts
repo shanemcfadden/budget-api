@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { Middleware, ValidationError } from "express-validator/src/base";
-import { ServerError } from "../util/errors";
+import { ServerError } from "util/errors";
 
 export const throwAllValidationErrorMessages: Middleware = (req, res, next) => {
   const errors = validationResult(req);

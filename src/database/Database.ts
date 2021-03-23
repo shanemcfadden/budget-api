@@ -2,8 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 import { RowDataPacket, OkPacket, ResultSetHeader } from "mysql2";
 import mysql from "mysql2";
-import { pluralModel } from "../util/models";
-import { ServerError } from "../util/errors";
+import { pluralModel } from "util/models";
+import { ServerError } from "util/errors";
 
 const { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE } = process.env;
 
