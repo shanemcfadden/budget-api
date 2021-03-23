@@ -10,7 +10,7 @@
       "models": ["models"],
       "routes": ["routes"],
       "types": ["types"],
-      "util": ["./util"]
+      "util": ["util"]
     },
     "lib": ["es2020"],
     "module": "CommonJS",
