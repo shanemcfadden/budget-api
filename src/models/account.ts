@@ -50,11 +50,10 @@ class Account {
   }
 
   static async getCurrentBalance(accountId: number): Promise<number> {
-    const {
-      currentBalance,
-    } = ((await queryDb("accounts/getCurrentDatabase.sql", [
-      accountId,
-    ])) as RowDataPacket[])[0];
+    const { currentBalance } = ((await queryDb(
+      "accounts/getCurrentBalance.sql",
+      [accountId]
+    )) as RowDataPacket[])[0];
     return currentBalance;
   }
 
