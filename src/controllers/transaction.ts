@@ -98,7 +98,17 @@ export const TransactionControllerBase: Controller = {
     });
   }) as AuthenticatedRequestHandler,
   deleteTransaction: (async (req, res, next) => {
-    res.send("DELETE transaction");
+    const { userId } = req;
+    const id = +req.params.id;
+
+    const hasPermissionToDelete = await User.hasPermissionToEditTransaction(
+      userId,
+      id
+    );
+    if (!hasPermissionToDelete) throw new ServerError(403, "Access denied");
+
+    await Transaction.removeById(id);
+    res.status(200).json({ message: "Transaction removed successfully" });
   }) as AuthenticatedRequestHandler,
 };
 

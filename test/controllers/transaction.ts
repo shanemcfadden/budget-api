@@ -561,5 +561,82 @@ describe("TransactionController", () => {
         },
       } as unknown) as AuthenticatedRequest;
     });
+    describe("if user is authorized to remove given transaction...", () => {
+      let transactionRemoveStub: SinonStub;
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditTransaction").resolves(true);
+      });
+      describe("if remove is successful...", () => {
+        beforeEach(() => {
+          transactionRemoveStub = Sinon.stub(
+            Transaction,
+            "removeById"
+          ).resolves(true);
+        });
+        it("should remove the transaction", async () => {
+          await deleteTransaction(req, res as Response, next);
+          expect(transactionRemoveStub.calledOnce).to.be.true;
+          expect(transactionRemoveStub.calledOnceWith(id)).to.be.true;
+        });
+        it("should send a 200 response", async () => {
+          await deleteTransaction(req, res as Response, next);
+          expect(res.statusCode).to.equal(200);
+        });
+        it("should send a success message in the response body", async () => {
+          await deleteTransaction(req, res as Response, next);
+          expect(res.body?.message).to.equal(
+            "Transaction removed successfully"
+          );
+        });
+      });
+      describe("if the remove is not successful...", () => {
+        beforeEach(() => {
+          transactionRemoveStub = Sinon.stub(Transaction, "removeById").rejects(
+            mockInternalServerError
+          );
+        });
+        it("should pass along error rejected by the model", async () => {
+          try {
+            await deleteTransaction(req, res as Response, next);
+            throw new Error("deleteTransaction() should reject here");
+          } catch (err) {
+            expect(err).to.deep.equal(mockInternalServerError);
+          }
+        });
+        it("should not send a response", async () => {
+          try {
+            await deleteTransaction(req, res as Response, next);
+            throw new Error("deleteTransaction() should reject here");
+          } catch {
+          } finally {
+            expect(res.statusCode).to.be.undefined;
+            expect(res.body).to.be.undefined;
+          }
+        });
+      });
+    });
+    describe("if user is not authorized to remove given transaction...", () => {
+      beforeEach(() => {
+        Sinon.stub(User, "hasPermissionToEditTransaction").resolves(false);
+      });
+      it("should pass along a 403 error", async () => {
+        try {
+          await deleteTransaction(req, res as Response, next);
+          throw new Error("deleteTransaction() should reject here");
+        } catch (err) {
+          expect(err).to.deep.equal(error403);
+        }
+      });
+      it("should not send a response", async () => {
+        try {
+          await deleteTransaction(req, res as Response, next);
+          throw new Error("deleteTransaction() should reject here");
+        } catch {
+        } finally {
+          expect(res.statusCode).to.be.undefined;
+          expect(res.body).to.be.undefined;
+        }
+      });
+    });
   });
 });
