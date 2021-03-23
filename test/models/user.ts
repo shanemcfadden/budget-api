@@ -238,4 +238,54 @@ describe("User model", () => {
       });
     });
   });
+  describe("hasPermissionToEditTransaction()", () => {
+    const fakeTransactionId = 92735;
+    let queryDbStub: SinonStub;
+    describe("if database query returns a row...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon
+          .stub(Database, "queryDb")
+          .resolves([{ transactionId: fakeTransactionId } as RowDataPacket]);
+      });
+      it("should query the database", async () => {
+        await User.hasPermissionToEditTransaction(_id, fakeTransactionId);
+        expect(queryDbStub.calledOnce).to.be.true;
+        expect(
+          queryDbStub.calledOnceWith(
+            "users/hasPermissionToEditTransaction.sql",
+            [_id, fakeTransactionId]
+          )
+        ).to.be.true;
+      });
+      it("should return true", async () => {
+        const result = await User.hasPermissionToEditTransaction(
+          _id,
+          fakeTransactionId
+        );
+        expect(result).to.be.true;
+      });
+    });
+    describe("if database query returns an empty set...", () => {
+      beforeEach(() => {
+        queryDbStub = sinon.stub(Database, "queryDb").resolves([]);
+      });
+      it("should query the database", async () => {
+        await User.hasPermissionToEditTransaction(_id, fakeTransactionId);
+        expect(queryDbStub.calledOnce).to.be.true;
+        expect(
+          queryDbStub.calledOnceWith(
+            "users/hasPermissionToEditTransaction.sql",
+            [_id, fakeTransactionId]
+          )
+        ).to.be.true;
+      });
+      it("should return false", async () => {
+        const result = await User.hasPermissionToEditTransaction(
+          _id,
+          fakeTransactionId
+        );
+        expect(result).to.be.false;
+      });
+    });
+  });
 });

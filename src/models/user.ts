@@ -88,6 +88,18 @@ class User {
   ): Promise<boolean> {
     return await Subcategory.checkUserPermissions(subcategoryId, userId);
   }
+
+  static async hasPermissionToEditTransaction(
+    userId: string,
+    transactionId: number
+  ): Promise<boolean> {
+    // TODO
+    const results = (await queryDb("users/hasPermissionToEditTransaction.sql", [
+      userId,
+      transactionId,
+    ])) as RowDataPacket[];
+    return !!results.length;
+  }
 }
 
 export default User;
