@@ -1,8 +1,8 @@
-import Category from "../models/category";
-import User from "../models/user";
-import { Controller } from "../types/controllers";
-import { AuthenticatedRequestHandler } from "../types/express";
-import { handleControllerErrors, ServerError } from "../util/errors";
+import Category from "models/category";
+import User from "models/user";
+import { Controller } from "types/controllers";
+import { AuthenticatedRequestHandler } from "types/express";
+import { handleControllerErrors, ServerError } from "util/errors";
 
 export const CategoryControllerBase: Controller = {
   postCategory: (async (req, res, next) => {

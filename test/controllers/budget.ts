@@ -1,17 +1,17 @@
 import { expect } from "chai";
 import { NextFunction, Response } from "express";
 import sinon from "sinon";
-import { BudgetControllerBase } from "../../src/controllers/budget";
-import { AuthenticatedRequest } from "../../src/types/express";
+import { BudgetControllerBase } from "controllers/budget";
+import { AuthenticatedRequest } from "types/express";
 import { MockResponse } from "../types";
-import Budget from "../../src/models/budget";
-import * as Errors from "../../src/util/errors";
+import Budget from "models/budget";
+import * as Errors from "util/errors";
 import {
   fakeCompleteBudgetData,
   fakeUserMinusPassword,
   mockInternalServerError,
 } from "../fixtures";
-import User from "../../src/models/user";
+import User from "models/user";
 
 const {
   getBudget,

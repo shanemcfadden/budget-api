@@ -1,11 +1,11 @@
 import { RequestHandler, Router } from "express";
 import { body } from "express-validator";
-import AuthController from "../controllers/auth";
+import AuthController from "controllers/auth";
 import {
   throwAllValidationErrorMessages,
   throwFirstValidationErrorMessage,
-} from "../middleware/validator";
-import isValidPassword from "../util/isValidPassword";
+} from "middleware/validator";
+import isValidPassword from "util/isValidPassword";
 
 const router = Router();
 

@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
-import Account from "../../src/models/account";
-import * as Model from "../../src/util/models";
+import Account from "models/account";
+import * as Model from "util/models";
 
 describe("Account model", () => {
   const newAccountData = {

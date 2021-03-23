@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import Category from "../../src/models/category";
-import * as Model from "../../src/util/models";
-import Transaction from "../../src/models/transaction";
-import * as Database from "../../src/database/Database";
+import Category from "models/category";
+import * as Model from "util/models";
+import Transaction from "models/transaction";
+import * as Database from "database/Database";
 import {
   fakeCategoriesData,
   fakeCategories,

@@ -5,10 +5,10 @@ import {
   removeById,
   update,
   IdPacket,
-} from "../util/models";
-import { SubcategoryData, NewSubcategoryData } from "../types/models";
-import Transaction from "./transaction";
-import { queryDb } from "../database/Database";
+} from "util/models";
+import { SubcategoryData, NewSubcategoryData } from "types/models";
+import Transaction from "models/transaction";
+import { queryDb } from "database/Database";
 import { RowDataPacket } from "mysql2";
 
 const modelName = "subcategory";

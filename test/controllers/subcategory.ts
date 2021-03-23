@@ -1,16 +1,16 @@
 import { NextFunction, Response } from "express";
 import Sinon, { SinonStub } from "sinon";
-import { AuthenticatedRequest } from "../../src/types/express";
-import { SubcategoryControllerBase } from "../../src/controllers/subcategory";
+import { AuthenticatedRequest } from "types/express";
+import { SubcategoryControllerBase } from "controllers/subcategory";
 import {
   fakeSubcategories,
   fakeUser,
   mockInternalServerError,
 } from "../fixtures";
-import * as Errors from "../../src/util/errors";
+import * as Errors from "util/errors";
 import { MockResponse } from "../types";
-import User from "../../src/models/user";
-import Subcategory from "../../src/models/subcategory";
+import User from "models/user";
+import Subcategory from "models/subcategory";
 import { expect } from "chai";
 
 const {

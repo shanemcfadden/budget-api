@@ -2,8 +2,8 @@ import { expect } from "chai";
 import fs from "fs/promises";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import * as Database from "../../src/database/Database";
-import { ServerError } from "../../src/util/errors";
+import * as Database from "database/Database";
+import { ServerError } from "util/errors";
 
 describe("Database functions", () => {
   let queryDbPoolStub: SinonStub;

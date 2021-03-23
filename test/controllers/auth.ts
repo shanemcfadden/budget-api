@@ -1,4 +1,4 @@
-import "../../src/util/env";
+import "util/env";
 import { expect } from "chai";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -6,10 +6,10 @@ import sinon, { SinonStub } from "sinon";
 import bcrypt from "bcrypt";
 import { MockResponse } from "../types";
 import { fakeUser, mockJWT, mockInternalServerError } from "../fixtures";
-import { AuthControllerBase } from "../../src/controllers/auth";
-import User from "../../src/models/user";
-import * as Errors from "../../src/util/errors";
-import { ExtendedRequestHandler } from "../../src/types/express";
+import { AuthControllerBase } from "controllers/auth";
+import User from "models/user";
+import * as Errors from "util/errors";
+import { ExtendedRequestHandler } from "types/express";
 
 const { JWT_SECRET } = process.env;
 const login = AuthControllerBase.login as ExtendedRequestHandler;

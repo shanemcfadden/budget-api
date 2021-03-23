@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { OkPacket, RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import Budget from "../../src/models/budget";
-import * as Model from "../../src/util/models";
-import * as Database from "../../src/database/Database";
+import Budget from "models/budget";
+import * as Model from "util/models";
+import * as Database from "database/Database";
 import {
   fakeBudgetAccountData,
   fakeBudgetAccountRows,
@@ -12,9 +12,9 @@ import {
   fakeCompleteBudgetData,
   fakeTransactions,
 } from "../fixtures";
-import { ServerError } from "../../src/util/errors";
-import Transaction from "../../src/models/transaction";
-import Category from "../../src/models/category";
+import { ServerError } from "util/errors";
+import Transaction from "models/transaction";
+import Category from "models/category";
 
 describe("Budget model", () => {
   const { id, title, description } = fakeBudgetData;

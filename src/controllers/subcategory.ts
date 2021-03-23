@@ -1,8 +1,8 @@
-import Subcategory from "../models/subcategory";
-import User from "../models/user";
-import { Controller } from "../types/controllers";
-import { AuthenticatedRequestHandler } from "../types/express";
-import { handleControllerErrors, ServerError } from "../util/errors";
+import Subcategory from "models/subcategory";
+import User from "models/user";
+import { Controller } from "types/controllers";
+import { AuthenticatedRequestHandler } from "types/express";
+import { handleControllerErrors, ServerError } from "util/errors";
 
 export const SubcategoryControllerBase: Controller = {
   postSubcategory: (async (req, res, next) => {

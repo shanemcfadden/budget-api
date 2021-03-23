@@ -1,7 +1,7 @@
 import { RequestHandler, Router } from "express";
 import { body } from "express-validator";
-import { throwAllValidationErrorMessages } from "../middleware/validator";
-import BudgetController from "../controllers/budget";
+import { throwAllValidationErrorMessages } from "middleware/validator";
+import BudgetController from "controllers/budget";
 
 const router = Router();
 

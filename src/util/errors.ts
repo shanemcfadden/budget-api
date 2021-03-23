@@ -1,11 +1,11 @@
 import { ErrorRequestHandler, NextFunction, Response } from "express";
-import { Controller } from "../types/controllers";
+import { Controller } from "types/controllers";
 import {
   AuthenticatedRequest,
   AuthenticatedRequestHandler,
   ExtendedRequest,
   ExtendedRequestHandler,
-} from "../types/express";
+} from "types/express";
 
 export class ServerError {
   statusCode: number;

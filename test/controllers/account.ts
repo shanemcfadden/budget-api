@@ -1,13 +1,13 @@
 import { NextFunction, Response } from "express";
 import Sinon, { SinonStub } from "sinon";
-import { AccountControllerBase } from "../../src/controllers/account";
-import Account from "../../src/models/account";
-import User from "../../src/models/user";
-import { AuthenticatedRequest } from "../../src/types/express";
+import { AccountControllerBase } from "controllers/account";
+import Account from "models/account";
+import User from "models/user";
+import { AuthenticatedRequest } from "types/express";
 import { MockResponse } from "../types";
 import { fakeAccounts, fakeUser, mockInternalServerError } from "../fixtures";
 import { expect } from "chai";
-import * as Errors from "../../src/util/errors";
+import * as Errors from "util/errors";
 
 const { postAccount, patchAccount, deleteAccount } = AccountControllerBase;
 

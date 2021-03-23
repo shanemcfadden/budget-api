@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../models/user";
-import { Controller } from "../types/controllers";
-import { ExtendedRequestHandler } from "../types/express";
-import { handleControllerErrors, ServerError } from "../util/errors";
+import User from "models/user";
+import { Controller } from "types/controllers";
+import { ExtendedRequestHandler } from "types/express";
+import { handleControllerErrors, ServerError } from "util/errors";
 
 const { JWT_SECRET } = process.env;
 

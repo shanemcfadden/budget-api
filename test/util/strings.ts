@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { capitalize } from "../../src/util/strings";
+import { capitalize } from "util/strings";
 
 describe("capitalize()", () => {
   it("should capitalize the first letter of a word", () => {

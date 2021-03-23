@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { RowDataPacket } from "mysql2";
 import sinon, { SinonStub } from "sinon";
-import Subcategory from "../../src/models/subcategory";
-import Transaction from "../../src/models/transaction";
-import * as Model from "../../src/util/models";
-import * as Database from "../../src/database/Database";
+import Subcategory from "models/subcategory";
+import Transaction from "models/transaction";
+import * as Model from "util/models";
+import * as Database from "database/Database";
 import { fakeSubcategories, fakeTransactions } from "../fixtures";
 
 describe("Subcategory model", () => {

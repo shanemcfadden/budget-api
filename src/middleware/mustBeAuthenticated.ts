@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
-import { ExtendedRequest } from "../types/express";
-import { ServerError } from "../util/errors";
+import { ExtendedRequest } from "types/express";
+import { ServerError } from "util/errors";
 
 const mustBeAuthenticated = (
   req: ExtendedRequest,

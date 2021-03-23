@@ -1,8 +1,8 @@
-import Budget from "../models/budget";
-import User from "../models/user";
-import { Controller } from "../types/controllers";
-import { AuthenticatedRequestHandler } from "../types/express";
-import { handleControllerErrors, ServerError } from "../util/errors";
+import Budget from "models/budget";
+import User from "models/user";
+import { Controller } from "types/controllers";
+import { AuthenticatedRequestHandler } from "types/express";
+import { handleControllerErrors, ServerError } from "util/errors";
 
 export const BudgetControllerBase: Controller = {
   getBudgets: (async (req, res, next) => {
