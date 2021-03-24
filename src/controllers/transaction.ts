@@ -29,26 +29,19 @@ export const TransactionControllerBase: Controller = {
       accountId,
     });
 
-    let currentBalance: number;
-    try {
-      currentBalance = await Account.getCurrentBalance(accountId);
-    } catch (err) {
-      res.status(200).json({
-        message: "Transaction created successfully",
-        error: {
-          message:
-            "Internal server error: unable to retrieve current account balance",
-        },
-        transactionId: _id,
-      });
-      return;
-    }
-
-    res.status(200).json({
+    const responseBody: Record<string, any> = {
       message: "Transaction created successfully",
-      currentBalance,
       transactionId: _id,
-    });
+    };
+    try {
+      responseBody.currentBalance = await Account.getCurrentBalance(accountId);
+    } catch (err) {
+      responseBody.error = {
+        message:
+          "Internal server error: unable to retrieve current account balance",
+      };
+    }
+    res.status(200).json(responseBody);
   }) as AuthenticatedRequestHandler,
   patchTransaction: (async (req, res, next) => {
     const id = +req.params.id;
@@ -89,9 +82,8 @@ export const TransactionControllerBase: Controller = {
     const accountIds = [accountId];
     const previousAccountId = originalTransactionData.accountId;
     if (accountId !== previousAccountId) accountIds.push(previousAccountId);
-    let editedAccounts;
     try {
-      editedAccounts = await Promise.all(
+      responseBody.editedAccounts = await Promise.all(
         accountIds.map(async (id) => {
           const currentBalance = await Account.getCurrentBalance(id);
           return {
@@ -106,7 +98,6 @@ export const TransactionControllerBase: Controller = {
           "Internal server error: unable to retrieve current account balance",
       };
     }
-    responseBody.editedAccounts = editedAccounts;
     res.status(200).json(responseBody);
   }) as AuthenticatedRequestHandler,
   deleteTransaction: (async (req, res, next) => {
@@ -125,10 +116,9 @@ export const TransactionControllerBase: Controller = {
     };
 
     try {
-      const currentBalance = await Account.getCurrentBalance(
+      responseBody.currentBalance = await Account.getCurrentBalance(
         currentTransaction.accountId
       );
-      responseBody.currentBalance = currentBalance;
     } catch {
       responseBody.error = {
         message:
