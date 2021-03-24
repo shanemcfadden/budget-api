@@ -256,6 +256,15 @@ describe("TransactionController", () => {
     });
   });
   describe("patchTransaction()", () => {
+    const oldTransaction = {
+      id,
+      description: "old description",
+      amount: 503,
+      date: new Date("2016-01-01"),
+      subcategoryId: subcategoryId + 10,
+      accountId,
+    };
+    let getTransactionByIdStub: SinonStub;
     beforeEach(() => {
       req = ({
         userId: fakeUser._id,
@@ -265,6 +274,9 @@ describe("TransactionController", () => {
           id: id.toString(),
         },
       } as unknown) as AuthenticatedRequest;
+      getTransactionByIdStub = Sinon.stub(Transaction, "findById").resolves(
+        oldTransaction
+      );
     });
     describe("if user has permission to update the given transaction...", () => {
       beforeEach(() => {
@@ -287,38 +299,97 @@ describe("TransactionController", () => {
             });
             describe("if retrieving new current balance for the given account is successful...", () => {
               const mockCurrentBalance = 3000;
-              beforeEach(() => {
-                Sinon.stub(Account, "getCurrentBalance").resolves(
-                  mockCurrentBalance
-                );
+              describe("if the new account is the same as the old account...", () => {
+                beforeEach(() => {
+                  Sinon.stub(Account, "getCurrentBalance").resolves(
+                    mockCurrentBalance
+                  );
+                });
+
+                it("should update the transaction", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(updateTransactonStub.calledOnce).to.be.true;
+                  expect(
+                    updateTransactonStub.calledOnceWith({
+                      id,
+                      amount,
+                      description,
+                      date,
+                      accountId,
+                      subcategoryId,
+                    })
+                  ).to.be.true;
+                });
+                it("should send a 200 response", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.statusCode).to.equal(200);
+                });
+                it("should send a success message in the response body", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.body?.message).to.equal(
+                    "Transaction updated successfully"
+                  );
+                });
+                it("should send updated current balance in the response body", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.body?.editedAccounts).to.deep.equal([
+                    { accountId, currentBalance: mockCurrentBalance },
+                  ]);
+                });
               });
-              it("should update the transaction", async () => {
-                await patchTransaction(req, res as Response, next);
-                expect(updateTransactonStub.calledOnce).to.be.true;
-                expect(
-                  updateTransactonStub.calledOnceWith({
-                    id,
-                    amount,
-                    description,
-                    date,
-                    accountId,
-                    subcategoryId,
-                  })
-                ).to.be.true;
-              });
-              it("should send a 200 response", async () => {
-                await patchTransaction(req, res as Response, next);
-                expect(res.statusCode).to.equal(200);
-              });
-              it("should send a success message in the response body", async () => {
-                await patchTransaction(req, res as Response, next);
-                expect(res.body?.message).to.equal(
-                  "Transaction updated successfully"
-                );
-              });
-              it("should send current balance in the response body", async () => {
-                await patchTransaction(req, res as Response, next);
-                expect(res.body?.currentBalance).to.equal(mockCurrentBalance);
+              describe("if the new account is not the same as the old account...", () => {
+                const oldAccountId = 471262;
+                const oldAccountCurrentBalance = 20;
+                beforeEach(() => {
+                  getTransactionByIdStub.resolves({
+                    ...oldTransaction,
+                    accountId: oldAccountId,
+                  });
+                  const getCurrentBalanceStub = Sinon.stub(
+                    Account,
+                    "getCurrentBalance"
+                  );
+                  getCurrentBalanceStub
+                    .withArgs(accountId)
+                    .resolves(mockCurrentBalance);
+                  getCurrentBalanceStub
+                    .withArgs(oldAccountId)
+                    .resolves(oldAccountCurrentBalance);
+                });
+                it("should update the transaction", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(updateTransactonStub.calledOnce).to.be.true;
+                  expect(
+                    updateTransactonStub.calledOnceWith({
+                      id,
+                      amount,
+                      description,
+                      date,
+                      accountId,
+                      subcategoryId,
+                    })
+                  ).to.be.true;
+                });
+                it("should send a 200 response", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.statusCode).to.equal(200);
+                });
+                it("should send a success message in the response body", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.body?.message).to.equal(
+                    "Transaction updated successfully"
+                  );
+                });
+                it("should send the updated current balances in the response body", async () => {
+                  await patchTransaction(req, res as Response, next);
+                  expect(res.body?.editedAccounts).to.deep.equal([
+                    { accountId, currentBalance: mockCurrentBalance },
+                    {
+                      accountId: oldAccountId,
+                      currentBalance: oldAccountCurrentBalance,
+                    },
+                  ]);
+                });
               });
             });
             describe("if retrieving the new current balance for the given account is not successful...", () => {
