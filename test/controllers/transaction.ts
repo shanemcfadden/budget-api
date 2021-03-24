@@ -31,6 +31,7 @@ describe("TransactionController", () => {
     accountId,
   } = fakeTransaction;
   const error403 = new Errors.ServerError(403, "Access denied");
+  const mockCurrentBalance = 3000;
   let req: AuthenticatedRequest;
   let res: MockResponse;
   const next = (() => {}) as NextFunction;
@@ -79,7 +80,6 @@ describe("TransactionController", () => {
             });
           });
           describe("if retrieving new current balance for the given account is successful...", () => {
-            const mockCurrentBalance = 3000;
             beforeEach(() => {
               Sinon.stub(Account, "getCurrentBalance").resolves(
                 mockCurrentBalance
@@ -298,7 +298,6 @@ describe("TransactionController", () => {
               );
             });
             describe("if retrieving new current balance for the given account is successful...", () => {
-              const mockCurrentBalance = 3000;
               describe("if the new account is the same as the old account...", () => {
                 beforeEach(() => {
                   Sinon.stub(Account, "getCurrentBalance").resolves(
@@ -643,6 +642,7 @@ describe("TransactionController", () => {
           id: id.toString(),
         },
       } as unknown) as AuthenticatedRequest;
+      Sinon.stub(Transaction, "findById").resolves(fakeTransaction);
     });
     describe("if user is authorized to remove given transaction...", () => {
       let transactionRemoveStub: SinonStub;
@@ -656,20 +656,57 @@ describe("TransactionController", () => {
             "removeById"
           ).resolves(true);
         });
-        it("should remove the transaction", async () => {
-          await deleteTransaction(req, res as Response, next);
-          expect(transactionRemoveStub.calledOnce).to.be.true;
-          expect(transactionRemoveStub.calledOnceWith(id)).to.be.true;
+        describe("if current balance of account is retrieved successfully...", () => {
+          beforeEach(() => {
+            Sinon.stub(Account, "getCurrentBalance").resolves(
+              mockCurrentBalance
+            );
+          });
+          it("should remove the transaction", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(transactionRemoveStub.calledOnce).to.be.true;
+            expect(transactionRemoveStub.calledOnceWith(id)).to.be.true;
+          });
+          it("should send a 200 response", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should send a success message in the response body", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.body?.message).to.equal(
+              "Transaction removed successfully"
+            );
+          });
+          it("should send the updated current balance of the transaction's account", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.body?.currentBalance).to.equal(mockCurrentBalance);
+          });
         });
-        it("should send a 200 response", async () => {
-          await deleteTransaction(req, res as Response, next);
-          expect(res.statusCode).to.equal(200);
-        });
-        it("should send a success message in the response body", async () => {
-          await deleteTransaction(req, res as Response, next);
-          expect(res.body?.message).to.equal(
-            "Transaction removed successfully"
-          );
+        describe("if current balance is not retrieved successfully...", () => {
+          beforeEach(() => {
+            Sinon.stub(Account, "getCurrentBalance").rejects();
+          });
+          it("should remove the transaction", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(transactionRemoveStub.calledOnce).to.be.true;
+            expect(transactionRemoveStub.calledOnceWith(id)).to.be.true;
+          });
+          it("should send a 200 response", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.statusCode).to.equal(200);
+          });
+          it("should send a success message in the response body", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.body?.message).to.equal(
+              "Transaction removed successfully"
+            );
+          });
+          it("should send an error message in the response body", async () => {
+            await deleteTransaction(req, res as Response, next);
+            expect(res.body?.error.message).to.equal(
+              "Internal server error: unable to retrieve current account balance"
+            );
+          });
         });
       });
       describe("if the remove is not successful...", () => {

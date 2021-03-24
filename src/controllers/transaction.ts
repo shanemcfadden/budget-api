@@ -113,15 +113,29 @@ export const TransactionControllerBase: Controller = {
     const { userId } = req;
     const id = +req.params.id;
 
-    const hasPermissionToDelete = await User.hasPermissionToEditTransaction(
-      userId,
-      id
-    );
+    const [currentTransaction, hasPermissionToDelete] = await Promise.all([
+      Transaction.findById(id),
+      User.hasPermissionToEditTransaction(userId, id),
+    ]);
     if (!hasPermissionToDelete) throw new ServerError(403, "Access denied");
 
     await Transaction.removeById(id);
-    // TODO Return current balance of account
-    res.status(200).json({ message: "Transaction removed successfully" });
+    const responseBody: Record<string, any> = {
+      message: "Transaction removed successfully",
+    };
+
+    try {
+      const currentBalance = await Account.getCurrentBalance(
+        currentTransaction.accountId
+      );
+      responseBody.currentBalance = currentBalance;
+    } catch {
+      responseBody.error = {
+        message:
+          "Internal server error: unable to retrieve current account balance",
+      };
+    }
+    res.status(200).json(responseBody);
   }) as AuthenticatedRequestHandler,
 };
 
