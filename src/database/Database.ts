@@ -19,6 +19,8 @@ const pool = mysql.createPool({
   user: MYSQL_USER,
   password: MYSQL_PASSWORD,
   database: MYSQL_DATABASE,
+  dateStrings: ["DATE"],
+  timezone: "UTC",
 });
 
 export const db = pool.promise();
