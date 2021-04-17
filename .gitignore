@@ -1,6 +1,6 @@
 .env
 dist/
 node_modules/
+playground/
 .vscode
-playground.*
 *.session.sql
