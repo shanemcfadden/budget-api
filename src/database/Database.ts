@@ -20,7 +20,7 @@ const pool = mysql.createPool({
   password: MYSQL_PASSWORD,
   database: MYSQL_DATABASE,
   dateStrings: ["DATE"],
-  timezone: "UTC",
+  timezone: "Z",
   typeCast: (field, next) => {
     if (field.type == "DECIMAL" || field.type == "NEWDECIMAL") {
       const value = field.string();
