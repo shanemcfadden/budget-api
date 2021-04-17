@@ -36,7 +36,7 @@ export interface CompleteBudgetData extends BudgetData {
 export interface AccountDataBase {
   name: string;
   description?: string;
-  startDate: Date;
+  startDate: string;
   startBalance: number;
 }
 export interface NewAccountData extends AccountDataBase {
@@ -62,7 +62,7 @@ export interface CompleteAccountData extends CoreAccountData {
 export interface NewTransactionData {
   amount: number;
   description?: string;
-  date: Date;
+  date: string;
   accountId: number;
   subcategoryId: number;
 }
