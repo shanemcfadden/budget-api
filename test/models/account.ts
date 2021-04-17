@@ -9,7 +9,7 @@ describe("Account model", () => {
   const newAccountData = {
     name: "The Addams Family account",
     description: "It's a bit scary...",
-    startDate: new Date("2020-01-11"),
+    startDate: "2020-01-11",
     startBalance: 100,
     budgetId: 3,
   };

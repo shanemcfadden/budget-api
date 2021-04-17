@@ -16,7 +16,7 @@ export const AccountControllerBase: Controller = {
       name,
       description,
       startBalance,
-      startDate: new Date(startDate), // TODO: make date timezone compatible between REST API and mysql server
+      startDate: startDate, // TODO: make date timezone compatible between REST API and mysql server
       budgetId,
     });
 
@@ -38,7 +38,7 @@ export const AccountControllerBase: Controller = {
       name,
       description,
       startBalance,
-      startDate: new Date(startDate),
+      startDate: startDate,
     });
     res.status(200).json({
       message: "Account updated successfully",

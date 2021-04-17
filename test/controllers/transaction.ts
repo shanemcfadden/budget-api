@@ -260,7 +260,7 @@ describe("TransactionController", () => {
       id,
       description: "old description",
       amount: 503,
-      date: new Date("2016-01-01"),
+      date: "2016-01-01",
       subcategoryId: subcategoryId + 10,
       accountId,
     };
