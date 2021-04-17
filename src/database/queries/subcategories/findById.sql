@@ -1,7 +1,8 @@
-SELECT 
+SELECT
     id,
-    description, 
+    description,
     category_id AS categoryId
-FROM transaction_subcategories
-    WHERE id = ?
-;
+FROM
+    transaction_subcategories
+WHERE
+    id = ?;
