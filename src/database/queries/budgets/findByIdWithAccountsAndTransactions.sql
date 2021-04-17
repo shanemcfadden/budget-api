@@ -12,9 +12,12 @@ SELECT
     a.name AS accountName,
     a.start_date AS accountStartDate,
     a.start_balance AS accountStartBalance
-FROM transactions AS t
+FROM
+    transactions AS t
     RIGHT JOIN accounts AS a ON a.id = t.account_id
     JOIN budgets AS b ON b.id = a.budget_id
-WHERE b.id = ?
-ORDER BY t.date DESC, t.description ASC
-;
+WHERE
+    b.id = ?
+ORDER BY
+    t.date DESC,
+    t.description ASC;
