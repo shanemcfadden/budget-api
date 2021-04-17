@@ -19,6 +19,15 @@ const pool = mysql.createPool({
   user: MYSQL_USER,
   password: MYSQL_PASSWORD,
   database: MYSQL_DATABASE,
+  dateStrings: ["DATE"],
+  timezone: "Z",
+  typeCast: (field, next) => {
+    if (field.type == "DECIMAL" || field.type == "NEWDECIMAL") {
+      const value = field.string();
+      return value == null ? null : +value;
+    }
+    return next();
+  },
 });
 
 export const db = pool.promise();

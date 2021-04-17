@@ -3,6 +3,7 @@ import { RowDataPacket } from "mysql2";
 import sinon from "sinon";
 import Account from "models/account";
 import * as Model from "util/models";
+import * as Database from "database/Database";
 
 describe("Account model", () => {
   const newAccountData = {
@@ -23,6 +24,7 @@ describe("Account model", () => {
     description,
     startDate,
     startBalance,
+    currentBalance,
     budgetId,
   } = accountData;
   const updateAccountArr = [name, description, startDate, startBalance];
@@ -71,6 +73,18 @@ describe("Account model", () => {
       const results = await Account.findAllByUserId(userId);
       expect(findStub.calledOnceWith(userId, modelName)).to.be.true;
       expect(results).to.deep.equal([accountData]);
+    });
+  });
+  describe("getCurrentBalance()", () => {
+    it("should query database and return results of its only value", async () => {
+      const queryDbStub = sinon
+        .stub(Database, "queryDb")
+        .resolves([{ currentBalance } as RowDataPacket]);
+      const result = await Account.getCurrentBalance(id);
+      expect(queryDbStub.calledOnce).to.be.true;
+      expect(queryDbStub.calledOnceWith("accounts/getCurrentBalance.sql", [id]))
+        .to.be.true;
+      expect(result).to.equal(currentBalance);
     });
   });
   describe("update()", () => {

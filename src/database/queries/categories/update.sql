@@ -1,4 +1,4 @@
 UPDATE transaction_categories
-    description = ?, is_income = ?, 
+    SET description = ?, is_income = ? 
 WHERE id = ?
 ;
