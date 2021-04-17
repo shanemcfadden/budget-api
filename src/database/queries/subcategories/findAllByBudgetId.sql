@@ -1,8 +1,9 @@
-SELECT 
+SELECT
     tsc.id,
-    tsc.description, 
+    tsc.description,
     category_id AS categoryId
-FROM transaction_subcategories as tsc
+FROM
+    transaction_subcategories as tsc
     JOIN transaction_categories as tc ON tc.id = category_id
-    WHERE tc.budget_id = ?
-;
+WHERE
+    tc.budget_id = ?;

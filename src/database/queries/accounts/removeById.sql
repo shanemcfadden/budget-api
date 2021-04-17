@@ -1,1 +1,4 @@
-DELETE FROM accounts WHERE id = ? ;
+DELETE FROM
+    accounts
+WHERE
+    id = ?;

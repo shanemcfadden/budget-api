@@ -1,3 +1,6 @@
-SELECT * FROM budgets
-    WHERE id = ?
-;
+SELECT
+    *
+FROM
+    budgets
+WHERE
+    id = ?;

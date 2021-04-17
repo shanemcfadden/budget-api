@@ -1,3 +1,4 @@
-INSERT INTO budgets (title, description)
-    VALUES (? , ?)
-;
+INSERT INTO
+    budgets (title, description)
+VALUES
+    (?, ?);

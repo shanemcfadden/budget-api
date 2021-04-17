@@ -1,1 +1,4 @@
-DELETE FROM users WHERE _id = ? ;
+DELETE FROM
+    users
+WHERE
+    _id = ?;

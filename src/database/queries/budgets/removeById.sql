@@ -1,1 +1,4 @@
-DELETE FROM budgets WHERE id = ? ;
+DELETE FROM
+    budgets
+WHERE
+    id = ?;

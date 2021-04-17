@@ -1,1 +1,4 @@
-DELETE FROM transaction_subcategories WHERE id = ? ;
+DELETE FROM
+    transaction_subcategories
+WHERE
+    id = ?;
