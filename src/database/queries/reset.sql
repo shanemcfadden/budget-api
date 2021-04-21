@@ -67,7 +67,7 @@ VALUES
     );
 
 CREATE TABLE budgets(
-    id INT NOT NULL AUTO_INCREMENT,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
     description VARCHAR(240),
     PRIMARY KEY (id)
@@ -84,7 +84,7 @@ VALUES
     );
 
 CREATE TABLE budget_users(
-    budget_id INT NOT NULL,
+    budget_id INT UNSIGNED NOT NULL,
     user_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -100,12 +100,12 @@ VALUES
     (3, '4');
 
 CREATE TABLE accounts(
-    id INT NOT NULL AUTO_INCREMENT,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(240),
     start_date DATE NOT NULL,
     start_balance DECIMAL(10, 2) NOT NULL,
-    budget_id INT NOT NULL,
+    budget_id INT UNSIGNED NOT NULL,
     FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
@@ -163,10 +163,10 @@ VALUES
     );
 
 CREATE TABLE transaction_categories (
-    id INT AUTO_INCREMENT,
+    id INT UNSIGNED AUTO_INCREMENT,
     description VARCHAR(100) NOT NULL,
     is_income BOOLEAN NOT NULL,
-    budget_id INT NOT NULL,
+    budget_id INT UNSIGNED NOT NULL,
     FOREIGN Key (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
@@ -182,9 +182,9 @@ VALUES
     ('Freelance Work', 1, 2);
 
 CREATE TABLE transaction_subcategories (
-    id INT AUTO_INCREMENT,
+    id INT UNSIGNED AUTO_INCREMENT,
     description VARCHAR(100) NOT NULL,
-    category_id INT NOT NULL,
+    category_id INT UNSIGNED NOT NULL,
     FOREIGN Key (category_id) REFERENCES transaction_categories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
@@ -200,12 +200,12 @@ VALUES
     ('Food', 5);
 
 CREATE TABLE transactions(
-    id INT AUTO_INCREMENT,
+    id INT UNSIGNED AUTO_INCREMENT,
     amount DECIMAL(10, 2) NOT NULL,
     description VARCHAR(100),
     date DATE NOT NULL,
-    account_id INT NOT NULL,
-    subcategory_id INT NOT NULL,
+    account_id INT UNSIGNED NOT NULL,
+    subcategory_id INT UNSIGNED NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
     FOREIGN KEY (subcategory_id) REFERENCES transaction_subcategories(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
