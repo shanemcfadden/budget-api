@@ -78,3 +78,15 @@ The production server runs the javascript build using the process manager pm2. T
 1. Run `yarn build` to compile the typescript source code into javascript.
 2. Run `yarn start` to spin up the server. While server is running, you may run `npx pm2 status` to monitor all instances.
 3. Run `yarn stop` to stop the servers and delete their processes.
+
+## Testing
+
+### Unit tests
+
+Run all unit tests by running `yarn test`. To test while watching for changes, run `yarn test:watch`.
+
+### Integration tests
+
+Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test by using the collection runner.
+
+**Note: the default value for the baseUrl collection variable is 'localhost:3000'.** If you are running your server on a different port, update the variable before running the tests.
