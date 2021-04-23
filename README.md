@@ -26,9 +26,9 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 ## Documentation
 
-See [Budget API Documentation](https://documenter.getpostman.com/view/14663488/TzJuAdH2)
+[Budget API Documentation](https://documenter.getpostman.com/view/14663488/TzJuAdH2)
 
-## Running the Project Locally
+## Running the project locally
 
 NodeJS LTS 14.16.1+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
@@ -74,28 +74,28 @@ NodeJS LTS 14.16.1+ and a mysql server instance are required to run the project 
    Connected to MySql server
    ```
 
-## Running in Development mode
+### Running in development mode
 
 The development server can be run in default mode by running `yarn run dev` or in watch mode by running `yarn run dev:watch`. When making file changes, it is recommended to run the server in watch mode, as it will restart the server with every change saved to typescript files.
 
-**Watch mode does not track changes to .sql files.** If you make a change to a .sql file, restart the server manually to serve the changes.
+**Watch mode does not track changes to SQL files.** If you make a change to a .sql file, restart the server manually to serve the changes.
 
-## Running in Production mode
+### Running in production mode
 
 The production server runs the javascript build using the process manager pm2. This allows for multiple instances of the server to run at once, and instances will automatically restart if an uncaught error crashes the application.
 
 1. Run `yarn build` to compile the typescript source code into javascript.
-2. Run `yarn start` to spin up the server. While server is running, you may run `npx pm2 status` to monitor all instances.
-3. Run `yarn stop` to stop the servers and delete their processes.
+2. Run `yarn start` to spin up the server. While the server is running, you may run `npx pm2 status` to monitor all instances.
+3. Run `yarn stop` to stop all instances and delete their processes.
 
 ## Testing
 
 ### Unit tests
 
-Run all unit tests by running `yarn test`. To test while watching for changes, run `yarn test:watch`.
+Run all unit tests by running `yarn test`. To test while watching for file changes, run `yarn test:watch`.
 
 ### Integration tests
 
-Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test by using the collection runner.
+Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test using the collection runner.
 
 **Note: the default value for the baseUrl collection variable is 'localhost:3000'.** If you are running your server on a different port, update the variable before running the tests.
