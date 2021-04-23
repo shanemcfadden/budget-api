@@ -8,8 +8,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "postbuild": "yarn run copy-files",
     "copy-files": "copyfiles -u 1 src/**/*.sql dist",
-    "postbuild": "copy-files",
     "start": "pm2 start dist/app.js -i max --node-args=\"-r ./tsconfig-paths-bootstrap.js\"",
     "dev": "ts-node -r ./tsconfig-paths-bootstrap.js src/app.ts",
     "predev:watch": "yarn run copy-files",
