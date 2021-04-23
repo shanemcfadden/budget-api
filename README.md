@@ -24,6 +24,10 @@ A REST API for a simple budget tracking application. Users can create multiple b
 - Allow users to add other authorized users to view/edit their budgets.
 - Write integration tests for unhappy paths.
 
+## Documentation
+
+See [Budget API Documentation](https://documenter.getpostman.com/view/14663488/TzJuAdH2)
+
 ## Running the Project Locally
 
 NodeJS LTS 14.16.1+ and mysql server are required to run the project locally. Yarn package manager is also recommended, but not required.
