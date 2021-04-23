@@ -22,6 +22,7 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 - Include routes that allow users to get transactions by account/category/subcategory/date. That would allow users with larger budgets to only retrieve the data they need for a given session.
 - Allow users to add other authorized users to view/edit their budgets.
+- Allow users to track predicted monthly income/expenses by category.
 - Write integration tests for unhappy paths.
 
 ## Documentation
