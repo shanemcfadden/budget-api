@@ -64,3 +64,17 @@ mysql> source ./src/databases/queries/reset.sql;
 App is listening on port 3000
 Connected to MySql server
 ```
+
+## Running in Development mode
+
+The development server can be run in default mode by running `yarn run dev` or in watch mode by running `yarn run dev:watch`. When making file changes, it is recommended to run the server in watch mode, as it will restart the server with every change saved to typescript files.
+
+**Watch mode does not track changes to .sql files.** If you make a change to a .sql file, restart the server manually to serve the changes.
+
+## Running in Production mode
+
+The production server runs the javascript build using the process manager pm2. This allows for multiple instances of the server to run at once, and instances will automatically restart if an uncaught error crashes the application.
+
+1. Run `yarn build` to compile the typescript source code into javascript.
+2. Run `yarn start` to spin up the server. While server is running, you may run `npx pm2 status` to monitor all instances.
+3. Run `yarn stop` to stop the servers and delete their processes.
