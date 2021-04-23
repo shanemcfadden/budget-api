@@ -15,6 +15,7 @@
     "predev:watch": "yarn run copy-files",
     "postbuild": "yarn run copy-files",
     "start": "pm2 start dist/app.js -i max --node-args=\"-r ./tsconfig-paths-bootstrap.js\"",
+    "stop": "pm2 stop dist/app.js",
     "test": "mocha --recursive",
     "test:watch": "mocha --watch --recursive"
   },
