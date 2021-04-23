@@ -30,44 +30,49 @@ See [Budget API Documentation](https://documenter.getpostman.com/view/14663488/T
 
 ## Running the Project Locally
 
-NodeJS LTS 14.16.1+ and mysql server are required to run the project locally. Yarn package manager is also recommended, but not required.
+NodeJS LTS 14.16.1+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
 ### Setup
 
-1. Clone the repository and navigate to the home directory
-2. run `yarn install` or `npm install` to install dependencies
-3. Create a .env file and add the following content to establish environment variables:
+1. Clone the budget-api repository and navigate to the home directory.
+2. Run `yarn install` to install dependencies.
+3. Ensure that your local mysql server is running.
+4. Create a new database in your local mysql server called 'budget'.
+5. If you plan to use a user other than root to connect to the database, be sure to grant said user SELECT, INSERT, UPDATE, DELETE, CREATE, and DROP privileges for the new database.
 
-```
-PORT=3000
-JWT_SECRET=<random string>
-MYSQL_HOST=localhost
-MYSQL_USER=<local mysql user>
-MYSQL_PASSWORD=<local mysql password>
-MYSQL_DATABASE=budget
-```
+   ```sh
+   # mysql CLI
+   mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON budget.* TO '<user>'@'localhost';
+   mysql> FLUSH PRIVILEGES;
+   ```
 
-4. Create a new database in your local mysql instance. **If you choose to use a user other than root to connect to the database, be sure to grant said user SELECT, INSERT, UPDATE, DELETE, CREATE, and DROP privileges for the new database.** This can be accomplished using the mysql cli like so:
+6. Create the required tables by running the contents of `src/databases/queries/reset.sql`
 
-```
-mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON budget.* TO '<user>'@'localhost';
-mysql> FLUSH PRIVILEGES;
-```
+   ```sh
+   # mysql CLI
+   # current directory: budget-api
+   mysql> USE budget;
+   mysql> source ./src/databases/queries/reset.sql;
+   ```
 
-5. Create the required tables by running the query in \_\_rootdir/src/databases/queries/reset.sql
+7. Create a .env file in the root directory and add the following content to establish environment variables:
 
-```
-# current directory: budget-api
-mysql> USE budget;
-mysql> source ./src/databases/queries/reset.sql;
-```
+   ```txt
+   # .env
+   JWT_SECRET=<random string>
+   MYSQL_DATABASE=budget
+   MYSQL_HOST=localhost
+   MYSQL_PASSWORD=<local mysql password>
+   MYSQL_USER=<local mysql user>
+   PORT=3000
+   ```
 
-6. Test that setup succeeded by running `yarn run dev` or `npm run dev`. App will display the following when running successfully:
+8. Test that setup succeeded by running `yarn run dev`. App will display the following when set up successfully:
 
-```
-App is listening on port 3000
-Connected to MySql server
-```
+   ```sh
+   App is listening on port 3000
+   Connected to MySql server
+   ```
 
 ## Running in Development mode
 
