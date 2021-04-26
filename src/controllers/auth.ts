@@ -11,15 +11,11 @@ export const AuthControllerBase: Controller = {
   login: (async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findByEmail(email);
-    if (!user) {
-      throw new ServerError(404, "User not found");
-    }
+    if (!user) throw new ServerError(404, "User not found");
 
     const hashedPassword = user.password;
     const passwordMatches = await bcrypt.compare(password, hashedPassword);
-    if (!passwordMatches) {
-      throw new ServerError(401, "Authentification failed");
-    }
+    if (!passwordMatches) throw new ServerError(401, "Authentification failed");
 
     const userId = user._id;
     const token = jwt.sign({ userId }, JWT_SECRET!, { expiresIn: "1h" });
@@ -29,9 +25,8 @@ export const AuthControllerBase: Controller = {
   signup: (async (req, res, next) => {
     const { email, password, firstName, lastName } = req.body;
     const user = await User.findByEmail(email);
-    if (user) {
+    if (user)
       throw new ServerError(401, "Account already associated with this email");
-    }
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = await User.create({
