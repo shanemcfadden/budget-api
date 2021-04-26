@@ -35,7 +35,7 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 ## Running the project locally
 
-NodeJS LTS 14.16.1+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
+NodeJS v14.0.0+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
 ### Setup
 
