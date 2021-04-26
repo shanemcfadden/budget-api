@@ -14,22 +14,17 @@ const authenticateBearer = (
   next: NextFunction
 ) => {
   const authHeader = req.get("Authorization");
-  if (!authHeader) {
-    next();
-    return;
-  }
-  const token = authHeader.split(" ")[1];
-
-  let payload: JWTPayload;
-  try {
-    payload = jwt.verify(token, JWT_SECRET!) as JWTPayload;
-  } catch (err) {
-    next();
-    return;
-  }
-  if (payload.userId) {
-    req.isAuth = true;
-    req.userId = payload.userId;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    let payload: JWTPayload;
+    try {
+      // jwt.verify() will throw error if token is invalid
+      payload = jwt.verify(token, JWT_SECRET!) as JWTPayload;
+      if (payload.userId) {
+        req.isAuth = true;
+        req.userId = payload.userId;
+      }
+    } catch {}
   }
   next();
 };
