@@ -7,7 +7,7 @@ import BudgetRoutes from "routes/budget";
 import CategoryRoutes from "routes/category";
 import SubcategoryRoutes from "routes/subcategory";
 import authenticateBearer from "middleware/authenticateBearer";
-import { errorRequestHandler } from "util/errors";
+import { errorRequestHandler, ServerError } from "util/errors";
 import mustBeAuthenticated from "middleware/mustBeAuthenticated";
 import TransactionRoutes from "routes/transaction";
 
@@ -26,7 +26,7 @@ app.use("/transaction", mustBeAuthenticated, TransactionRoutes);
 app.use("/subcategory", mustBeAuthenticated, SubcategoryRoutes);
 
 app.use((req, res) => {
-  res.send("route not found");
+  throw new ServerError(404, "Route not found");
 });
 
 app.use(errorRequestHandler);
