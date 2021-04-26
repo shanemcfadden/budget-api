@@ -11,10 +11,7 @@ export async function findById(id: RowId, model: string) {
   const results = (await queryDb(getQueryPath(model, "findById"), [
     id,
   ])) as RowDataPacket[];
-  if (results.length < 1) {
-    return null;
-  }
-  return results[0];
+  return results.length ? results[0] : null;
 }
 
 export async function findAllByBudgetId(id: number, model: string) {
@@ -42,28 +39,23 @@ export async function create(data: any[], model: string): Promise<IdPacket> {
 export async function update(id: RowId, data: any[], model: string) {
   const queryPath = getQueryPath(model, "update");
   const results = (await queryDb(queryPath, [...data, id])) as OkPacket;
-  if (results.affectedRows === 1) {
-    return true;
-  }
-  if (!results.affectedRows) {
-    throw new Error(`${capitalize(model)} does not exist`);
-  }
-  throw new Error(
-    `Multiple rows updated due to faulty query. Fix ${queryPath}`
-  );
+  if (results.affectedRows === 1) return true;
+
+  const errorMessage = results.affectedRows
+    ? `Multiple rows updated due to faulty query. Fix ${queryPath}`
+    : `${capitalize(model)} does not exist`;
+  throw new Error(errorMessage);
 }
 
 export async function removeById(id: RowId, model: string) {
   const queryPath = getQueryPath(model, "removeById");
   const results = (await queryDb(queryPath, [id])) as OkPacket;
-  if (results.affectedRows === 1) {
-    return true;
-  } else if (!results.affectedRows) {
-    throw new Error(`${capitalize(model)} does not exist`);
-  }
-  throw new Error(
-    `Multiple rows deleted due to faulty query. Fix ${queryPath}`
-  );
+  if (results.affectedRows === 1) return true;
+
+  const errorMessage = results.affectedRows
+    ? `Multiple rows deleted due to faulty query. Fix ${queryPath}`
+    : `${capitalize(model)} does not exist`;
+  throw new Error(errorMessage);
 }
 
 export function pluralModel(modelName: string): string {

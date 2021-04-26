@@ -9,7 +9,6 @@ export const TransactionControllerBase: Controller = {
   postTransaction: (async (req, res, next) => {
     const { userId } = req;
     const { description, amount, date, subcategoryId, accountId } = req.body;
-
     const [
       hasSubcategoryPermissions,
       hasAccountPermissions,
@@ -17,7 +16,6 @@ export const TransactionControllerBase: Controller = {
       User.hasPermissionToEditSubcategory(userId, subcategoryId),
       User.hasPermissionToEditAccount(userId, accountId),
     ]);
-
     if (!hasAccountPermissions || !hasSubcategoryPermissions)
       throw new ServerError(403, "Access denied");
 
@@ -28,19 +26,11 @@ export const TransactionControllerBase: Controller = {
       subcategoryId,
       accountId,
     });
-
     const responseBody: Record<string, any> = {
       message: "Transaction created successfully",
       transactionId: _id,
     };
-    try {
-      responseBody.currentBalance = await Account.getCurrentBalance(accountId);
-    } catch (err) {
-      responseBody.error = {
-        message:
-          "Internal server error: unable to retrieve current account balance",
-      };
-    }
+    await attachNewAccountBalanceToResBody(accountId, responseBody);
     res.status(200).json(responseBody);
   }) as AuthenticatedRequestHandler,
   patchTransaction: (async (req, res, next) => {
@@ -114,19 +104,26 @@ export const TransactionControllerBase: Controller = {
     const responseBody: Record<string, any> = {
       message: "Transaction removed successfully",
     };
-
-    try {
-      responseBody.currentBalance = await Account.getCurrentBalance(
-        currentTransaction.accountId
-      );
-    } catch {
-      responseBody.error = {
-        message:
-          "Internal server error: unable to retrieve current account balance",
-      };
-    }
+    await attachNewAccountBalanceToResBody(
+      currentTransaction.accountId,
+      responseBody
+    );
     res.status(200).json(responseBody);
   }) as AuthenticatedRequestHandler,
 };
 
 export default handleControllerErrors(TransactionControllerBase);
+
+async function attachNewAccountBalanceToResBody(
+  accountId: number,
+  responseBody: Record<string, any>
+) {
+  try {
+    responseBody.currentBalance = await Account.getCurrentBalance(accountId);
+  } catch {
+    responseBody.error = {
+      message:
+        "Internal server error: unable to retrieve current account balance",
+    };
+  }
+}

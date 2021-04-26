@@ -50,17 +50,14 @@ export const SubcategoryControllerBase: Controller = {
       User.hasPermissionToEditSubcategory(userId, id),
       Subcategory.hasTransactions(id),
     ]);
-
     if (!hasPermissionToEditSubcategory)
       throw new ServerError(403, "Access denied");
-
     if (subcategoryHasTransactions) {
       throw new ServerError(
         403,
         "Make sure none of the current transactions are in this subcategory before deleting it"
       );
     }
-
     await Subcategory.removeById(id);
     res.status(200).json({
       message: "Subcategory removed successfully",
