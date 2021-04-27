@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription } from "./common";
+import { trimDescription, validateIdParam } from "./common";
 
 const validateDescriptionIsNotNull = body(
   "description",
@@ -13,10 +13,7 @@ const validateDescriptionLength = body(
   "Subcategory description must not exceed 100 characters"
 ).isLength({ max: 100 });
 const validateCategoryId = body("categoryId", "Specify a category id").isInt();
-const validateSubcategoryIdParam = param(
-  "id",
-  "Invalid subcategory id"
-).isInt();
+const validateSubcategoryIdParam = validateIdParam("subcategory");
 
 const subcategoryValidatorBase = [
   trimDescription,

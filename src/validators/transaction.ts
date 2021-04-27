@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription } from "./common";
+import { trimDescription, validateIdParam } from "./common";
 
 const validateDescription = body(
   "description",
@@ -18,10 +18,7 @@ const validateSubcategoryId = body(
   "Specify a subcategory id"
 ).isInt();
 const validateDate = body("date", "Transaction date is required").isDate();
-const validateTransactionIdParam = param(
-  "id",
-  "Invalid transaction id"
-).isInt();
+const validateTransactionIdParam = validateIdParam("transaction");
 
 const transactionValidatorBase = [
   trimDescription,

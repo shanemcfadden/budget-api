@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription } from "./common";
+import { trimDescription, validateIdParam } from "./common";
 
 const trimTitle = body("title").trim();
 const validateTitle = body("title", "Budget title is required").isLength({
@@ -11,7 +11,7 @@ const validateDescription = body(
   "description",
   "Budget description must contain no more than 240 characters"
 ).isLength({ max: 240 });
-const validateBudgetIdParam = param("id", "Invalid budget id").isInt();
+const validateBudgetIdParam = validateIdParam("budget");
 
 const budgetValidatorBase = [
   trimTitle,
