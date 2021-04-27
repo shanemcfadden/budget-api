@@ -19,15 +19,15 @@ export const validateDescriptionMax = (modelName: string, max: number) => {
   return validateBodyElementMax(modelName, "description", max);
 };
 
-export const validateIdParam = (modelName: string): ValidationChain => {
-  return param("id", `Invalid ${modelName} id`).isInt();
-};
-
 const validateId = (modelName: string): ValidationChain => {
   return body(
     `${modelName}Id`,
     `Specify a${modelName === "account" ? "n" : ""} ${modelName} id`
   ).isInt();
+};
+
+export const validateIdParam = (modelName: string): ValidationChain => {
+  return param("id", `Invalid ${modelName} id`).isInt();
 };
 
 export const validateAccountId = validateId("account");
