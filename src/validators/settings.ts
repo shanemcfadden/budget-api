@@ -25,3 +25,13 @@ export const AUTH_SETTINGS = {
     max: 100,
   },
 };
+
+export const BUDGET_SETTINGS = {
+  title: {
+    min: 1,
+    max: 100,
+  },
+  description: {
+    max: 240,
+  },
+};
