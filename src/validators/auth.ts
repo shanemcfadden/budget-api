@@ -14,11 +14,11 @@ const validateEmail = body("email", "Invalid email or password")
 const validatePassword = body("password", "Invalid email or password")
   .trim()
   .custom(isValidPassword());
-const validateSanitizeEmail = body("email", "Email is invalid")
+const validateNewEmail = body("email", "Email is invalid")
   .isEmail()
   .normalizeEmail()
   .isLength({ max: email.max });
-const validateSanitizePassword = body("password")
+const validateNewPassword = body("password")
   .custom((value, { req }) => {
     if (value !== req.body.confirmPassword) {
       throw new Error("Passwords do not match");
@@ -31,20 +31,24 @@ const validateSanitizePassword = body("password")
       "Password must be 8-20 characters long and contain at least one uppercase letter, lowercase letter, number, and special character"
     )
   );
-const validateSanitizeFirstName = body("firstName", "First name is required")
-  .trim()
-  .isLength({ min: firstName.min, max: firstName.max });
-const validateSanitizeLastName = body("lastName", "Last name is required")
-  .trim()
-  .isLength({ min: lastName.min, max: lastName.max });
+const validateFirstName = body("firstName", "First name is required").isLength({
+  min: firstName.min,
+  max: firstName.max,
+});
+const validateLastName = body("lastName", "Last name is required").isLength({
+  min: lastName.min,
+  max: lastName.max,
+});
 
 const AuthValidator = {
   login: [validateEmail, validatePassword, throwFirstValidationErrorMessage],
   signup: [
-    validateSanitizeEmail,
-    validateSanitizePassword,
-    validateSanitizeFirstName,
-    validateSanitizeLastName,
+    validateNewEmail,
+    validateNewPassword,
+    body("firstName").trim(),
+    validateFirstName,
+    body("lastName").trim(),
+    validateLastName,
     throwAllValidationErrorMessages,
   ],
 };
