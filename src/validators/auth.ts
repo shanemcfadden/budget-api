@@ -4,13 +4,16 @@ import {
   throwFirstValidationErrorMessage,
 } from "middleware/validator";
 import isValidPassword from "util/isValidPassword";
+import { AUTH_SETTINGS } from "./settings";
+
+const { email, firstName, lastName } = AUTH_SETTINGS;
 
 const validateEmail = body("email", "Invalid email or password")
   .isEmail()
   .normalizeEmail();
 const validateSanitizeEmail = body("email", "Email is invalid")
   .isEmail()
-  .isLength({ max: 100 })
+  .isLength({ max: email.max }) // TODO: Reconsider: isLength
   .normalizeEmail();
 const validatePassword = body("password", "Invalid email or password")
   .trim()
@@ -30,11 +33,11 @@ const validateSanitizePassword = body("password")
   );
 const validateSanitizeFirstName = body("firstName", "First name is required")
   .trim()
-  .isLength({ min: 1, max: 100 });
+  .isLength({ min: firstName.min, max: firstName.max });
 
 const validateSanitizeLastName = body("lastName", "Last name is required")
   .trim()
-  .isLength({ min: 1, max: 100 });
+  .isLength({ min: lastName.min, max: lastName.max });
 
 const AuthValidator = {
   login: [validateEmail, validatePassword, throwFirstValidationErrorMessage],
