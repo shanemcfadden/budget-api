@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
+import { trimDescription } from "./common";
 
 const validateName = body("name", "Account name is required").isLength({
   min: 1,
@@ -30,6 +31,7 @@ const validateAccountIdParam = param("id", "Invalidate account id").isInt();
 
 const accountValidatorBase = [
   validateName,
+  trimDescription,
   validateDescription,
   validateStartBalance,
   validateStartDate,

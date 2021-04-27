@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
+import { trimDescription } from "./common";
 
 const validateDescription = body(
   "description",
@@ -23,6 +24,7 @@ const validateTransactionIdParam = param(
 ).isInt();
 
 const transactionValidatorBase = [
+  trimDescription,
   validateDescription,
   validateAmount,
   validateAccountId,

@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
+import { trimDescription } from "./common";
 
 const validateDescriptionIsNotNull = body(
   "description",
@@ -18,6 +19,7 @@ const validateBudgetId = body("budgetId", "Specify a budget id").isInt();
 const validateCategoryIdParam = param("id", "Invalid category id").isInt();
 
 const categoryValidatorBase = [
+  trimDescription,
   validateDescriptionIsNotNull,
   validateDescriptionLength,
   validateIsIncome,

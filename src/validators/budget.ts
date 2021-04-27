@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
+import { trimDescription } from "./common";
 
 const validateTitle = body("title", "Budget title is required").isLength({
   min: 1,
@@ -11,7 +12,11 @@ const validateDescription = body(
 ).isLength({ max: 240 });
 const validateBudgetIdParam = param("id", "Invalid budget id").isInt();
 
-const budgetValidatorBase = [validateTitle, validateDescription];
+const budgetValidatorBase = [
+  validateTitle,
+  trimDescription,
+  validateDescription,
+];
 
 const BudgetValidator = {
   postBudget: [...budgetValidatorBase, throwAllValidationErrorMessages],
