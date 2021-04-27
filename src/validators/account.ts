@@ -1,25 +1,28 @@
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import { trimDescription, validateBudgetId, validateIdParam } from "./common";
+import { ACCOUNT_SETTINGS } from "./settings";
+
+const { name, description, startBalance } = ACCOUNT_SETTINGS;
 
 const trimName = body("name").trim();
 
 const validateName = body("name", "Account name is required").isLength({
   min: 1,
-  max: 100,
+  max: name.max,
 });
 
 const validateDescription = body(
   "description",
   "Account description must not exceed 240 characters"
-).isLength({ max: 240 });
+).isLength({ max: description.max });
 
 const validateStartBalance = body(
   "startBalance",
   "Account starting balance is required"
 ).isFloat({
-  min: -99999999.99,
-  max: 99999999.99,
+  min: startBalance.min,
+  max: startBalance.max,
 });
 
 const validateStartDate = body(
