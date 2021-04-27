@@ -28,21 +28,22 @@ const validBudgetId = body("budgetId", "Budget id is required").isInt();
 
 const validAccountIdParam = param("id", "Invalid account id").isInt();
 
+const accountValidatorBase = [
+  validName,
+  validDescription,
+  validStartBalance,
+  validStartDate,
+];
+
 const AccountValidator = {
   postAccount: [
-    validName,
-    validDescription,
-    validStartBalance,
-    validStartDate,
+    ...accountValidatorBase,
     validBudgetId,
     throwAllValidationErrorMessages,
   ],
   patchAccount: [
     validAccountIdParam,
-    validName,
-    validDescription,
-    validStartBalance,
-    validStartDate,
+    ...accountValidatorBase,
     throwAllValidationErrorMessages,
   ],
   deleteAccount: [validAccountIdParam, throwAllValidationErrorMessages],
