@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import SubcategoryController from "controllers/subcategory";
 
@@ -21,6 +21,7 @@ router.post(
 
 router.patch(
   "/:id",
+  param("id", "Invalid subcategory id").isInt(),
   body("description", "Subcategory description is required").isLength({
     min: 1,
   }),
@@ -35,6 +36,8 @@ router.patch(
 
 router.delete(
   "/:id",
+  param("id", "Invalid subcategory id").isInt(),
+  throwAllValidationErrorMessages,
   SubcategoryController.deleteSubcategory as RequestHandler
 );
 

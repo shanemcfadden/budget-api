@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import AccountController from "controllers/account";
 
@@ -24,6 +24,7 @@ router.post(
 
 router.patch(
   "/:id",
+  param("id", "Invalid account id").isInt(),
   body("name", "Account name is required").isLength({ min: 1, max: 100 }),
   body(
     "description",
@@ -38,6 +39,11 @@ router.patch(
   AccountController.patchAccount as RequestHandler
 );
 
-router.delete("/:id", AccountController.deleteAccount as RequestHandler);
+router.delete(
+  "/:id",
+  param("id", "Invalid account id").isInt(),
+  throwAllValidationErrorMessages,
+  AccountController.deleteAccount as RequestHandler
+);
 
 export default router;
