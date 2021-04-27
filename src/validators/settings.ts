@@ -1,61 +1,48 @@
 export const ACCOUNT_SETTINGS = {
-  name: {
-    max: 100,
-  },
-  description: {
-    max: 240,
-  },
-  startBalance: {
-    min: -99999999.99,
-    max: 99999999.99,
-  },
+  name: maxSetting(100),
+  description: maxSetting(240),
+  startBalance: minMaxSetting(-99999999.99, 99999999.99),
 };
 
 export const AUTH_SETTINGS = {
-  email: {
-    max: 100,
-  },
+  email: maxSetting(100),
   password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
-  firstName: {
-    min: 1,
-    max: 100,
-  },
-  lastName: {
-    min: 1,
-    max: 100,
-  },
+  firstName: minMaxSetting(1, 100),
+  lastName: minMaxSetting(1, 100),
 };
 
 export const BUDGET_SETTINGS = {
-  title: {
-    min: 1,
-    max: 100,
-  },
-  description: {
-    max: 240,
-  },
+  title: minMaxSetting(1, 100),
+  description: maxSetting(240),
 };
 
 export const CATEGORY_SETTINGS = {
-  description: {
-    min: 1,
-    max: 100,
-  },
+  description: minMaxSetting(1, 100),
 };
 
 export const SUBCATEGORY_SETTINGS = {
-  description: {
-    min: 1,
-    max: 100,
-  },
+  description: minMaxSetting(1, 100),
 };
 
 export const TRANSACTION_SETTINGS = {
-  description: {
-    max: 100,
-  },
-  amount: {
-    min: -99999999.99,
-    max: 9999999.99,
-  },
+  description: maxSetting(100),
+  amount: minMaxSetting(-99999999.99, 9999999.99),
 };
+
+interface MaxSettingObject {
+  max: number;
+}
+
+interface MinMaxSettingObject extends MaxSettingObject {
+  min: number;
+}
+
+function maxSetting(maxNum: number): MaxSettingObject {
+  return { max: maxNum };
+}
+
+function minMaxSetting(minNum: number, maxNum: number): MinMaxSettingObject {
+  const o = maxSetting(maxNum) as MinMaxSettingObject;
+  o.min = minNum;
+  return o;
+}
