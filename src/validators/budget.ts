@@ -11,17 +11,14 @@ const validateDescription = body(
 ).isLength({ max: 240 });
 const validateBudgetIdParam = param("id", "Invalid budget id").isInt();
 
+const budgetValidatorBase = [validateTitle, validateDescription];
+
 const BudgetValidator = {
-  postBudget: [
-    validateTitle,
-    validateDescription,
-    throwAllValidationErrorMessages,
-  ],
+  postBudget: [...budgetValidatorBase, throwAllValidationErrorMessages],
   getBudget: [validateBudgetIdParam, throwAllValidationErrorMessages],
   patchBudget: [
     validateBudgetIdParam,
-    validateTitle,
-    validateDescription,
+    ...budgetValidatorBase,
     throwAllValidationErrorMessages,
   ],
   deleteBudget: [validateBudgetIdParam, throwAllValidationErrorMessages],
