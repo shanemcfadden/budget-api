@@ -13,8 +13,8 @@ const validateEmail = body("email", "Invalid email or password")
   .normalizeEmail();
 const validateSanitizeEmail = body("email", "Email is invalid")
   .isEmail()
-  .isLength({ max: email.max }) // TODO: Reconsider: isLength
-  .normalizeEmail();
+  .normalizeEmail()
+  .isLength({ max: email.max });
 const validatePassword = body("password", "Invalid email or password")
   .trim()
   .custom(isValidPassword());
