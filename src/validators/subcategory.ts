@@ -1,6 +1,11 @@
 import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription, validateCategoryId, validateIdParam } from "./common";
+import {
+  trimDescription,
+  validateBodyElementMax,
+  validateCategoryId,
+  validateIdParam,
+} from "./common";
 import { SUBCATEGORY_SETTINGS } from "./settings";
 
 const { description } = SUBCATEGORY_SETTINGS;
@@ -11,10 +16,11 @@ const validateDescriptionIsNotNull = body(
 ).isLength({
   min: description.min,
 });
-const validateDescriptionLength = body(
+const validateDescriptionLength = validateBodyElementMax(
+  "subcategory",
   "description",
-  "Subcategory description must not exceed 100 characters"
-).isLength({ max: description.max });
+  description.max
+);
 const validateSubcategoryIdParam = validateIdParam("subcategory");
 
 const subcategoryValidatorBase = [

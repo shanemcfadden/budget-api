@@ -37,7 +37,7 @@ interface MinMaxSettingObject extends MaxSettingObject {
   min: number;
 }
 
-function maxSetting(maxNum: number): MaxSettingObject {
+export function maxSetting(maxNum: number): MaxSettingObject {
   return { max: maxNum };
 }
 

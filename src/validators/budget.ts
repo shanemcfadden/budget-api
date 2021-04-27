@@ -1,6 +1,10 @@
 import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription, validateIdParam } from "./common";
+import {
+  trimDescription,
+  validateBodyElementMax,
+  validateIdParam,
+} from "./common";
 import { BUDGET_SETTINGS } from "./settings";
 
 const { title, description } = BUDGET_SETTINGS;
@@ -10,10 +14,11 @@ const validateTitle = body("title", "Budget title is required").isLength({
   min: title.min,
   max: title.max,
 });
-const validateDescription = body(
+const validateDescription = validateBodyElementMax(
+  "budget",
   "description",
-  "Budget description must contain no more than 240 characters"
-).isLength({ max: description.max });
+  description.max
+);
 const validateBudgetIdParam = validateIdParam("budget");
 
 const budgetValidatorBase = [

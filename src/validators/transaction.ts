@@ -3,6 +3,7 @@ import { throwAllValidationErrorMessages } from "middleware/validator";
 import {
   trimDescription,
   validateAccountId,
+  validateBodyElementMax,
   validateIdParam,
   validateSubcategoryId,
 } from "./common";
@@ -10,10 +11,11 @@ import { TRANSACTION_SETTINGS } from "./settings";
 
 const { description, amount } = TRANSACTION_SETTINGS;
 
-const validateDescription = body(
+const validateDescription = validateBodyElementMax(
+  "transaction",
   "description",
-  "Transaction description must not exceed 100 characters"
-).isLength({ max: description.max });
+  description.max
+);
 const validateAmount = body("amount", "Transaction amount is required").isFloat(
   {
     min: amount.min,

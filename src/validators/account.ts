@@ -1,6 +1,11 @@
 import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription, validateBudgetId, validateIdParam } from "./common";
+import {
+  trimDescription,
+  validateBodyElementMax,
+  validateBudgetId,
+  validateIdParam,
+} from "./common";
 import { ACCOUNT_SETTINGS } from "./settings";
 
 const { name, description, startBalance } = ACCOUNT_SETTINGS;
@@ -12,10 +17,11 @@ const validateName = body("name", "Account name is required").isLength({
   max: name.max,
 });
 
-const validateDescription = body(
+const validateDescription = validateBodyElementMax(
+  "account",
   "description",
-  "Account description must not exceed 240 characters"
-).isLength({ max: description.max });
+  description.max
+);
 
 const validateStartBalance = body(
   "startBalance",
