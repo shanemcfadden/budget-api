@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription, validateIdParam } from "./common";
+import { trimDescription, validateBudgetId, validateIdParam } from "./common";
 
 const trimName = body("name").trim();
 
@@ -26,8 +26,6 @@ const validateStartDate = body(
   "startDate",
   "Account starting date is required"
 ).isDate();
-
-const validateBudgetId = body("budgetId", "Budget id is required").isInt();
 
 const validateAccountIdParam = validateIdParam("account");
 

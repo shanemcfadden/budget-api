@@ -1,6 +1,11 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
-import { trimDescription, validateIdParam } from "./common";
+import {
+  trimDescription,
+  validateAccountId,
+  validateIdParam,
+  validateSubcategoryId,
+} from "./common";
 
 const validateDescription = body(
   "description",
@@ -12,11 +17,6 @@ const validateAmount = body("amount", "Transaction amount is required").isFloat(
     max: 9999999.99,
   }
 );
-const validateAccountId = body("accountId", "Specify an account id").isInt();
-const validateSubcategoryId = body(
-  "subcategoryId",
-  "Specify a subcategory id"
-).isInt();
 const validateDate = body("date", "Transaction date is required").isDate();
 const validateTransactionIdParam = validateIdParam("transaction");
 
