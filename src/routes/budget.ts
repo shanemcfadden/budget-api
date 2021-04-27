@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from "express";
-import { body, param } from "express-validator";
-import { throwAllValidationErrorMessages } from "middleware/validator";
 import BudgetController from "controllers/budget";
+import BudgetValidator from "validators/budget";
 
 const router = Router();
 
@@ -9,38 +8,25 @@ router.get("/", BudgetController.getBudgets as RequestHandler);
 
 router.post(
   "/",
-  body("title", "Budget title is required").isLength({ min: 1, max: 100 }),
-  body(
-    "description",
-    "Budget description must contain no more than 240 characters"
-  ).isLength({ max: 240 }),
-  throwAllValidationErrorMessages,
+  BudgetValidator.postBudget,
   BudgetController.postBudget as RequestHandler
 );
 
 router.get(
   "/:id",
-  param("id", "Invalid budget id").isInt(),
-  throwAllValidationErrorMessages,
+  BudgetValidator.getBudget,
   BudgetController.getBudget as RequestHandler
 );
 
 router.patch(
   "/:id",
-  param("id", "Invalid budget id").isInt(),
-  body("title", "Budget title is required").isLength({ min: 1, max: 100 }),
-  body(
-    "description",
-    "Budget description must contain no more than 240 characters"
-  ).isLength({ max: 240 }),
-  throwAllValidationErrorMessages,
+  BudgetValidator.patchBudget,
   BudgetController.patchBudget as RequestHandler
 );
 
 router.delete(
   "/:id",
-  param("id", "Invalid budget id").isInt(),
-  throwAllValidationErrorMessages,
+  BudgetValidator.deleteBudget,
   BudgetController.deleteBudget as RequestHandler
 );
 
