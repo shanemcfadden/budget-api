@@ -34,7 +34,6 @@ const validateSanitizePassword = body("password")
 const validateSanitizeFirstName = body("firstName", "First name is required")
   .trim()
   .isLength({ min: firstName.min, max: firstName.max });
-
 const validateSanitizeLastName = body("lastName", "Last name is required")
   .trim()
   .isLength({ min: lastName.min, max: lastName.max });

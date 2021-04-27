@@ -18,7 +18,6 @@ const validateDescriptionLength = validateDescriptionMax(
   "category",
   description.max
 );
-
 const validateIsIncome = body(
   "isIncome",
   "Specify whether or not this category is for income"
