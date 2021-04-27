@@ -18,7 +18,12 @@ router.post(
   BudgetController.postBudget as RequestHandler
 );
 
-router.get("/:id", BudgetController.getBudget as RequestHandler);
+router.get(
+  "/:id",
+  param("id", "Invalid budget id").isInt(),
+  throwAllValidationErrorMessages,
+  BudgetController.getBudget as RequestHandler
+);
 
 router.patch(
   "/:id",
