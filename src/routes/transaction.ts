@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "../middleware/validator";
 import TransactionController from "../controllers/transaction";
 
@@ -24,6 +24,7 @@ router.post(
 
 router.patch(
   "/:id",
+  param("id", "Invalid transaction id").isInt(),
   body(
     "description",
     "Transaction description must not exceed 100 characters"
@@ -41,6 +42,8 @@ router.patch(
 
 router.delete(
   "/:id",
+  param("id", "Invalid transaction id").isInt(),
+  throwAllValidationErrorMessages,
   TransactionController.deleteTransaction as RequestHandler
 );
 

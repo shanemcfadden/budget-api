@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import CategoryController from "controllers/category";
 
@@ -22,7 +22,8 @@ router.post(
 );
 
 router.patch(
-  "/:id", // TODO: Sanitize/validate id param
+  "/:id",
+  param("id", "Invalid category id").isInt(),
   body("description", "Category description is required").isLength({ min: 1 }),
   body(
     "description",
@@ -36,6 +37,11 @@ router.patch(
   CategoryController.patchCategory as RequestHandler
 );
 
-router.delete("/:id", CategoryController.deleteCategory as RequestHandler);
+router.delete(
+  "/:id",
+  param("id", "Invalid category id").isInt(),
+  throwAllValidationErrorMessages,
+  CategoryController.deleteCategory as RequestHandler
+);
 
 export default router;

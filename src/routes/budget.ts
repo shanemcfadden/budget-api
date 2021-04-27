@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import BudgetController from "controllers/budget";
 
@@ -18,10 +18,16 @@ router.post(
   BudgetController.postBudget as RequestHandler
 );
 
-router.get("/:id", BudgetController.getBudget as RequestHandler);
+router.get(
+  "/:id",
+  param("id", "Invalid budget id").isInt(),
+  throwAllValidationErrorMessages,
+  BudgetController.getBudget as RequestHandler
+);
 
 router.patch(
   "/:id",
+  param("id", "Invalid budget id").isInt(),
   body("title", "Budget title is required").isLength({ min: 1, max: 100 }),
   body(
     "description",
@@ -31,6 +37,11 @@ router.patch(
   BudgetController.patchBudget as RequestHandler
 );
 
-router.delete("/:id", BudgetController.deleteBudget as RequestHandler);
+router.delete(
+  "/:id",
+  param("id", "Invalid budget id").isInt(),
+  throwAllValidationErrorMessages,
+  BudgetController.deleteBudget as RequestHandler
+);
 
 export default router;
