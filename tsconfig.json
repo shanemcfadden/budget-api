@@ -10,7 +10,8 @@
       "models": ["models"],
       "routes": ["routes"],
       "types": ["types"],
-      "util": ["util"]
+      "util": ["util"],
+      "validatiors": ["validatiors"]
     },
     "lib": ["es2020"],
     "module": "CommonJS",
