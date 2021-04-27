@@ -35,3 +35,10 @@ export const BUDGET_SETTINGS = {
     max: 240,
   },
 };
+
+export const CATEGORY_SETTINGS = {
+  description: {
+    min: 1,
+    max: 100,
+  },
+};
