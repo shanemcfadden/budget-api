@@ -11,13 +11,13 @@ const { email, firstName, lastName } = AUTH_SETTINGS;
 const validateEmail = body("email", "Invalid email or password")
   .isEmail()
   .normalizeEmail();
+const validatePassword = body("password", "Invalid email or password")
+  .trim()
+  .custom(isValidPassword());
 const validateSanitizeEmail = body("email", "Email is invalid")
   .isEmail()
   .normalizeEmail()
   .isLength({ max: email.max });
-const validatePassword = body("password", "Invalid email or password")
-  .trim()
-  .custom(isValidPassword());
 const validateSanitizePassword = body("password")
   .custom((value, { req }) => {
     if (value !== req.body.confirmPassword) {
