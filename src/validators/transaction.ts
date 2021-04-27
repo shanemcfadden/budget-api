@@ -3,7 +3,7 @@ import { throwAllValidationErrorMessages } from "middleware/validator";
 import {
   trimDescription,
   validateAccountId,
-  validateBodyElementMax,
+  validateDescriptionMax,
   validateIdParam,
   validateSubcategoryId,
 } from "./common";
@@ -11,9 +11,8 @@ import { TRANSACTION_SETTINGS } from "./settings";
 
 const { description, amount } = TRANSACTION_SETTINGS;
 
-const validateDescription = validateBodyElementMax(
+const validateDescription = validateDescriptionMax(
   "transaction",
-  "description",
   description.max
 );
 const validateAmount = body("amount", "Transaction amount is required").isFloat(

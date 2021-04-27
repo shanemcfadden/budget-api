@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import {
   trimDescription,
-  validateBodyElementMax,
+  validateDescriptionMax,
   validateCategoryId,
   validateIdParam,
 } from "./common";
@@ -16,9 +16,8 @@ const validateDescriptionIsNotNull = body(
 ).isLength({
   min: description.min,
 });
-const validateDescriptionLength = validateBodyElementMax(
+const validateDescriptionLength = validateDescriptionMax(
   "subcategory",
-  "description",
   description.max
 );
 const validateSubcategoryIdParam = validateIdParam("subcategory");

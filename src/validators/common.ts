@@ -15,6 +15,10 @@ export const validateBodyElementMax = (
   ).isLength(maxSetting(max));
 };
 
+export const validateDescriptionMax = (modelName: string, max: number) => {
+  return validateBodyElementMax(modelName, "description", max);
+};
+
 export const validateIdParam = (modelName: string): ValidationChain => {
   return param("id", `Invalid ${modelName} id`).isInt();
 };

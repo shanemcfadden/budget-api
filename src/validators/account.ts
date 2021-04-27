@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import {
   trimDescription,
-  validateBodyElementMax,
+  validateDescriptionMax,
   validateBudgetId,
   validateIdParam,
 } from "./common";
@@ -17,11 +17,7 @@ const validateName = body("name", "Account name is required").isLength({
   max: name.max,
 });
 
-const validateDescription = validateBodyElementMax(
-  "account",
-  "description",
-  description.max
-);
+const validateDescription = validateDescriptionMax("account", description.max);
 
 const validateStartBalance = body(
   "startBalance",
