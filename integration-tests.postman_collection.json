@@ -1,0 +1,1722 @@
+{
+	"info": {
+		"_postman_id": "36f2e489-bdca-4f03-8d1e-08725626af54",
+		"name": "Budget API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authorization",
+			"item": [
+				{
+					"name": "signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has success message\", function () {",
+									"    pm.expect(jsonData.message).to.eql('Sign up successful');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"currentPassword\", pm.variables.replaceIn(getRandomPassword()))",
+									"",
+									"pm.variables.set(\"currentEmail\", pm.variables.replaceIn('{{$randomEmail}}'))",
+									"",
+									"pm.variables.set(\"numberOfUserBudgets\", 0)",
+									"pm.collectionVariables.set(\"currentBudget\", null)",
+									"pm.variables.set(\"currentBudgetTitle\", null)",
+									"pm.variables.set(\"currentBudgetDescription\", null)",
+									"pm.variables.set(\"currentBudgetHasBeenEdited\", false)",
+									"",
+									"pm.variables.set(\"numberOfAccounts\", 0)",
+									"pm.collectionVariables.set(\"currentAccount\", null)",
+									"pm.variables.set(\"currentAccountName\", null)",
+									"pm.variables.set(\"currentAccountDescription\", null)",
+									"pm.variables.set(\"currentAccountStartBalance\", null)",
+									"pm.variables.set(\"currentAccountStartDate\", null)",
+									"pm.variables.set(\"currentAccountHasBeenEdited\", false)",
+									"pm.variables.set(\"currentAccountBalance\", null)",
+									"",
+									"pm.variables.set(\"numberOfCategories\", 0)",
+									"pm.collectionVariables.set(\"currentCategory\", null)",
+									"pm.variables.set('currentCategoryDescription', null)",
+									"pm.variables.set('currentCategoryIsIncome', null)",
+									"pm.variables.set(\"currentCategoryHasBeenEdited\", false)",
+									"",
+									"pm.variables.set(\"numberOfSubcategories\", 0)",
+									"pm.collectionVariables.set(\"currentSubcategory\", null)",
+									"pm.variables.set('currentSubcategoryDescription', null)",
+									"pm.variables.set(\"currentSubcategoryHasBeenEdited\", false)",
+									"",
+									"pm.variables.set(\"numberOfTransactions\", 0)",
+									"pm.collectionVariables.set('currentTransaction', null)",
+									"pm.variables.set('currentTransactionDescription', null)",
+									"pm.variables.set('currentTransactionDate', null)",
+									"pm.variables.set('currentTransactionAmount', null)",
+									"pm.variables.set(\"currentTransactionHasBeenEdited\", false)",
+									"",
+									"pm.variables.set('currentModelIndex', null)",
+									"pm.variables.set('currentDeleteModelIndex', null)",
+									"",
+									"pm.collectionVariables.set('accountToDelete', null)",
+									"pm.collectionVariables.set('categoryToDelete', null)",
+									"pm.collectionVariables.set('subcategoryToDelete', null)",
+									"",
+									"",
+									"function getRandomPassword() {",
+									"    let pw = ''",
+									"    for (let i = 0; i < 4; i++) {",
+									"        pw += getRandomDigitChar()",
+									"        pw += getRandomLowerCaseLetter()",
+									"        pw += getRandomUpperCaseLetter()",
+									"        pw += getRandomSpecialChar()",
+									"    }",
+									"    return pw",
+									"}",
+									"",
+									"function getRandomDigitChar() {",
+									"    return getRandomInteger(9).toString()",
+									"}",
+									"",
+									"function getRandomUpperCaseLetter() {",
+									"    const n = getRandomInteger(25)",
+									"    return String.fromCharCode(65 + n)",
+									"}",
+									"",
+									"function getRandomLowerCaseLetter() {",
+									"    return getRandomUpperCaseLetter().toLowerCase()",
+									"}",
+									"",
+									"function getRandomSpecialChar() {",
+									"    const validSpecialChars = ['@', '$', '!', '%', '*', '?', '&']",
+									"    return validSpecialChars[getRandomInteger(validSpecialChars.length - 1)]",
+									"}",
+									"",
+									"function getRandomInteger(max) {",
+									"    return Math.floor(Math.random() * (max + 1))",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\",\n    \"confirmPassword\": \"{{currentPassword}}\",\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"lastName\": \"{{$randomLastName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/signup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Create new user account"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Should send 200 response', () => {",
+									"    pm.response.to.have.status(200)",
+									"})",
+									"",
+									"const jsonData = pm.response.json()",
+									"",
+									"pm.test('Should have success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Login successful')",
+									"})",
+									"",
+									"pm.collectionVariables.set(\"currentToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{currentEmail}}\",\n    \"password\": \"{{currentPassword}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json()",
+							"",
+							"pm.test('Should have token', () => {",
+							"    pm.expect(jsonData.token).to.be.string",
+							"})",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Budgets",
+			"item": [
+				{
+					"name": "User budgets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"pm.test('Budgets is an array', () => {",
+									"    pm.expect(jsonData).to.be.instanceOf(Array)",
+									"})",
+									"",
+									"pm.test('Budgets has the correct number of items', () => {",
+									"    pm.expect(jsonData.length).to.equal(pm.variables.get('numberOfUserBudgets'))",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (pm.variables.get('numberOfUserBudgets') === 3) {",
+									"    postman.setNextRequest('Create account')",
+									"    pm.variables.set('currentModelIndex', 0)",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/budget",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"budget"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create budget",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentBudgetTitle', pm.variables.replaceIn('{{$randomCatchPhraseNoun}}'))",
+									"",
+									"pm.variables.set('currentBudgetDescription', pm.variables.replaceIn('{{$randomLoremSentence}}'))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.collectionVariables.set('currentBudget', jsonData.budgetId)",
+									"    pm.variables.set('numberOfUserBudgets', pm.variables.get('numberOfUserBudgets') + 1)",
+									"} catch (err) { ",
+									"    // continue without incrementing  numberOfUserBudgets",
+									"}",
+									"   ",
+									"pm.test('Response contains budgetId', () => {",
+									"    pm.expect(jsonData.budgetId).to.be.a('number')",
+									"})",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Budget created successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"{{currentBudgetTitle}}\",\n    \"description\": \"{{currentBudgetDescription}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/budget",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"budget"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single budget",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (pm.variables.get('currentBudgetHasBeenEdited')) {",
+									"    postman.setNextRequest('User budgets')",
+									"    pm.variables.set('currentBudgetHasBeenEdited', false)",
+									"}",
+									"",
+									"const models = ['account', 'category', 'subcategory', 'transaction']",
+									"const currentModelIndex = pm.variables.get('currentModelIndex')",
+									"",
+									"if (currentModelIndex != null && currentModelIndex < models.length) {",
+									"    currentModel = models[currentModelIndex]",
+									"    if (getModelHasBeenEdited(currentModel)) {",
+									"        const numberOfModels = getNumberOf(currentModel)",
+									"        if (numberOfModels === 3) {",
+									"            const nextRequest = currentModelIndex === models.length - 1 ? 'Delete transaction' : getCreateModelRequest(models[currentModelIndex + 1])",
+									"            postman.setNextRequest(nextRequest)",
+									"            pm.variables.set('currentModelIndex', currentModelIndex + 1)",
+									"        } else {",
+									"            postman.setNextRequest(getCreateModelRequest(currentModel))",
+									"        }",
+									"        setModelHasBeenEdited(currentModel, false)",
+									"    } else {",
+									"        postman.setNextRequest(getEditModelRequest(currentModel))",
+									"    }",
+									"}",
+									"",
+									"const deleteModels = ['transaction', 'subcategory', 'category', 'account', 'budget']",
+									"const currentDeleteModelIndex = pm.variables.get('currentDeleteModelIndex')",
+									"",
+									"if (currentDeleteModelIndex != null && currentDeleteModelIndex < deleteModels.length) {",
+									"    const nextModel = deleteModels[currentDeleteModelIndex + 1]",
+									"    const nextRequest = currentDeleteModelIndex === deleteModels.length - 1 ? null : getDeleteModelRequest(nextModel)",
+									"    postman.setNextRequest(nextRequest)",
+									"    pm.variables.set('currentDeleteModelIndex', currentDeleteModelIndex + 1)",
+									"}",
+									"",
+									"function getModelHasBeenEdited(model) {",
+									"    return pm.variables.get(`current${capitalize(model)}HasBeenEdited`)",
+									"}",
+									"",
+									"function setModelHasBeenEdited(model, boolean) {",
+									"    pm.variables.set(`current${capitalize(model)}HasBeenEdited`, boolean)",
+									"}",
+									"",
+									"function getCreateModelRequest(model) {",
+									"    return 'Create ' + model",
+									"}",
+									"",
+									"function getEditModelRequest(model) {",
+									"    return 'Edit ' + model",
+									"}",
+									"",
+									"function getDeleteModelRequest(model) {",
+									"    return 'Delete ' + model",
+									"}",
+									"",
+									"function getNumberOf(model) {",
+									"    return pm.variables.get(`numberOf${capitalize(pluralModel(model))}`)",
+									"}",
+									"",
+									"function capitalize(str) {",
+									"    return str[0].toUpperCase() + str.slice(1)",
+									"}",
+									"",
+									"function pluralModel(model) {",
+									"    const oddPlurals = {",
+									"        category: 'categories',",
+									"        subcategory: 'subcategories'",
+									"    }",
+									"    return oddPlurals[model] || model + 's'",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"pm.test('Correct id', () => {",
+									"    pm.expect(jsonData.id).to.equal(pm.collectionVariables.get('currentBudget'))",
+									"})",
+									"",
+									"pm.test('Correct title', () => {",
+									"    pm.expect(jsonData.title).to.equal(pm.variables.get('currentBudgetTitle'))",
+									"})",
+									"",
+									"pm.test('Correct description', () => {",
+									"    pm.expect(jsonData.description).to.equal(pm.variables.get('currentBudgetDescription'))",
+									"})",
+									"",
+									"pm.test('Has correct number of accounts', () => {",
+									"    pm.expect(jsonData).to.haveOwnProperty('accounts')",
+									"    pm.expect(jsonData.accounts).to.not.be.instanceOf(Array)",
+									"    pm.expect(jsonData.accounts).to.be.instanceOf(Object)",
+									"    pm.expect(Object.keys(jsonData.accounts).length).to.equal(pm.variables.get('numberOfAccounts'))",
+									"})",
+									"",
+									"if (pm.collectionVariables.get('currentAccount')) {",
+									"    pm.test('Has current account', () => {",
+									"        const currentAccount = pm.collectionVariables.get('currentAccount')",
+									"        pm.expect(jsonData.accounts[currentAccount]).to.be.instanceOf(Object)",
+									"        const currentAccountData = jsonData.accounts[currentAccount]",
+									"        pm.expect(currentAccountData.name).to.equal(pm.variables.get('currentAccountName'))",
+									"        pm.expect(currentAccountData.description).to.equal(pm.variables.get('currentAccountDescription'))",
+									"        pm.expect(currentAccountData.startDate).to.equal(pm.variables.get('currentAccountStartDate'))",
+									"        pm.expect(currentAccountData.startBalance).to.equal(+pm.variables.get('currentAccountStartBalance'))",
+									"    })",
+									"}",
+									"",
+									"pm.test('Has the correct number of categories', () => {",
+									"    pm.expect(jsonData).to.haveOwnProperty('categories')",
+									"    pm.expect(jsonData.categories).to.be.instanceOf(Object)",
+									"    const currentNumberOfCategories = Object.keys(jsonData.categories).length",
+									"    pm.expect(currentNumberOfCategories).to.equal(pm.variables.get('numberOfCategories'))",
+									"})",
+									"",
+									"pm.test('Has the correct number of subcategories', () => {",
+									"    let currentNumberOfSubcategories = 0",
+									"    for (const cat in jsonData.categories) {",
+									"        const subcat = jsonData.categories[cat].subcategories",
+									"        currentNumberOfSubcategories += Object.keys(subcat).length",
+									"    }",
+									"    pm.expect(currentNumberOfSubcategories).to.equal(pm.variables.get('numberOfSubcategories'))",
+									"})",
+									"",
+									"pm.test('Has the correct number of transactions', () => {",
+									"    pm.expect(jsonData).to.haveOwnProperty('transactions')",
+									"    pm.expect(jsonData.transactions).to.be.instanceOf(Array)",
+									"    pm.expect(jsonData.transactions.length).to.equal(pm.variables.get('numberOfTransactions'))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/budget/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"budget",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentBudget}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch budget details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('currentBudgetHasBeenEdited', true)",
+									"} catch (err) { ",
+									"    // continue without editing variable",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Budget updated successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"postman.setNextRequest('Get single budget')",
+									"",
+									"pm.variables.set('currentBudgetTitle', pm.variables.replaceIn('{{$randomCatchPhraseNoun}}'))",
+									"",
+									"pm.variables.set('currentBudgetDescription', pm.variables.replaceIn('{{$randomLoremSentence}}'))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"{{currentBudgetTitle}}\",\n    \"description\": \"{{currentBudgetDescription}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/budget/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"budget",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentBudget}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete budget",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"postman.setNextRequest(null)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"pm.test('Response contains success message', () => {",
+									"    pm.expect(jsonData).to.have.property('message')",
+									"    pm.expect(jsonData.message).to.equal('Budget deleted successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/budget/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"budget",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentBudget}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Create account",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentAccountName', pm.variables.replaceIn('{{$randomBankAccountName}}'))",
+									"pm.variables.set('currentAccountDescription', pm.variables.replaceIn('{{$randomLoremSentence}}'))",
+									"pm.variables.set('currentAccountStartBalance', +pm.variables.replaceIn('{{$randomInt}}'))",
+									"pm.variables.set('currentAccountStartDate', '2000-01-01')",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try { ",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('numberOfAccounts',",
+									"        pm.variables.get('numberOfAccounts') + 1",
+									"    )",
+									"    pm.collectionVariables.set('currentAccount', jsonData.accountId)",
+									"    pm.variables.set('currentAccountBalance', pm.variables.get('currentAccountStartBalance'))",
+									"} catch (err) {",
+									"    // continue without changing variables",
+									"}",
+									"",
+									"pm.test('Response contains account id', () => {",
+									"    pm.expect(jsonData.accountId).to.be.a('number')",
+									"})",
+									"",
+									"if (pm.variables.get('numberOfAccounts') === 1) {",
+									"    pm.collectionVariables.set('accountToDelete', jsonData.accountId)",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Account created successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"name\": \"{{currentAccountName}}\",\n    \"description\": \"{{currentAccountDescription}}\",\n    \"startBalance\": {{currentAccountStartBalance}},\n    \"startDate\": \"{{currentAccountStartDate}}\",\n    \"budgetId\": \"{{currentBudget}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/account",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit account",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentAccountName', pm.variables.replaceIn('{{$randomBankAccountName}}'))",
+									"pm.variables.set('currentAccountDescription', pm.variables.replaceIn('{{$randomLoremSentence}}'))",
+									"pm.variables.set('currentAccountStartBalance', +pm.variables.replaceIn('{{$randomInt}}'))",
+									"pm.variables.set('currentAccountStartDate', '2011-11-11')",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('currentAccountBalance', pm.variables.get('currentAccountStartBalance'))",
+									"    pm.variables.set('currentAccountHasBeenEdited', true)",
+									"} catch (err) {",
+									"    // continue without changing variables",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Account updated successfully')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{currentToken}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{CurrentAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"name\": \"{{currentAccountName}}\",\n    \"description\": \"{{currentAccountDescription}}\",\n    \"startBalance\": {{currentAccountStartBalance}},\n    \"startDate\": \"{{currentAccountStartDate}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/account/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentAccount}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete account",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"postman.setNextRequest('Get single budget')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('numberOfAccounts', ",
+									"        pm.variables.get('numberOfAccounts') - 1",
+									"    )",
+									"    pm.variables.set('numberOfTransactions', 0)",
+									"    pm.collectionVariables.set('currentAccount', null)",
+									"} catch (err) {",
+									"    // continue without changing variables",
+									"}",
+									"",
+									"pm.test('Response contains success message', () => {",
+									"    pm.expect(jsonData).to.have.property('message')",
+									"    pm.expect(jsonData.message).to.equal('Account deleted successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/account/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentAccount}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Create category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentCategoryDescription', pm.variables.replaceIn('{{$randomDepartment}}'))",
+									"pm.variables.set('currentCategoryIsIncome', pm.variables.replaceIn('{{$randomBoolean}}'))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('numberOfCategories',",
+									"        pm.variables.get('numberOfCategories') + 1",
+									"    )",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains category id', () => {",
+									"    pm.expect(jsonData.categoryId).to.be.a('number')",
+									"    pm.collectionVariables.set('currentCategory', jsonData.categoryId)",
+									"})",
+									"",
+									"if (pm.variables.get('numberOfCategories') === 1) {",
+									"    pm.collectionVariables.set('categoryToDelete', jsonData.categoryId)",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Category created successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{currentToken}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{CurrentAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentCategoryDescription}}\",\n    \"isIncome\": {{currentCategoryIsIncome}},\n    \"budgetId\": {{currentBudget}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/category",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('currentCategoryHasBeenEdited', true)",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Category updated successfully')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentCategoryDescription', pm.variables.replaceIn('{{$randomDepartment}}'))",
+									"pm.variables.set('currentCategoryIsIncome', pm.variables.replaceIn('{{$randomBoolean}}'))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{currentToken}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{CurrentAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentCategoryDescription}}\",\n    \"isIncome\": {{currentCategoryIsIncome}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/category/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"category",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentCategory}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('numberOfCategories', ",
+									"        pm.variables.get('numberOfCategories') - 1",
+									"    )",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains success message', () => {",
+									"    pm.expect(jsonData).to.have.property('message')",
+									"    pm.expect(jsonData.message).to.equal('Category deleted successfully')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{currentToken}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{CurrentAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/category/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"category",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{categoryToDelete}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Subcategories",
+			"item": [
+				{
+					"name": "Create subcategory",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentSubcategoryDescription', pm.variables.replaceIn('{{$randomBsNoun}}'))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('numberOfSubcategories',",
+									"        pm.variables.get('numberOfSubcategories') + 1",
+									"    )",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains subcategory id', () => {",
+									"    pm.expect(jsonData.subcategoryId).to.be.a('number')",
+									"    pm.collectionVariables.set('currentSubcategory', jsonData.subcategoryId)",
+									"})",
+									"",
+									"if (pm.variables.get('numberOfSubcategories') === 1) {",
+									"    pm.collectionVariables.set('subcategoryToDelete', jsonData.subcategoryId)",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Subcategory created successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentSubcategoryDescription}}\",\n    \"categoryId\": {{currentCategory}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subcategory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subcategory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit subcategory",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentSubcategoryDescription', pm.variables.replaceIn('{{$randomBsNoun}}'))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('currentSubcategoryHasBeenEdited', true)",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Subcategory updated successfully')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentSubcategoryDescription}}\",\n    \"categoryId\": {{currentCategory}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subcategory/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subcategory",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentSubcategory}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete subcategory",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"postman.setNextRequest('Get single budget')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('numberOfSubcategories', ",
+									"        pm.variables.get('numberOfSubcategories') - 1",
+									"    )    ",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains success message', () => {",
+									"    pm.expect(jsonData).to.have.property('message')",
+									"    pm.expect(jsonData.message).to.equal('Subcategory removed successfully')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/subcategory/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subcategory",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{subcategoryToDelete}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Create transaction",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"currentTransactionDescription\", pm.variables.replaceIn(\"{{$randomProductName}}\"))",
+									"pm.variables.set(\"currentTransactionAmount\", +pm.variables.replaceIn(\"{{$randomPrice}}\"))",
+									"pm.variables.set(\"currentTransactionDate\", pm.variables.replaceIn(\"2020-01-11\"))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('numberOfTransactions',",
+									"        pm.variables.get('numberOfTransactions') + 1",
+									"    )",
+									"    pm.variables.set('currentAccountBalance', ",
+									"        pm.variables.get('currentAccountBalance') + pm.variables.get('currentTransactionAmount')",
+									"    )",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains transaction id', () => {",
+									"    pm.expect(jsonData.transactionId).to.be.a('number')",
+									"    pm.collectionVariables.set('currentTransaction', jsonData.transactionId)",
+									"})",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Transaction created successfully')",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentTransactionDescription}}\",\n    \"amount\": {{currentTransactionAmount}},\n    \"date\": \"{{currentTransactionDate}}\",\n    \"subcategoryId\": {{currentSubcategory}},\n    \"accountId\": {{currentAccount}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit transaction",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentAccountBalance', pm.variables.get('currentAccountBalance') - pm.variables.get('currentTransactionAmount'))",
+									"pm.variables.set(\"currentTransactionDescription\", pm.variables.replaceIn(\"{{$randomProductName}}\"))",
+									"pm.variables.set(\"currentTransactionAmount\", +pm.variables.replaceIn(\"{{$randomPrice}}\"))",
+									"",
+									"pm.variables.set(\"currentTransactionDate\", pm.variables.replaceIn(\"2003-03-31\"))",
+									"",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200)",
+									"    pm.variables.set('currentAccountBalance', ",
+									"        pm.variables.get('currentAccountBalance') + pm.variables.get('currentTransactionAmount')",
+									"    )",
+									"    pm.variables.set('currentTransactionHasBeenEdited', true)",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains a success message', () => {",
+									"    pm.expect(jsonData.message).to.equal('Transaction updated successfully')",
+									"})",
+									"",
+									"pm.test('Response contains updated current balances', () => {",
+									"    pm.expect(jsonData.editedAccounts).to.be.instanceOf(Array)",
+									"    pm.expect(jsonData.editedAccounts).to.have.lengthOf(1)",
+									"    const editedAccounts = jsonData.editedAccounts[0]",
+									"    pm.expect(editedAccounts).to.have.property('currentBalance')",
+									"    pm.expect(editedAccounts).to.have.property('accountId')",
+									"    pm.expect(editedAccounts.accountId).to.equal(pm.collectionVariables.get('currentAccount'))",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"{{currentTransactionDescription}}\",\n    \"amount\": {{currentTransactionAmount}},\n    \"date\": \"{{currentTransactionDate}}\",\n    \"subcategoryId\": {{currentSubcategory}},\n    \"accountId\": {{currentAccount}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentTransaction}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete transaction",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('currentDeleteModelIndex', 0)",
+									"postman.setNextRequest('Get single budget')"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()",
+									"",
+									"try {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set('currentAccountBalance', ",
+									"        pm.variables.get('currentAccountBalance') - pm.variables.get('currentTransactionAmount')",
+									"    )",
+									"    pm.collectionVariables.set('currentTransaction', null)",
+									"    pm.variables.set('currentTransactionAmount', null)",
+									"    pm.variables.set('currentTransactionDate', null)",
+									"    pm.variables.set('currentTransactionDescription', null)",
+									"    pm.variables.set('numberOfTransactions', pm.variables.get('numberOfTransactions') - 1)",
+									"} catch (err) {",
+									"    // continue without altering variables",
+									"}",
+									"",
+									"pm.test('Response contains success message', () => {",
+									"    pm.expect(jsonData).to.have.property('message')",
+									"    pm.expect(jsonData.message).to.equal('Transaction removed successfully')",
+									"})",
+									"",
+									"pm.test('Response contains updated account balance', () => {",
+									"    pm.expect(jsonData).to.have.property('currentBalance')",
+									"    pm.expect(jsonData.currentBalance).to.equal(",
+									"        roundToNearestCent(pm.variables.get('currentAccountBalance'))",
+									"    )",
+									"})",
+									"",
+									"function roundToNearestCent(num) {",
+									"    return Math.round(num * 100) / 100",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{currentTransaction}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{currentToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:3000"
+		},
+		{
+			"key": "currentToken",
+			"value": ""
+		},
+		{
+			"key": "currentBudget",
+			"value": ""
+		},
+		{
+			"key": "currentAccount",
+			"value": ""
+		},
+		{
+			"key": "currentCategory",
+			"value": ""
+		},
+		{
+			"key": "currentSubcategory",
+			"value": ""
+		},
+		{
+			"key": "currentTransaction",
+			"value": ""
+		},
+		{
+			"key": "accountToDelete",
+			"value": ""
+		},
+		{
+			"key": "categoryToDelete",
+			"value": ""
+		},
+		{
+			"key": "subcategoryToDelete",
+			"value": ""
+		}
+	]
+}
