@@ -42,3 +42,10 @@ export const CATEGORY_SETTINGS = {
     max: 100,
   },
 };
+
+export const SUBCATEGORY_SETTINGS = {
+  description: {
+    min: 1,
+    max: 100,
+  },
+};
