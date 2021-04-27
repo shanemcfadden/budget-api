@@ -12,11 +12,13 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 ## Things learned
 
-- How to organize code and make it more DRY by separating routing, controller, and model logic.
-- How to query a database without an ORM by passing escaped variables into SQL files dynamically.
-- How to write unit tests that explore both happy and unhappy paths.
-- How to automate integration tests in Postman.
-- How to write documentation.
+- Organize code and make it more DRY by separating routing, controller, and model logic.
+- Implement authentication using JSON Web Tokens.
+- Query a database without an ORM by passing escaped variables into SQL files dynamically.
+- Write unit tests that explore both happy and unhappy paths.
+- Automate integration tests in Postman.
+- Write documentation.
+- Test on various versions of NodeJS using node version manager.
 
 ## Possible next steps
 
