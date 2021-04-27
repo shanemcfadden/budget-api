@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 import {
   trimDescription,
@@ -6,15 +6,18 @@ import {
   validateIdParam,
   validateSubcategoryId,
 } from "./common";
+import { TRANSACTION_SETTINGS } from "./settings";
+
+const { description, amount } = TRANSACTION_SETTINGS;
 
 const validateDescription = body(
   "description",
   "Transaction description must not exceed 100 characters"
-).isLength({ max: 100 });
+).isLength({ max: description.max });
 const validateAmount = body("amount", "Transaction amount is required").isFloat(
   {
-    min: -99999999.99,
-    max: 9999999.99,
+    min: amount.min,
+    max: amount.max,
   }
 );
 const validateDate = body("date", "Transaction date is required").isDate();

@@ -49,3 +49,13 @@ export const SUBCATEGORY_SETTINGS = {
     max: 100,
   },
 };
+
+export const TRANSACTION_SETTINGS = {
+  description: {
+    max: 100,
+  },
+  amount: {
+    min: -99999999.99,
+    max: 9999999.99,
+  },
+};
