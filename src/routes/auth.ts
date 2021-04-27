@@ -1,6 +1,6 @@
 import { RequestHandler, Router } from "express";
 import AuthController from "controllers/auth";
-import AuthValidator from "validation/auth";
+import AuthValidator from "validators/auth";
 
 const router = Router();
 

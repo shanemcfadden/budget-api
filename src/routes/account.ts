@@ -1,6 +1,6 @@
 import { RequestHandler, Router } from "express";
 import AccountController from "controllers/account";
-import AccountValidator from "validation/account";
+import AccountValidator from "validators/account";
 
 const router = Router();
 

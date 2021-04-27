@@ -11,7 +11,7 @@
       "routes": ["routes"],
       "types": ["types"],
       "util": ["util"],
-      "validation": ["validation"]
+      "validatiors": ["validatiors"]
     },
     "lib": ["es2020"],
     "module": "CommonJS",
