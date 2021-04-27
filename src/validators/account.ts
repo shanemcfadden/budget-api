@@ -1,17 +1,17 @@
 import { body, param } from "express-validator";
 import { throwAllValidationErrorMessages } from "middleware/validator";
 
-const validName = body("name", "Account name is required").isLength({
+const validateName = body("name", "Account name is required").isLength({
   min: 1,
   max: 100,
 });
 
-const validDescription = body(
+const validateDescription = body(
   "description",
   "Account description must not exceed 240 characters"
 ).isLength({ max: 240 });
 
-const validStartBalance = body(
+const validateStartBalance = body(
   "startBalance",
   "Account starting balance is required"
 ).isFloat({
@@ -19,34 +19,34 @@ const validStartBalance = body(
   max: 99999999.99,
 });
 
-const validStartDate = body(
+const validateStartDate = body(
   "startDate",
   "Account starting date is required"
 ).isDate();
 
-const validBudgetId = body("budgetId", "Budget id is required").isInt();
+const validateBudgetId = body("budgetId", "Budget id is required").isInt();
 
-const validAccountIdParam = param("id", "Invalid account id").isInt();
+const validateAccountIdParam = param("id", "Invalidate account id").isInt();
 
 const accountValidatorBase = [
-  validName,
-  validDescription,
-  validStartBalance,
-  validStartDate,
+  validateName,
+  validateDescription,
+  validateStartBalance,
+  validateStartDate,
 ];
 
 const AccountValidator = {
   postAccount: [
     ...accountValidatorBase,
-    validBudgetId,
+    validateBudgetId,
     throwAllValidationErrorMessages,
   ],
   patchAccount: [
-    validAccountIdParam,
+    validateAccountIdParam,
     ...accountValidatorBase,
     throwAllValidationErrorMessages,
   ],
-  deleteAccount: [validAccountIdParam, throwAllValidationErrorMessages],
+  deleteAccount: [validateAccountIdParam, throwAllValidationErrorMessages],
 };
 
 export default AccountValidator;
