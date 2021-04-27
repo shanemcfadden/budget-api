@@ -9,14 +9,14 @@ import { AUTH_SETTINGS } from "./settings";
 const { email, firstName, lastName } = AUTH_SETTINGS;
 
 const validateEmail = body("email", "Invalid email or password")
-  .isEmail()
-  .normalizeEmail();
+  .normalizeEmail()
+  .isEmail();
 const validatePassword = body("password", "Invalid email or password")
   .trim()
   .custom(isValidPassword());
 const validateNewEmail = body("email", "Email is invalid")
-  .isEmail()
   .normalizeEmail()
+  .isEmail()
   .isLength({ max: email.max });
 const validateNewPassword = body("password")
   .custom((value, { req }) => {
