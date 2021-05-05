@@ -2,17 +2,19 @@
 
 A REST API for a simple budget tracking application. Users can create multiple budgets and track their income and expenses across bank accounts and transaction categories. I designed this API to be coupled with a front end web or mobile application that could display transaction data using tables and charts.
 
-## Tools used
+## Technology used
 
 - Typescript
-- MySQL
+- NodeJS
 - Express (NodeJS web framework)
+- MySQL (Database)
+- JSON Web Tokens (Authentication)
 - Mocha, Chai, & Sinon (unit tests)
 - Postman (integration tests/documentation)
 
-## Things learned
+## Skills improved
 
-- Organize code and make it more DRY by separating routing, controller, and model logic.
+- Organize code and make it more DRY by separating routing, validation, controller, and model logic.
 - Implement authentication using JSON Web Tokens.
 - Query a database without an ORM by passing escaped variables into SQL files dynamically.
 - Write unit tests that explore both happy and unhappy paths.
@@ -22,10 +24,12 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 ## Possible next steps
 
+- Build front-end web application to connect to this API
 - Include routes that allow users to get transactions by account/category/subcategory/date. That would allow users with larger budgets to only retrieve the data they need for a given session.
 - Allow users to add other authorized users to view/edit their budgets.
 - Allow users to track predicted monthly income/expenses by category.
 - Write integration tests for unhappy paths.
+- Consider Swagger as an alternative to Postman for executable API documentation.
 
 ## Documentation
 
@@ -35,11 +39,11 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 [Budget API Database Schema](https://drawsql.app/shane-mcfadden/diagrams/budget-api)
 
-## Running the project locally
+## Run the project locally
 
 NodeJS v14.0.0+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
-### Setup
+### Build
 
 1. Clone the budget-api repository and navigate to the home directory.
 2. Run `yarn install` to install dependencies.
@@ -81,28 +85,30 @@ NodeJS v14.0.0+ and a mysql server instance are required to run the project loca
    Connected to MySql server
    ```
 
-### Running in development mode
+### Test
+
+#### Unit tests
+
+Run all unit tests by running `yarn test`. To test while watching for file changes, run `yarn test:watch`.
+
+#### Integration tests
+
+Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test using the collection runner.
+
+**Note: the default value for the baseUrl collection variable is 'localhost:3000'.** If you are running your server on a different port, update the variable before running the tests.
+
+### Run
+
+#### Development server
 
 The development server can be run in default mode by running `yarn run dev` or in watch mode by running `yarn run dev:watch`. When making file changes, it is recommended to run the server in watch mode, as it will restart the server with every change saved to typescript files.
 
 **Watch mode does not track changes to SQL files.** If you make a change to a .sql file, restart the server manually to serve the changes.
 
-### Running in production mode
+#### Production server
 
 The production server runs the javascript build using the process manager pm2. This allows for multiple instances of the server to run at once, and instances will automatically restart if an uncaught error crashes the application.
 
 1. Run `yarn build` to compile the typescript source code into javascript.
 2. Run `yarn start` to spin up the server. While the server is running, you may run `npx pm2 status` to monitor all instances.
 3. Run `yarn stop` to stop all instances and delete their processes.
-
-## Testing
-
-### Unit tests
-
-Run all unit tests by running `yarn test`. To test while watching for file changes, run `yarn test:watch`.
-
-### Integration tests
-
-Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test using the collection runner.
-
-**Note: the default value for the baseUrl collection variable is 'localhost:3000'.** If you are running your server on a different port, update the variable before running the tests.
