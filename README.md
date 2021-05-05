@@ -1,13 +1,15 @@
 # Budget API
 
-A REST API for a simple budget tracking application. Users can create multiple budgets and track their income and expenses across bank accounts and transaction categories. I designed this API to be coupled with a front end web or mobile application that could display transaction data using tables and charts.
+For the past few years, I've been tracking my income and expenses in a Google Sheets file for each year. I list each transaction in a monthly sheet and label it according to the type of transaction (Travel, Food, Rent, etc) and the account it is associated with. This has mostly worked well, but as the number of transactions grows throughout the year, calculating the current balance for each account and the total spent in each category becomes an incredibly expensive (i.e. slow) process for the front end of the application. In addition, migrating to a new Google Sheets file at the beginning of every year is incredibly time consuming. I wanted something more scalable.
+
+As a result, I built this REST API for a simple budget tracking application from scratch using Typescript, Express, and MySQL. Users can create multiple budgets and track their income and expenses across various bank accounts and transaction categories. I designed this API to be coupled with a front-end web or mobile application that could display transaction data using tables and charts. It still doesn't have all of the features of my Google Sheets files, but I plan to continue building it until it suits my needs. Because the API stores strictly budget data (instead of an entire Sheets file with cell size, formatting, etc.), it's my hope that this API will run faster and scale much more easily than my previous setup.
 
 ## Technology used
 
 - Typescript
 - NodeJS
 - Express (NodeJS web framework)
-- MySQL (Database)
+- MySQL (SQL Database)
 - JSON Web Tokens (Authentication)
 - Mocha, Chai, & Sinon (unit tests)
 - Postman (integration tests/documentation)
