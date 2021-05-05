@@ -43,7 +43,7 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 [![Budget API Database Schema](images/databaseSchema.jpg)](https://drawsql.app/shane-mcfadden/diagrams/budget-api)
 
-## Run the project locally
+## Run project locally
 
 NodeJS v14.0.0+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
