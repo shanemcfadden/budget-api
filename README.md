@@ -35,9 +35,13 @@ A REST API for a simple budget tracking application. Users can create multiple b
 
 [Budget API Documentation](https://documenter.getpostman.com/view/14663488/TzJuAdH2)
 
+[![Budget API Documentation](images/APIDocumentation.jpg)](https://documenter.getpostman.com/view/14663488/TzJuAdH2)
+
 ## Database schema
 
 [Budget API Database Schema](https://drawsql.app/shane-mcfadden/diagrams/budget-api)
+
+[![Budget API Database Schema](images/databaseSchema.jpg)](https://drawsql.app/shane-mcfadden/diagrams/budget-api)
 
 ## Run the project locally
 
