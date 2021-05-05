@@ -95,6 +95,8 @@ NodeJS v14.0.0+ and a mysql server instance are required to run the project loca
 
 Run all unit tests by running `yarn test`. To test while watching for file changes, run `yarn test:watch`.
 
+![Run unit tests](images/unitTests.gif)
+
 #### Integration tests
 
 Run integration tests by importing `integration-tests.postman_collection.json` into Postman. While the server is running on your local machine, run the collection's test using the collection runner.
