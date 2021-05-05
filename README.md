@@ -48,14 +48,14 @@ As a result, I built this REST API for a simple budget tracking application from
 
 ## Run project locally
 
-NodeJS v14.0.0+ and a mysql server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
+NodeJS v14.0.0+ and a MySQL server instance are required to run the project locally. Yarn package manager is also recommended, but not required. If not using yarn, replace all instances of `yarn` commands with `npm` commands.
 
 ### Build
 
 1. Clone the budget-api repository and navigate to the home directory.
 2. Run `yarn install` to install dependencies.
-3. Ensure that your local mysql server is running.
-4. Create a new database in your local mysql server called 'budget'.
+3. Ensure that your local MySQL server is running.
+4. Create a new database in your local MySQL server called 'budget'.
 5. If you plan to use a user other than root to connect to the database, be sure to grant said user SELECT, INSERT, UPDATE, DELETE, CREATE, and DROP privileges for the new database.
 
    ```sh
@@ -80,8 +80,8 @@ NodeJS v14.0.0+ and a mysql server instance are required to run the project loca
    JWT_SECRET=<random string>
    MYSQL_DATABASE=budget
    MYSQL_HOST=localhost
-   MYSQL_PASSWORD=<local mysql password>
-   MYSQL_USER=<local mysql user>
+   MYSQL_PASSWORD=<local MySQL password>
+   MYSQL_USER=<local MySQL user>
    PORT=3000
    ```
 
