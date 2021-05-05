@@ -89,7 +89,7 @@ NodeJS v14.0.0+ and a MySQL server instance are required to run the project loca
 
    ```sh
    App is listening on port 3000
-   Connected to MySql server
+   Connected to MySQL database
    ```
 
 ### Test
