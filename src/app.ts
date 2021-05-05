@@ -35,7 +35,7 @@ app.listen(PORT, () => {
   console.log(`App is listening on port ${PORT}`);
   db.query("SHOW TABLES;")
     .then(() => {
-      console.log("Connected to MySql server");
+      console.log("Connected to MySQL database");
     })
-    .catch((err) => console.log("MySql connection error:", err));
+    .catch((err) => console.log("MySQL connection error:", err));
 });
