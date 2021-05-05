@@ -101,6 +101,8 @@ Run integration tests by importing `integration-tests.postman_collection.json` i
 
 **Note: the default value for the baseUrl collection variable is 'localhost:3000'.** If you are running your server on a different port, update the variable before running the tests.
 
+![Run integration tests](images/integrationTests.gif)
+
 ### Run
 
 #### Development server
