@@ -28,6 +28,7 @@ As a result, I built this REST API for a simple budget tracking application from
 
 - Build front-end web application to connect to this API
 - Include routes that allow users to get transactions by account/category/subcategory/date. That would allow users with larger budgets to only retrieve the data they need for a given session.
+- Allow users to add transfers between accounts.
 - Allow users to add other authorized users to view/edit their budgets.
 - Allow users to track predicted monthly income/expenses by category.
 - Write integration tests for unhappy paths.
